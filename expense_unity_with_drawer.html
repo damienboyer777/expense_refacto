@@ -1,0 +1,489 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --u-blue: #0057FF; --u-blue-light: #EBF1FF; --u-blue-hover: #0047D4;
+  --u-text: #1A1A2E; --u-text-secondary: #6B7280; --u-text-tertiary: #9CA3AF;
+  --u-border: #E5E7EB; --u-border-strong: #D1D5DB;
+  --u-bg: #F9FAFB; --u-white: #FFFFFF; --u-radius: 6px; --u-radius-sm: 4px;
+  --u-green: #059669; --u-green-bg: #ECFDF5;
+  --u-orange: #D97706; --u-orange-bg: #FFFBEB;
+  --u-red: #DC2626; --u-red-bg: #FEF2F2;
+  --u-gray: #6B7280; --u-gray-bg: #F3F4F6;
+}
+body { font-family: 'Inter', -apple-system, sans-serif; font-size: 13px; color: var(--u-text); }
+
+.shell { display: flex; height: 100vh; min-height: 640px; background: var(--u-bg); overflow: hidden; }
+
+/* Sidebar */
+.sidebar { width: 196px; background: var(--u-white); border-right: 1px solid var(--u-border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-logo { padding: 14px 12px; border-bottom: 1px solid var(--u-border); }
+.logo { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--u-blue); }
+.logo-dot { width: 22px; height: 22px; background: var(--u-blue); border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.sidebar-item { display: flex; align-items: center; gap: 8px; padding: 7px 12px; font-size: 12px; color: var(--u-text-secondary); cursor: pointer; }
+.sidebar-item:hover { background: var(--u-bg); color: var(--u-text); }
+.sidebar-item.active { background: var(--u-blue-light); color: var(--u-blue); font-weight: 500; }
+.sidebar-label { font-size: 10px; font-weight: 600; color: var(--u-text-tertiary); letter-spacing: 0.07em; text-transform: uppercase; padding: 10px 12px 4px; }
+
+/* Main */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.topbar { padding: 14px 20px; border-bottom: 1px solid var(--u-border); background: var(--u-white); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.page-title { font-size: 17px; font-weight: 600; }
+.btn-primary { background: var(--u-blue); color: white; border: none; border-radius: var(--u-radius); padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.btn-primary:hover { background: var(--u-blue-hover); }
+.btn-secondary { background: var(--u-white); color: var(--u-text); border: 1px solid var(--u-border-strong); border-radius: var(--u-radius); padding: 6px 12px; font-size: 12px; cursor: pointer; }
+.btn-secondary:hover { background: var(--u-bg); }
+.btn-ghost { background: transparent; color: var(--u-text-secondary); border: none; border-radius: var(--u-radius); padding: 6px 10px; font-size: 12px; cursor: pointer; }
+.btn-ghost:hover { background: var(--u-bg); color: var(--u-text); }
+
+/* Summary strip */
+.summary-strip { padding: 10px 20px; background: var(--u-white); border-bottom: 1px solid var(--u-border); display: flex; gap: 20px; align-items: center; flex-shrink: 0; }
+.strip-item { display: flex; align-items: baseline; gap: 6px; }
+.strip-label { font-size: 11px; color: var(--u-text-secondary); }
+.strip-value { font-size: 13px; font-weight: 600; }
+.strip-divider { width: 1px; height: 16px; background: var(--u-border); }
+
+/* Drop zone */
+.dropzone { margin: 12px 20px 0; border: 1.5px dashed var(--u-border-strong); border-radius: var(--u-radius); padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--u-white); flex-shrink: 0; transition: all 0.15s; }
+.dropzone:hover { border-color: var(--u-blue); background: var(--u-blue-light); }
+
+/* Toolbar */
+.toolbar { padding: 10px 20px; border-bottom: 1px solid var(--u-border); background: var(--u-white); display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.filter-chip { display: flex; align-items: center; gap: 4px; border: 1px solid var(--u-border-strong); border-radius: var(--u-radius-sm); padding: 4px 8px; font-size: 11px; color: var(--u-text-secondary); cursor: pointer; background: var(--u-white); }
+.filter-chip.active { border-color: var(--u-blue); color: var(--u-blue); background: var(--u-blue-light); }
+
+/* Content area: table + drawer side by side */
+.content-area { flex: 1; display: flex; overflow: hidden; }
+.table-area { flex: 1; overflow-y: auto; padding: 12px 20px; min-width: 0; }
+table { width: 100%; border-collapse: collapse; background: var(--u-white); border: 1px solid var(--u-border); border-radius: var(--u-radius); overflow: hidden; font-size: 12px; }
+thead th { padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 600; color: var(--u-text-secondary); letter-spacing: 0.04em; text-transform: uppercase; border-bottom: 1px solid var(--u-border); background: var(--u-bg); white-space: nowrap; }
+th.num, td.num { text-align: right; }
+tbody tr { border-bottom: 1px solid var(--u-border); cursor: pointer; transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--u-bg); }
+tbody tr.selected { background: var(--u-blue-light); }
+td { padding: 9px 10px; color: var(--u-text); vertical-align: middle; }
+td.muted { color: var(--u-text-secondary); }
+.td-check { width: 28px; }
+input[type=checkbox] { width: 13px; height: 13px; cursor: pointer; accent-color: var(--u-blue); }
+.badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.badge-pending { background: var(--u-orange-bg); color: var(--u-orange); }
+.badge-validated { background: var(--u-green-bg); color: var(--u-green); }
+.badge-rejected { background: var(--u-red-bg); color: var(--u-red); }
+.badge-draft { background: var(--u-gray-bg); color: var(--u-gray); }
+.badge-auto { background: var(--u-blue-light); color: var(--u-blue); font-size: 10px; }
+
+/* Footer */
+.table-footer { padding: 9px 20px; border-top: 1px solid var(--u-border); background: var(--u-white); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--u-text-secondary); flex-shrink: 0; }
+.footer-total { font-size: 12px; font-weight: 600; color: var(--u-text); }
+.pagination { display: flex; gap: 3px; }
+.page-btn { width: 22px; height: 22px; border: 1px solid var(--u-border); border-radius: var(--u-radius-sm); background: var(--u-white); font-size: 11px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--u-text-secondary); }
+.page-btn.active { background: var(--u-blue); color: white; border-color: var(--u-blue); }
+
+/* DRAWER */
+.drawer { width: 0; border-left: 1px solid var(--u-border); background: var(--u-white); display: flex; flex-direction: column; overflow: hidden; transition: width 0.2s ease; flex-shrink: 0; }
+.drawer.open { width: 340px; }
+.drawer-header { padding: 14px 16px; border-bottom: 1px solid var(--u-border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.drawer-title { font-size: 14px; font-weight: 600; color: var(--u-text); }
+.drawer-close { width: 26px; height: 26px; border: 1px solid var(--u-border); border-radius: var(--u-radius-sm); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--u-text-secondary); font-size: 14px; }
+.drawer-close:hover { background: var(--u-bg); }
+.drawer-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.drawer-footer { padding: 12px 16px; border-top: 1px solid var(--u-border); display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+
+/* Form elements */
+.field { display: flex; flex-direction: column; gap: 4px; }
+.field label { font-size: 11px; font-weight: 600; color: var(--u-text); }
+.field input, .field select, .field textarea { border: 1px solid var(--u-border-strong); border-radius: var(--u-radius); padding: 7px 10px; font-size: 12px; color: var(--u-text); background: var(--u-white); width: 100%; font-family: inherit; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--u-blue); box-shadow: 0 0 0 3px rgba(0,87,255,0.1); }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field-hint { font-size: 10px; color: var(--u-text-tertiary); margin-top: 2px; }
+
+/* Upload zone in drawer */
+.upload-zone { border: 1.5px dashed var(--u-border-strong); border-radius: var(--u-radius); padding: 16px; text-align: center; cursor: pointer; background: var(--u-bg); transition: all 0.15s; }
+.upload-zone:hover { border-color: var(--u-blue); background: var(--u-blue-light); }
+.upload-zone.has-file { border-color: var(--u-green); background: var(--u-green-bg); }
+.upload-icon { width: 32px; height: 32px; background: var(--u-blue-light); border-radius: var(--u-radius); display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; }
+.uploaded-file { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--u-white); border: 1px solid var(--u-border); border-radius: var(--u-radius); }
+.file-icon { width: 28px; height: 28px; background: var(--u-red-bg); border-radius: var(--u-radius-sm); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--u-red); font-weight: 700; flex-shrink: 0; }
+.file-name { font-size: 11px; font-weight: 500; color: var(--u-text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-size { font-size: 10px; color: var(--u-text-tertiary); }
+.file-remove { background: none; border: none; color: var(--u-text-tertiary); cursor: pointer; font-size: 14px; padding: 2px 4px; border-radius: 3px; }
+.file-remove:hover { color: var(--u-red); background: var(--u-red-bg); }
+
+/* Transport auto-badge */
+.auto-rule { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--u-blue-light); border-radius: var(--u-radius); margin-top: 2px; }
+.auto-rule-text { font-size: 11px; color: var(--u-blue); }
+.section-divider { font-size: 10px; font-weight: 600; color: var(--u-text-tertiary); letter-spacing: 0.05em; text-transform: uppercase; padding-bottom: 4px; border-bottom: 1px solid var(--u-border); }
+</style>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo">
+        <div class="logo-dot">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="white"><rect x="1" y="1" width="4" height="4" rx="1"/><rect x="7" y="1" width="4" height="4" rx="1"/><rect x="1" y="7" width="4" height="4" rx="1"/><rect x="7" y="7" width="4" height="4" rx="1"/></svg>
+        </div>
+        PayFit
+      </div>
+    </div>
+    <div style="padding:6px 8px;border-bottom:1px solid var(--u-border);">
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:var(--u-bg);border-radius:var(--u-radius);font-size:11px;color:var(--u-text-tertiary);">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+        Rechercher...
+      </div>
+    </div>
+    <div style="flex:1;padding:4px 0;">
+      <div class="sidebar-label">Daily tools</div>
+      <div class="sidebar-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+        Dashboard
+      </div>
+      <div class="sidebar-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 100 8A4 4 0 008 2zM2 14s1-3 6-3 6 3 6 3"/></svg>
+        Payslip
+      </div>
+      <div class="sidebar-item active">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6M5 10h4"/></svg>
+        Expenses
+      </div>
+      <div class="sidebar-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Time off
+      </div>
+    </div>
+    <div style="padding:10px 12px;border-top:1px solid var(--u-border);display:flex;align-items:center;gap:8px;">
+      <div style="width:24px;height:24px;background:var(--u-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700;flex-shrink:0;">MD</div>
+      <div><div style="font-weight:500;font-size:11px;">Damien M.</div><div style="font-size:10px;color:var(--u-text-tertiary);">Design Manager</div></div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">Expenses</div>
+      <button class="btn-primary" onclick="openDrawer()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v10M3 8h10"/></svg>
+        Add expense
+      </button>
+    </div>
+
+    <div class="summary-strip">
+      <div class="strip-item">
+        <span class="strip-label">This month</span>
+        <span class="strip-value" style="color:var(--u-blue);">342,50 €</span>
+      </div>
+      <div class="strip-divider"></div>
+      <div class="strip-item">
+        <span class="strip-label">YTD</span>
+        <span class="strip-value">1 240 €</span>
+        <span style="font-size:11px;color:var(--u-text-tertiary);">/ 3 000 €</span>
+      </div>
+      <div class="strip-divider"></div>
+      <div class="strip-item">
+        <span class="strip-label">Pending</span>
+        <span class="strip-value" style="color:var(--u-orange);">2</span>
+      </div>
+    </div>
+
+    <div class="dropzone" ondragover="event.preventDefault();this.style.borderColor='var(--u-blue)'" ondragleave="this.style.borderColor=''" ondrop="handleListDrop(event)">
+      <div style="width:28px;height:28px;background:var(--u-blue-light);border-radius:var(--u-radius);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0057FF" stroke-width="1.5"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:500;">Drop receipts here — multiple files at once</div>
+        <div style="font-size:10px;color:var(--u-text-tertiary);">PDF, JPEG, PNG</div>
+      </div>
+      <button class="btn-secondary" style="margin-left:auto;font-size:11px;">Browse</button>
+    </div>
+
+    <div class="toolbar" style="margin-top:10px;">
+      <button class="filter-chip active">
+        <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+        Filter
+      </button>
+      <div class="filter-chip">Expense Type</div>
+      <div class="filter-chip">Date</div>
+      <div class="filter-chip">Status</div>
+      <select style="margin-left:auto;font-size:11px;border:1px solid var(--u-border-strong);border-radius:var(--u-radius-sm);padding:4px 8px;color:var(--u-text-secondary);background:var(--u-white);">
+        <option>March 2026</option><option>February 2026</option><option>January 2026</option>
+      </select>
+    </div>
+
+    <div class="content-area">
+      <div class="table-area">
+        <table>
+          <thead>
+            <tr>
+              <th class="td-check"><input type="checkbox"/></th>
+              <th>Expense Type ↕</th>
+              <th>Sub Type ↕</th>
+              <th>Date ↕</th>
+              <th class="num">Amount ↕</th>
+              <th>Status</th>
+              <th>VAT</th>
+            </tr>
+          </thead>
+          <tbody id="expense-tbody">
+            <tr onclick="rowClick(this,'Hôtel Paris — Lyon','Hotel / Logement','275,64 €','pending')">
+              <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+              <td>🏨 Hotel / Logement</td><td class="muted">WFH</td><td class="muted">13 sept. 2025</td>
+              <td class="num">275,64 €</td><td><span class="badge badge-pending">En attente</span></td><td><span class="badge badge-auto">Auto 20%</span></td>
+            </tr>
+            <tr onclick="rowClick(this,'MacBook Stand','Équipement','123 €','validated')">
+              <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+              <td>🖥️ Équipement</td><td class="muted">N/A</td><td class="muted">26 juin 2025</td>
+              <td class="num">123 €</td><td><span class="badge badge-validated">Validé</span></td><td><span class="badge badge-auto">Auto 20%</span></td>
+            </tr>
+            <tr onclick="rowClick(this,'Abonnement RATP','Transport domicile','132,00 €','pending')">
+              <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+              <td>🚌 Transport domicile</td><td class="muted">Abonnement</td><td class="muted">1 mars 2026</td>
+              <td class="num">132,00 €</td><td><span class="badge badge-pending">En attente</span></td><td><span class="badge badge-auto">50% auto</span></td>
+            </tr>
+            <tr onclick="rowClick(this,'Déjeuner client','Repas','68,50 €','draft')">
+              <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+              <td>🍽️ Repas</td><td class="muted">Client</td><td class="muted">15 mars 2026</td>
+              <td class="num">68,50 €</td><td><span class="badge badge-draft">Brouillon</span></td><td><span class="badge badge-auto">Auto 10%</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- DRAWER -->
+      <div class="drawer" id="drawer">
+        <div class="drawer-header">
+          <div class="drawer-title" id="drawer-title">Add expense</div>
+          <button class="drawer-close" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="drawer-body" id="drawer-body">
+          <!-- Add expense form -->
+          <div id="form-add">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div class="section-divider">Justificatif</div>
+
+              <div class="upload-zone" id="upload-zone" ondragover="event.preventDefault();this.classList.add('has-file')" ondragleave="this.classList.remove('has-file')" ondrop="handleDrawerDrop(event)">
+                <div class="upload-icon">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#0057FF" stroke-width="1.5"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+                </div>
+                <div style="font-size:12px;font-weight:500;color:var(--u-text);">Déposer le justificatif</div>
+                <div style="font-size:10px;color:var(--u-text-tertiary);margin-top:2px;">PDF, JPEG, PNG — max 10 MB</div>
+              </div>
+              <div id="file-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+
+              <div class="section-divider" style="margin-top:4px;">Détails de la dépense</div>
+
+              <div class="field">
+                <label>Expense type *</label>
+                <select id="expense-type" onchange="handleTypeChange(this.value)">
+                  <option value="">Sélectionner...</option>
+                  <option value="transport">🚌 Transport domicile-travail</option>
+                  <option value="transport-pro">🚆 Transport professionnel</option>
+                  <option value="repas">🍽️ Repas</option>
+                  <option value="hotel">🏨 Hotel / Logement</option>
+                  <option value="equipement">🖥️ Équipement</option>
+                  <option value="autre">📄 Autre</option>
+                </select>
+              </div>
+
+              <div id="transport-rule" style="display:none;">
+                <div class="auto-rule">
+                  <span class="auto-rule-text">🎯 Règle entreprise : remboursement à 50% appliqué automatiquement</span>
+                  <span class="badge badge-auto">Auto</span>
+                </div>
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label>Date *</label>
+                  <input type="date" value="2026-03-27"/>
+                </div>
+                <div class="field">
+                  <label>Montant TTC *</label>
+                  <input type="text" placeholder="0,00 €" id="amount-input" oninput="updateVAT()"/>
+                </div>
+              </div>
+
+              <div id="vat-row" style="display:none;">
+                <div class="field">
+                  <label>TVA récupérable</label>
+                  <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="text" id="vat-amount" style="flex:1;" readonly/>
+                    <span class="badge badge-auto" style="white-space:nowrap;">Calculée auto</span>
+                  </div>
+                  <div class="field-hint">Taux appliqué automatiquement selon la catégorie</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Description</label>
+                <input type="text" placeholder="Ex : Déjeuner avec client Acme Corp"/>
+              </div>
+
+              <div class="field">
+                <label>Projet (optionnel)</label>
+                <select>
+                  <option value="">Aucun projet</option>
+                  <option>Projet Alpha</option>
+                  <option>Projet Beta</option>
+                  <option>Commercial</option>
+                </select>
+                <div class="field-hint">Requis pour les projets avec suivi budgétaire</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="drawer-footer">
+          <button class="btn-ghost" onclick="closeDrawer()">Annuler</button>
+          <button class="btn-primary" onclick="submitExpense()" style="font-size:12px;padding:7px 16px;">Soumettre la note</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-footer">
+      <div>1–4 sur 27 expenses</div>
+      <div class="footer-total"><span style="font-weight:400;color:var(--u-text-secondary);margin-right:4px;">Total mars</span>342,50 €</div>
+      <div class="pagination">
+        <button class="page-btn">‹</button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const vatRates = { transport: 0, 'transport-pro': 0.2, repas: 0.1, hotel: 0.2, equipement: 0.2, autre: 0.2 };
+
+function openDrawer() {
+  const d = document.getElementById('drawer');
+  document.getElementById('drawer-title').textContent = 'Add expense';
+  document.getElementById('form-add').style.display = '';
+  d.classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+}
+
+function handleTypeChange(val) {
+  const rule = document.getElementById('transport-rule');
+  const vatRow = document.getElementById('vat-row');
+  rule.style.display = val === 'transport' ? '' : 'none';
+  vatRow.style.display = val && val !== 'transport' ? '' : 'none';
+  updateVAT();
+}
+
+function updateVAT() {
+  const type = document.getElementById('expense-type').value;
+  const raw = document.getElementById('amount-input').value.replace(/[^0-9,\.]/g,'').replace(',','.');
+  const amount = parseFloat(raw) || 0;
+  const rate = vatRates[type] || 0;
+  const vat = (amount * rate / (1 + rate)).toFixed(2).replace('.', ',');
+  document.getElementById('vat-amount').value = rate > 0 ? `${vat} € (${Math.round(rate*100)}%)` : '—';
+}
+
+function handleDrawerDrop(e) {
+  e.preventDefault();
+  const zone = document.getElementById('upload-zone');
+  zone.classList.remove('has-file');
+  const files = e.dataTransfer.files;
+  const list = document.getElementById('file-list');
+  for (const f of files) {
+    const div = document.createElement('div');
+    div.className = 'uploaded-file';
+    const ext = f.name.split('.').pop().toUpperCase().slice(0,3);
+    const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+' MB' : Math.round(f.size/1024)+' KB';
+    div.innerHTML = `
+      <div class="file-icon">${ext}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="file-name">${f.name}</div>
+        <div class="file-size">${size}</div>
+      </div>
+      <button class="file-remove" onclick="this.closest('.uploaded-file').remove()">✕</button>`;
+    list.appendChild(div);
+  }
+  zone.style.display = 'none';
+}
+
+function handleListDrop(e) {
+  e.preventDefault();
+  const tbody = document.getElementById('expense-tbody');
+  const files = e.dataTransfer.files;
+  for (const f of files) {
+    const tr = document.createElement('tr');
+    tr.onclick = function(){ rowClick(this, f.name.replace(/\.[^.]+$/,''), 'À catégoriser', '—', 'draft'); };
+    tr.innerHTML = `
+      <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td>📄 ${f.name.replace(/\.[^.]+$/,'')}</td><td class="muted">—</td><td class="muted">Aujourd'hui</td>
+      <td class="num">—</td><td><span class="badge badge-draft">À catégoriser</span></td><td><span style="font-size:10px;color:var(--u-text-tertiary);">Auto</span></td>`;
+    tbody.appendChild(tr);
+  }
+}
+
+function rowClick(tr, name, type, amount, status) {
+  document.querySelectorAll('#expense-tbody tr').forEach(r => r.classList.remove('selected'));
+  tr.classList.add('selected');
+  openDrawer();
+  document.getElementById('drawer-title').textContent = name;
+  // Switch to detail view
+  const body = document.getElementById('form-add');
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--u-bg);border-radius:var(--u-radius);">
+        <div style="width:36px;height:36px;background:var(--u-blue-light);border-radius:var(--u-radius);display:flex;align-items:center;justify-content:center;font-size:18px;">🏨</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;">${name}</div>
+          <div style="font-size:11px;color:var(--u-text-secondary);">${type} · ${amount}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <span class="badge ${status==='pending'?'badge-pending':status==='validated'?'badge-validated':'badge-draft'}">${status==='pending'?'En attente de validation':status==='validated'?'Validé':'Brouillon'}</span>
+      </div>
+      <button class="btn-primary" style="font-size:12px;width:100%;justify-content:center;">Relancer la demande</button>
+      <div class="section-divider">Justificatif</div>
+      <div class="uploaded-file">
+        <div class="file-icon">PDF</div>
+        <div style="flex:1;min-width:0;">
+          <div class="file-name">Recu_${name.replace(/ /g,'_')}.pdf</div>
+          <div class="file-size">245 KB · Ajouté il y a 2 jours</div>
+        </div>
+        <button style="background:none;border:1px solid var(--u-border);border-radius:var(--u-radius-sm);padding:3px 8px;font-size:10px;cursor:pointer;color:var(--u-text-secondary);">↓</button>
+      </div>
+      <div class="section-divider">Activité</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;">
+          <div style="width:24px;height:24px;background:#E9D5FF;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#7C3AED;flex-shrink:0;">MD</div>
+          <div>
+            <div style="font-size:11px;font-weight:500;">Margaux D. <span style="font-weight:400;color:var(--u-text-tertiary);">a demandé la validation</span></div>
+            <div style="font-size:10px;color:var(--u-text-tertiary);margin-top:1px;">Il y a 2 jours</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:24px;height:24px;background:var(--u-blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--u-blue);flex-shrink:0;">DM</div>
+          <div style="flex:1;">
+            <textarea style="width:100%;border:1px solid var(--u-border);border-radius:var(--u-radius);padding:6px 8px;font-size:11px;font-family:inherit;resize:none;height:56px;" placeholder="Ajouter un commentaire..."></textarea>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  document.querySelector('.drawer-footer').innerHTML = `<button class="btn-ghost" onclick="closeDrawer()">Fermer</button>`;
+}
+
+function submitExpense() {
+  const tbody = document.getElementById('expense-tbody');
+  const type = document.getElementById('expense-type');
+  const amount = document.getElementById('amount-input').value;
+  const typeText = type.options[type.selectedIndex]?.text || '📄 Nouvelle note';
+  if (!type.value) { type.style.borderColor = 'var(--u-red)'; return; }
+  const tr = document.createElement('tr');
+  tr.onclick = function(){ rowClick(this, typeText.replace(/^[^\s]+ /,''), typeText.replace(/^[^\s]+ /,''), amount||'—', 'pending'); };
+  tr.innerHTML = `
+    <td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+    <td>${typeText}</td><td class="muted">—</td><td class="muted">Aujourd'hui</td>
+    <td class="num">${amount||'—'}</td><td><span class="badge badge-pending">En attente</span></td><td><span class="badge badge-auto">Auto</span></td>`;
+  tbody.prepend(tr);
+  closeDrawer();
+}
+</script>
