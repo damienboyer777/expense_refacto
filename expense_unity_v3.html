@@ -1,0 +1,631 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --u-blue:#0057FF; --u-blue-light:#EBF1FF; --u-blue-hover:#0047D4;
+  --u-text:#1A1A2E; --u-text-2:#6B7280; --u-text-3:#9CA3AF;
+  --u-border:#E5E7EB; --u-border-s:#D1D5DB;
+  --u-bg:#F9FAFB; --u-w:#FFFFFF; --u-r:6px; --u-rs:4px;
+  --u-green:#059669; --u-green-bg:#ECFDF5;
+  --u-orange:#D97706; --u-orange-bg:#FFFBEB;
+  --u-red:#DC2626; --u-red-bg:#FEF2F2;
+  --u-gray:#6B7280; --u-gray-bg:#F3F4F6;
+}
+body { font-family:'Inter',-apple-system,sans-serif; font-size:13px; color:var(--u-text); }
+.shell { display:flex; height:100vh; min-height:640px; background:var(--u-bg); overflow:hidden; }
+
+/* Sidebar */
+.sb { width:192px; background:var(--u-w); border-right:1px solid var(--u-border); display:flex; flex-direction:column; flex-shrink:0; }
+.sb-logo { padding:14px 12px; border-bottom:1px solid var(--u-border); display:flex; align-items:center; gap:6px; font-weight:700; font-size:14px; color:var(--u-blue); }
+.sb-dot { width:22px; height:22px; background:var(--u-blue); border-radius:4px; display:flex; align-items:center; justify-content:center; }
+.sb-lbl { font-size:10px; font-weight:600; color:var(--u-text-3); letter-spacing:.07em; text-transform:uppercase; padding:10px 12px 4px; }
+.sb-item { display:flex; align-items:center; gap:8px; padding:7px 12px; font-size:12px; color:var(--u-text-2); cursor:pointer; }
+.sb-item:hover { background:var(--u-bg); color:var(--u-text); }
+.sb-item.active { background:var(--u-blue-light); color:var(--u-blue); font-weight:500; }
+
+/* Main */
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+.topbar { padding:13px 20px; border-bottom:1px solid var(--u-border); background:var(--u-w); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; gap:12px; }
+.page-title { font-size:17px; font-weight:600; }
+.top-right { display:flex; align-items:center; gap:8px; }
+
+/* Search */
+.search-wrap { position:relative; }
+.search-wrap input { border:1px solid var(--u-border-s); border-radius:var(--u-r); padding:6px 10px 6px 28px; font-size:12px; color:var(--u-text); background:var(--u-w); width:200px; font-family:inherit; }
+.search-wrap input:focus { outline:none; border-color:var(--u-blue); box-shadow:0 0 0 3px rgba(0,87,255,.1); }
+.search-icon { position:absolute; left:8px; top:50%; transform:translateY(-50%); color:var(--u-text-3); pointer-events:none; }
+
+.btn-primary { background:var(--u-blue); color:white; border:none; border-radius:var(--u-r); padding:7px 14px; font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:5px; }
+.btn-primary:hover { background:var(--u-blue-hover); }
+.btn-secondary { background:var(--u-w); color:var(--u-text); border:1px solid var(--u-border-s); border-radius:var(--u-r); padding:6px 12px; font-size:12px; cursor:pointer; }
+.btn-secondary:hover { background:var(--u-bg); }
+.btn-ghost { background:transparent; color:var(--u-text-2); border:none; border-radius:var(--u-r); padding:6px 10px; font-size:12px; cursor:pointer; }
+.btn-ghost:hover { background:var(--u-bg); }
+.btn-link { background:none; border:none; color:var(--u-blue); font-size:12px; cursor:pointer; padding:0; font-family:inherit; }
+.btn-link:hover { text-decoration:underline; }
+
+/* Summary */
+.sum-strip { padding:10px 20px; background:var(--u-w); border-bottom:1px solid var(--u-border); display:flex; gap:20px; align-items:center; flex-shrink:0; }
+.sum-item { display:flex; align-items:baseline; gap:5px; }
+.sum-lbl { font-size:11px; color:var(--u-text-2); }
+.sum-val { font-size:13px; font-weight:600; }
+.sum-div { width:1px; height:14px; background:var(--u-border); }
+
+/* Dropzone */
+.dz { margin:12px 20px 0; border:1.5px dashed var(--u-border-s); border-radius:var(--u-r); padding:10px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; background:var(--u-w); flex-shrink:0; transition:all .15s; }
+.dz:hover { border-color:var(--u-blue); background:var(--u-blue-light); }
+.dz-ico { width:28px; height:28px; background:var(--u-blue-light); border-radius:var(--u-r); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+/* Toolbar */
+.toolbar { padding:8px 20px; border-bottom:1px solid var(--u-border); background:var(--u-w); display:flex; align-items:center; gap:6px; flex-shrink:0; flex-wrap:wrap; }
+.chip { display:inline-flex; align-items:center; gap:4px; border:1px solid var(--u-border-s); border-radius:var(--u-rs); padding:4px 8px; font-size:11px; color:var(--u-text-2); cursor:pointer; background:var(--u-w); user-select:none; }
+.chip:hover { background:var(--u-bg); }
+.chip.active { border-color:var(--u-blue); color:var(--u-blue); background:var(--u-blue-light); }
+.chip .x { margin-left:3px; opacity:.6; font-size:10px; }
+
+/* Content area */
+.content-area { flex:1; display:flex; overflow:hidden; }
+.table-area { flex:1; overflow-y:auto; padding:12px 20px; min-width:0; }
+
+/* Table */
+table { width:100%; border-collapse:collapse; background:var(--u-w); border:1px solid var(--u-border); border-radius:var(--u-r); font-size:12px; }
+thead th { padding:8px 10px; text-align:left; font-size:10px; font-weight:600; color:var(--u-text-2); letter-spacing:.04em; text-transform:uppercase; border-bottom:1px solid var(--u-border); background:var(--u-bg); white-space:nowrap; cursor:pointer; user-select:none; }
+th.num, td.num { text-align:right; }
+th:hover { color:var(--u-text); }
+th .sort { opacity:.4; font-size:9px; margin-left:3px; }
+th.sorted .sort { opacity:1; color:var(--u-blue); }
+tbody tr { border-bottom:1px solid var(--u-border); cursor:pointer; transition:background .1s; }
+tbody tr:last-child { border-bottom:none; }
+tbody tr:hover { background:var(--u-bg); }
+tbody tr.selected-row { background:var(--u-blue-light); }
+td { padding:9px 10px; color:var(--u-text); vertical-align:middle; }
+td.muted { color:var(--u-text-2); }
+.td-ck { width:28px; }
+input[type=checkbox] { width:13px; height:13px; cursor:pointer; accent-color:var(--u-blue); }
+
+/* Badges */
+.badge { display:inline-flex; align-items:center; font-size:10px; font-weight:500; padding:2px 7px; border-radius:99px; white-space:nowrap; }
+.b-pending { background:var(--u-orange-bg); color:var(--u-orange); }
+.b-validated { background:var(--u-green-bg); color:var(--u-green); }
+.b-rejected { background:var(--u-red-bg); color:var(--u-red); }
+.b-draft { background:var(--u-gray-bg); color:var(--u-gray); }
+.b-auto { background:var(--u-blue-light); color:var(--u-blue); }
+
+/* Empty state */
+.empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 32px; text-align:center; flex:1; }
+.es-icon { width:48px; height:48px; border-radius:50%; background:var(--u-bg); border:1px solid var(--u-border); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+.es-title { font-size:14px; font-weight:600; color:var(--u-text); margin-bottom:6px; }
+.es-sub { font-size:12px; color:var(--u-text-2); max-width:280px; line-height:1.6; margin-bottom:16px; }
+
+/* Error state */
+.error-icon { width:48px; height:48px; border-radius:50%; background:#FEF2F2; border:1px solid #FECACA; display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+
+/* Footer */
+.tfoot { padding:9px 20px; border-top:1px solid var(--u-border); background:var(--u-w); display:flex; align-items:center; justify-content:space-between; font-size:11px; color:var(--u-text-2); flex-shrink:0; }
+.pager { display:flex; gap:3px; }
+.pg-btn { width:22px; height:22px; border:1px solid var(--u-border); border-radius:var(--u-rs); background:var(--u-w); font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--u-text-2); }
+.pg-btn.active { background:var(--u-blue); color:white; border-color:var(--u-blue); }
+.pg-btn:hover:not(.active) { background:var(--u-bg); }
+
+/* Drawer */
+.drawer { width:0; border-left:1px solid var(--u-border); background:var(--u-w); display:flex; flex-direction:column; overflow:hidden; transition:width .2s ease; flex-shrink:0; }
+.drawer.open { width:336px; }
+.dr-head { padding:13px 16px; border-bottom:1px solid var(--u-border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.dr-title { font-size:13px; font-weight:600; }
+.dr-close { width:26px; height:26px; border:1px solid var(--u-border); border-radius:var(--u-rs); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--u-text-2); font-size:13px; }
+.dr-close:hover { background:var(--u-bg); }
+.dr-body { flex:1; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px; }
+.dr-foot { padding:11px 14px; border-top:1px solid var(--u-border); display:flex; gap:8px; justify-content:flex-end; flex-shrink:0; }
+
+/* Form */
+.field { display:flex; flex-direction:column; gap:4px; }
+.field label { font-size:11px; font-weight:600; color:var(--u-text); }
+.field input,.field select,.field textarea { border:1px solid var(--u-border-s); border-radius:var(--u-r); padding:7px 10px; font-size:12px; color:var(--u-text); background:var(--u-w); width:100%; font-family:inherit; }
+.field input:focus,.field select:focus,.field textarea:focus { outline:none; border-color:var(--u-blue); box-shadow:0 0 0 3px rgba(0,87,255,.1); }
+.field input.err { border-color:var(--u-red); }
+.field-err { font-size:10px; color:var(--u-red); margin-top:2px; }
+.field-hint { font-size:10px; color:var(--u-text-3); margin-top:2px; }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.sec-div { font-size:10px; font-weight:600; color:var(--u-text-3); letter-spacing:.05em; text-transform:uppercase; padding-bottom:4px; border-bottom:1px solid var(--u-border); }
+.auto-rule { display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:var(--u-blue-light); border-radius:var(--u-r); }
+.auto-rule-txt { font-size:11px; color:var(--u-blue); }
+
+/* Upload zone */
+.up-zone { border:1.5px dashed var(--u-border-s); border-radius:var(--u-r); padding:14px; text-align:center; cursor:pointer; transition:all .15s; }
+.up-zone:hover { border-color:var(--u-blue); background:var(--u-blue-light); }
+.up-file { display:flex; align-items:center; gap:8px; padding:7px 10px; background:var(--u-w); border:1px solid var(--u-border); border-radius:var(--u-r); }
+.up-file-ico { width:26px; height:26px; background:var(--u-red-bg); border-radius:var(--u-rs); display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:700; color:var(--u-red); flex-shrink:0; }
+.up-file-rm { background:none; border:none; color:var(--u-text-3); cursor:pointer; font-size:13px; padding:2px 4px; border-radius:3px; margin-left:auto; }
+.up-file-rm:hover { color:var(--u-red); }
+
+/* Toggle */
+.toggle { position:relative; width:32px; height:18px; flex-shrink:0; }
+.toggle input { opacity:0; width:0; height:0; }
+.tsl { position:absolute; cursor:pointer; inset:0; background:var(--u-border-s); border-radius:99px; transition:.2s; }
+.tsl:before { position:absolute; content:""; height:12px; width:12px; left:3px; bottom:3px; background:white; border-radius:50%; transition:.2s; }
+input:checked + .tsl { background:var(--u-blue); }
+input:checked + .tsl:before { transform:translateX(14px); }
+
+/* Filter dropdown */
+.filter-panel { position:absolute; top:100%; left:0; background:var(--u-w); border:1px solid var(--u-border-s); border-radius:var(--u-r); box-shadow:0 4px 16px rgba(0,0,0,.08); z-index:100; padding:8px; min-width:180px; margin-top:4px; }
+.filter-option { display:flex; align-items:center; gap:8px; padding:6px 8px; font-size:12px; cursor:pointer; border-radius:var(--u-rs); color:var(--u-text); }
+.filter-option:hover { background:var(--u-bg); }
+.filter-option input { flex-shrink:0; }
+.filter-anchor { position:relative; }
+</style>
+
+<div class="shell">
+  <!-- Sidebar -->
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-dot"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><rect x="1" y="1" width="4" height="4" rx="1"/><rect x="7" y="1" width="4" height="4" rx="1"/><rect x="1" y="7" width="4" height="4" rx="1"/><rect x="7" y="7" width="4" height="4" rx="1"/></svg></div>
+      PayFit
+    </div>
+    <div style="padding:6px 8px;border-bottom:1px solid var(--u-border);">
+      <div style="display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--u-bg);border-radius:var(--u-r);font-size:11px;color:var(--u-text-3);">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg> Rechercher...
+      </div>
+    </div>
+    <div style="flex:1;padding:4px 0;overflow-y:auto;">
+      <div class="sb-lbl">Daily tools</div>
+      <div class="sb-item"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg> Dashboard</div>
+      <div class="sb-item"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 100 8A4 4 0 008 2zM2 14s1-3 6-3 6 3 6 3"/></svg> Payslip</div>
+      <div class="sb-item active"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6M5 10h4"/></svg> Expenses</div>
+      <div class="sb-item"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg> Time off</div>
+    </div>
+    <div style="padding:10px 12px;border-top:1px solid var(--u-border);display:flex;align-items:center;gap:8px;">
+      <div style="width:24px;height:24px;background:var(--u-blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700;flex-shrink:0;">MD</div>
+      <div><div style="font-weight:500;font-size:11px;">Damien M.</div><div style="font-size:10px;color:var(--u-text-3);">Design Manager</div></div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="page-title">Expenses</div>
+      <div class="top-right">
+        <div class="search-wrap">
+          <svg class="search-icon" width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+          <input type="text" placeholder="Search expenses..." id="search-input" oninput="doSearch(this.value)"/>
+        </div>
+        <button class="btn-primary" onclick="openAdd()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v10M3 8h10"/></svg>
+          Add expense
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="sum-strip">
+      <div class="sum-item"><span class="sum-lbl">This month</span><span class="sum-val" style="color:var(--u-blue);">342,50 €</span></div>
+      <div class="sum-div"></div>
+      <div class="sum-item"><span class="sum-lbl">YTD</span><span class="sum-val">1 240 €</span><span style="font-size:11px;color:var(--u-text-3);">&nbsp;/ 3 000 €</span></div>
+      <div class="sum-div"></div>
+      <div class="sum-item"><span class="sum-lbl">Pending</span><span class="sum-val" style="color:var(--u-orange);" id="pending-count">2</span></div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <!-- View state switcher for demo -->
+        <select onchange="switchView(this.value)" style="font-size:11px;border:1px solid var(--u-border-s);border-radius:var(--u-rs);padding:4px 8px;color:var(--u-text-2);background:var(--u-w);">
+          <option value="list">Vue : liste</option>
+          <option value="empty">Vue : empty state</option>
+          <option value="error">Vue : erreur</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dropzone -->
+    <div class="dz" ondragover="event.preventDefault();this.style.borderColor='var(--u-blue)'" ondragleave="this.style.borderColor=''" ondrop="handleListDrop(event)">
+      <div class="dz-ico"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#0057FF" stroke-width="1.5"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg></div>
+      <div><div style="font-size:12px;font-weight:500;">Drop receipts — multiple files at once</div><div style="font-size:10px;color:var(--u-text-3);">PDF, JPEG, PNG</div></div>
+      <button class="btn-secondary" style="margin-left:auto;font-size:11px;padding:5px 10px;">Browse</button>
+    </div>
+
+    <!-- Toolbar with filters -->
+    <div class="toolbar" style="margin-top:10px;">
+      <div class="filter-anchor" id="fa-type">
+        <div class="chip" id="chip-type" onclick="toggleFilter('type')">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+          Expense type
+          <span class="sort">▾</span>
+        </div>
+        <div class="filter-panel" id="fp-type" style="display:none;">
+          <div class="filter-option" onclick="applyFilter('type','transport',this)"><input type="checkbox"/> 🚌 Transport</div>
+          <div class="filter-option" onclick="applyFilter('type','repas',this)"><input type="checkbox"/> 🍽️ Repas</div>
+          <div class="filter-option" onclick="applyFilter('type','hotel',this)"><input type="checkbox"/> 🏨 Hotel</div>
+          <div class="filter-option" onclick="applyFilter('type','equipement',this)"><input type="checkbox"/> 🖥️ Équipement</div>
+        </div>
+      </div>
+      <div class="filter-anchor" id="fa-status">
+        <div class="chip" id="chip-status" onclick="toggleFilter('status')">
+          Statut <span class="sort">▾</span>
+        </div>
+        <div class="filter-panel" id="fp-status" style="display:none;">
+          <div class="filter-option" onclick="applyFilter('status','pending',this)"><input type="checkbox"/> En attente</div>
+          <div class="filter-option" onclick="applyFilter('status','validated',this)"><input type="checkbox"/> Validé</div>
+          <div class="filter-option" onclick="applyFilter('status','draft',this)"><input type="checkbox"/> Brouillon</div>
+          <div class="filter-option" onclick="applyFilter('status','rejected',this)"><input type="checkbox"/> Refusé</div>
+        </div>
+      </div>
+      <div id="active-filters" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div style="margin-left:auto;">
+        <select id="month-select" style="font-size:11px;border:1px solid var(--u-border-s);border-radius:var(--u-rs);padding:4px 8px;color:var(--u-text-2);background:var(--u-w);" onchange="doSearch()">
+          <option>Mars 2026</option><option>Février 2026</option><option>Janvier 2026</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- TABLE VIEW -->
+      <div class="table-area" id="view-list">
+        <table id="main-table">
+          <thead>
+            <tr>
+              <th class="td-ck"><input type="checkbox" onchange="toggleAll(this)"/></th>
+              <th onclick="sortBy('type')" id="th-type">Expense type <span class="sort">↕</span></th>
+              <th onclick="sortBy('sub')" id="th-sub">Sub type <span class="sort">↕</span></th>
+              <th onclick="sortBy('date')" id="th-date">Date <span class="sort">↕</span></th>
+              <th class="num" onclick="sortBy('amount')" id="th-amount">Amount <span class="sort">↕</span></th>
+              <th onclick="sortBy('status')" id="th-status">Status <span class="sort">↕</span></th>
+              <th>VAT</th>
+            </tr>
+          </thead>
+          <tbody id="expense-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- EMPTY STATE -->
+      <div class="table-area" id="view-empty" style="display:none;display:none;">
+        <div class="empty-state">
+          <div class="es-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.5"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <div class="es-title">You don't have any requests yet</div>
+          <div class="es-sub">As soon as you have one, you will be able to follow and manage your expenses.</div>
+          <button class="btn-primary" onclick="switchView('list');document.querySelector('select').value='Vue : liste'">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v10M3 8h10"/></svg>
+            Add expense
+          </button>
+        </div>
+      </div>
+
+      <!-- ERROR STATE -->
+      <div class="table-area" id="view-error" style="display:none;">
+        <div class="empty-state">
+          <div class="error-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          </div>
+          <div class="es-title">Something went wrong</div>
+          <div class="es-sub">Please refresh the page or try logging in again. We've been notified of the issue and are working on fixing it as quickly as possible.</div>
+          <button class="btn-secondary" onclick="switchView('list');document.querySelector('select').value='Vue : liste'">Go to dashboard</button>
+        </div>
+      </div>
+
+      <!-- DRAWER -->
+      <div class="drawer" id="drawer">
+        <div class="dr-head">
+          <div class="dr-title" id="dr-title">Add expense</div>
+          <button class="dr-close" onclick="closeDrawer()">✕</button>
+        </div>
+        <div class="dr-body" id="dr-body"></div>
+        <div class="dr-foot" id="dr-foot"></div>
+      </div>
+    </div>
+
+    <div class="tfoot">
+      <div id="count-label">1–<span id="showing">4</span> sur 27 expenses</div>
+      <div style="font-size:12px;font-weight:600;color:var(--u-text);"><span style="font-weight:400;color:var(--u-text-2);margin-right:4px;">Total mars</span>342,50 €</div>
+      <div class="pager">
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">2</button>
+        <button class="pg-btn">3</button>
+        <button class="pg-btn">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const vatRates = {transport:0,'transport-pro':.2,repas:.1,hotel:.2,equipement:.2,autre:.2};
+const allData = [
+  {type:'🏨 Hotel / Logement',cat:'hotel',sub:'WFH',date:'2025-09-13',dateStr:'13 sept. 2025',amount:275.64,status:'pending',vat:'Auto 20%'},
+  {type:'🖥️ Équipement',cat:'equipement',sub:'N/A',date:'2025-06-26',dateStr:'26 juin 2025',amount:123,status:'validated',vat:'Auto 20%'},
+  {type:'🏨 Hotel / Logement',cat:'hotel',sub:'N/A',date:'2025-09-13',dateStr:'13 sept. 2025',amount:275.64,status:'validated',vat:'Auto 20%'},
+  {type:'🚌 Transport domicile',cat:'transport',sub:'Abonnement',date:'2026-03-01',dateStr:'1 mars 2026',amount:132,status:'pending',vat:'50% auto'},
+  {type:'🍽️ Repas',cat:'repas',sub:'Client',date:'2026-03-15',dateStr:'15 mars 2026',amount:68.5,status:'draft',vat:'Auto 10%'},
+  {type:'🖥️ Équipement',cat:'equipement',sub:'N/A',date:'2025-06-26',dateStr:'26 juin 2025',amount:123,status:'rejected',vat:'Auto 20%'},
+];
+
+let activeFilters = {type:[], status:[]};
+let sortKey = null, sortDir = 1;
+let searchVal = '';
+
+function fmtAmt(n){ return n.toFixed(2).replace('.',',') + ' €'; }
+function statusBadge(s){
+  const m = {pending:['b-pending','En attente'],validated:['b-validated','Validé'],draft:['b-draft','Brouillon'],rejected:['b-rejected','Refusé']};
+  return `<span class="badge ${m[s]?.[0]||'b-draft'}">${m[s]?.[1]||s}</span>`;
+}
+
+function renderTable(){
+  let rows = allData.filter(r => {
+    const matchType = !activeFilters.type.length || activeFilters.type.includes(r.cat);
+    const matchStatus = !activeFilters.status.length || activeFilters.status.includes(r.status);
+    const matchSearch = !searchVal || r.type.toLowerCase().includes(searchVal) || r.sub.toLowerCase().includes(searchVal);
+    return matchType && matchStatus && matchSearch;
+  });
+  if(sortKey){
+    rows.sort((a,b)=>{
+      let va=a[sortKey],vb=b[sortKey];
+      if(typeof va==='string') va=va.toLowerCase();
+      if(typeof vb==='string') vb=vb.toLowerCase();
+      return va<vb?-sortDir:va>vb?sortDir:0;
+    });
+  }
+  const tbody = document.getElementById('expense-tbody');
+  tbody.innerHTML = '';
+  rows.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="td-ck"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td>${r.type}</td>
+      <td class="muted">${r.sub}</td>
+      <td class="muted">${r.dateStr}</td>
+      <td class="num">${fmtAmt(r.amount)}</td>
+      <td>${statusBadge(r.status)}</td>
+      <td><span class="badge b-auto">${r.vat}</span></td>`;
+    tr.onclick = ()=>openDetail(r, tr);
+    tbody.appendChild(tr);
+  });
+  document.getElementById('showing').textContent = rows.length;
+}
+
+function sortBy(key){
+  if(sortKey===key) sortDir*=-1; else { sortKey=key; sortDir=1; }
+  document.querySelectorAll('thead th .sort').forEach(s=>s.textContent='↕');
+  const th = document.getElementById('th-'+key);
+  if(th) th.querySelector('.sort').textContent = sortDir===1?'↑':'↓';
+  renderTable();
+}
+
+function doSearch(v){ if(v!==undefined) searchVal=v.toLowerCase(); renderTable(); }
+
+function toggleFilter(name){
+  const fp = document.getElementById('fp-'+name);
+  document.querySelectorAll('.filter-panel').forEach(p=>{ if(p.id!=='fp-'+name) p.style.display='none'; });
+  fp.style.display = fp.style.display==='none'?'':'none';
+}
+document.addEventListener('click', e=>{ if(!e.target.closest('.filter-anchor')) document.querySelectorAll('.filter-panel').forEach(p=>p.style.display='none'); });
+
+function applyFilter(name, val, el){
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  if(cb.checked){ if(!activeFilters[name].includes(val)) activeFilters[name].push(val); }
+  else { activeFilters[name] = activeFilters[name].filter(v=>v!==val); }
+  updateFilterChips();
+  renderTable();
+}
+
+function updateFilterChips(){
+  const container = document.getElementById('active-filters');
+  container.innerHTML='';
+  [...activeFilters.type,...activeFilters.status].forEach(f=>{
+    const c = document.createElement('div');
+    c.className='chip active';
+    c.innerHTML=`${f} <span class="x" onclick="removeFilter('${f}')">✕</span>`;
+    container.appendChild(c);
+  });
+  ['type','status'].forEach(n=>{
+    const chip = document.getElementById('chip-'+n);
+    chip.className = 'chip' + (activeFilters[n].length?' active':'');
+  });
+}
+
+function removeFilter(val){
+  activeFilters.type = activeFilters.type.filter(v=>v!==val);
+  activeFilters.status = activeFilters.status.filter(v=>v!==val);
+  document.querySelectorAll('.filter-option input').forEach(cb=>{ if(cb.closest('.filter-option').textContent.toLowerCase().includes(val)) cb.checked=false; });
+  updateFilterChips(); renderTable();
+}
+
+function toggleAll(cb){ document.querySelectorAll('#expense-tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked); }
+
+function switchView(v){
+  ['list','empty','error'].forEach(n=>{ document.getElementById('view-'+n).style.display = n===v?'':'none'; });
+}
+
+// DRAWER — Add form
+function openAdd(){
+  document.getElementById('dr-title').textContent='Add expense';
+  document.getElementById('dr-body').innerHTML=addFormHTML();
+  document.getElementById('dr-foot').innerHTML=`
+    <button class="btn-ghost" onclick="closeDrawer()">Annuler</button>
+    <button class="btn-primary" onclick="submitForm()" style="font-size:12px;padding:7px 14px;">Soumettre</button>`;
+  document.getElementById('drawer').classList.add('open');
+}
+
+function addFormHTML(prefill){
+  return `<div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="sec-div">Justificatif</div>
+    <div class="up-zone" id="up-zone" ondragover="event.preventDefault()" ondrop="handleDrawerDrop(event)">
+      <div style="width:28px;height:28px;background:var(--u-blue-light);border-radius:var(--u-r);display:flex;align-items:center;justify-content:center;margin:0 auto 6px;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="#0057FF" stroke-width="1.5"><path d="M8 2v8M5 5l3-3 3 3"/><path d="M2 11v1a2 2 0 002 2h8a2 2 0 002-2v-1"/></svg>
+      </div>
+      <div style="font-size:12px;font-weight:500;">Déposer le justificatif</div>
+      <div style="font-size:10px;color:var(--u-text-3);margin-top:2px;">PDF, JPEG, PNG · max 10 MB</div>
+    </div>
+    <div id="file-list" style="display:flex;flex-direction:column;gap:5px;"></div>
+    <div class="sec-div">Détails</div>
+    <div class="field">
+      <label>Expense type *</label>
+      <select id="f-type" onchange="handleTypeChange(this.value)">
+        <option value="">Sélectionner...</option>
+        <option value="transport">🚌 Transport domicile-travail</option>
+        <option value="transport-pro">🚆 Transport professionnel</option>
+        <option value="repas">🍽️ Repas</option>
+        <option value="hotel">🏨 Hotel / Logement</option>
+        <option value="equipement">🖥️ Équipement</option>
+        <option value="autre">📄 Autre</option>
+      </select>
+      <div class="field-err" id="err-type" style="display:none;">Ce champ est requis</div>
+    </div>
+    <div id="transport-rule" style="display:none;">
+      <div class="auto-rule">
+        <span class="auto-rule-txt">🎯 Règle entreprise : 50% appliqué automatiquement</span>
+        <span class="badge b-auto">Auto</span>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Date *</label>
+        <input type="date" id="f-date" value="2026-03-27"/>
+        <div class="field-err" id="err-date" style="display:none;">Requis</div>
+      </div>
+      <div class="field">
+        <label>Montant TTC *</label>
+        <input type="text" id="f-amount" placeholder="0,00 €" oninput="updateVAT()"/>
+        <div class="field-err" id="err-amount" style="display:none;">Requis</div>
+      </div>
+    </div>
+    <div id="vat-row" style="display:none;" class="field">
+      <label>TVA récupérable</label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input type="text" id="f-vat" readonly style="flex:1;"/>
+        <span class="badge b-auto">Auto</span>
+      </div>
+      <div class="field-hint">Calculée selon la catégorie</div>
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <input type="text" id="f-desc" placeholder="Ex : Déjeuner client Acme"/>
+    </div>
+    <div class="field">
+      <label>Projet</label>
+      <select id="f-project">
+        <option value="">Aucun projet</option>
+        <option>Projet Alpha</option><option>Projet Beta</option><option>Commercial</option>
+      </select>
+      <div class="field-hint">Requis pour les projets avec suivi budgétaire</div>
+    </div>
+  </div>`;
+}
+
+function handleTypeChange(val){
+  const rule = document.getElementById('transport-rule');
+  const vr = document.getElementById('vat-row');
+  if(rule) rule.style.display = val==='transport'?'':'none';
+  if(vr) vr.style.display = val&&val!=='transport'?'':'none';
+  updateVAT();
+}
+
+function updateVAT(){
+  const type = document.getElementById('f-type')?.value;
+  const raw = (document.getElementById('f-amount')?.value||'').replace(/[^0-9,.]/g,'').replace(',','.');
+  const amt = parseFloat(raw)||0;
+  const rate = vatRates[type]||0;
+  const vatEl = document.getElementById('f-vat');
+  if(vatEl) vatEl.value = rate>0 ? (amt*rate/(1+rate)).toFixed(2).replace('.',',')+'€ ('+Math.round(rate*100)+'%)' : '—';
+}
+
+function submitForm(){
+  let ok = true;
+  const type = document.getElementById('f-type');
+  const amount = document.getElementById('f-amount');
+  const date = document.getElementById('f-date');
+  const errType = document.getElementById('err-type');
+  const errAmount = document.getElementById('err-amount');
+  const errDate = document.getElementById('err-date');
+
+  if(!type.value){ type.classList.add('err'); errType.style.display=''; ok=false; }
+  else { type.classList.remove('err'); errType.style.display='none'; }
+  if(!amount.value){ amount.classList.add('err'); errAmount.style.display=''; ok=false; }
+  else { amount.classList.remove('err'); errAmount.style.display='none'; }
+  if(!date.value){ date.classList.add('err'); errDate.style.display=''; ok=false; }
+  else { date.classList.remove('err'); errDate.style.display='none'; }
+  if(!ok) return;
+
+  const typeText = type.options[type.selectedIndex].text;
+  const newRow = {
+    type: typeText, cat: type.value, sub:'—',
+    date: date.value, dateStr: new Date(date.value).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'}),
+    amount: parseFloat(amount.value.replace(',','.'))||0,
+    status:'pending', vat:'Auto'
+  };
+  allData.unshift(newRow);
+  renderTable();
+  closeDrawer();
+  document.getElementById('pending-count').textContent = allData.filter(r=>r.status==='pending').length;
+}
+
+// Detail drawer
+function openDetail(r, tr){
+  document.querySelectorAll('#expense-tbody tr').forEach(t=>t.classList.remove('selected-row'));
+  tr.classList.add('selected-row');
+  document.getElementById('dr-title').textContent = r.type.replace(/^[^\s]+ /,'');
+  document.getElementById('dr-body').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--u-bg);border-radius:var(--u-r);">
+        <div style="font-size:22px;">${r.type.split(' ')[0]}</div>
+        <div>
+          <div style="font-weight:600;font-size:13px;">${r.type.replace(/^[^\s]+ /,'')}</div>
+          <div style="font-size:11px;color:var(--u-text-2);">${r.sub} · ${r.dateStr} · ${fmtAmt(r.amount)}</div>
+        </div>
+      </div>
+      <div>${statusBadge(r.status)}</div>
+      ${r.status==='rejected'?`<div style="padding:8px 10px;background:var(--u-red-bg);border-radius:var(--u-r);border-left:3px solid var(--u-red);"><div style="font-size:11px;font-weight:600;color:var(--u-red);margin-bottom:2px;">Motif de refus</div><div style="font-size:11px;color:var(--u-red);">Justificatif manquant ou illisible. Merci de resoumettre avec un reçu lisible.</div></div>`:''}
+      ${r.status==='rejected'?`<button class="btn-primary" style="font-size:12px;width:100%;justify-content:center;">Modifier et resoumettre</button>`:''}
+      <div class="sec-div">Justificatif</div>
+      <div class="up-file">
+        <div class="up-file-ico">PDF</div>
+        <div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Recu_${r.type.replace(/^[^\s]+ /,'').replace(/ /g,'_')}.pdf</div><div style="font-size:10px;color:var(--u-text-3);">245 KB · il y a 2 jours</div></div>
+        <button style="background:none;border:1px solid var(--u-border);border-radius:var(--u-rs);padding:3px 8px;font-size:10px;cursor:pointer;color:var(--u-text-2);">↓</button>
+      </div>
+      <div class="sec-div">Activité</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;gap:8px;">
+          <div style="width:22px;height:22px;background:var(--u-blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--u-blue);flex-shrink:0;">MD</div>
+          <div><div style="font-size:11px;font-weight:500;">Vous <span style="font-weight:400;color:var(--u-text-2);">avez soumis cette note</span></div><div style="font-size:10px;color:var(--u-text-3);margin-top:1px;">Il y a 2 jours</div></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:22px;height:22px;background:var(--u-blue-light);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--u-blue);flex-shrink:0;">MD</div>
+          <textarea style="flex:1;border:1px solid var(--u-border);border-radius:var(--u-r);padding:6px 8px;font-size:11px;font-family:inherit;resize:none;height:52px;" placeholder="Ajouter un commentaire..."></textarea>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('dr-foot').innerHTML=`<button class="btn-ghost" onclick="closeDrawer()">Fermer</button>`;
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.querySelectorAll('#expense-tbody tr').forEach(t=>t.classList.remove('selected-row'));
+}
+
+function handleDrawerDrop(e){
+  e.preventDefault();
+  const files = e.dataTransfer.files;
+  const list = document.getElementById('file-list');
+  const zone = document.getElementById('up-zone');
+  if(list && zone){
+    for(const f of files){
+      const d = document.createElement('div');
+      d.className='up-file';
+      const ext = f.name.split('.').pop().toUpperCase().slice(0,3);
+      const sz = f.size>1048576?(f.size/1048576).toFixed(1)+' MB':Math.round(f.size/1024)+' KB';
+      d.innerHTML=`<div class="up-file-ico">${ext}</div><div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</div><div style="font-size:10px;color:var(--u-text-3);">${sz}</div></div><button class="up-file-rm" onclick="this.closest('.up-file').remove()">✕</button>`;
+      list.appendChild(d);
+    }
+    zone.style.display='none';
+  }
+}
+
+function handleListDrop(e){
+  e.preventDefault();
+  const files = e.dataTransfer.files;
+  for(const f of files){
+    allData.push({type:'📄 '+f.name.replace(/\.[^.]+$/,''),cat:'autre',sub:'—',date:'2026-03-27',dateStr:"Aujourd'hui",amount:0,status:'draft',vat:'Auto'});
+  }
+  renderTable();
+}
+
+// Init
+renderTable();
+</script>
