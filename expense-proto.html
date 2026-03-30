@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Notes de frais — PayFit</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --b:#0057FF;--bl:#EBF1FF;--bh:#0047D4;
+  --t:#111827;--t2:#6B7280;--t3:#9CA3AF;
+  --bo:#E5E7EB;--bs:#D1D5DB;
+  --bg:#F9FAFB;--w:#FFFFFF;--r:8px;--rs:4px;
+  --g:#059669;--gb:#ECFDF5;
+  --o:#D97706;--ob:#FFFBEB;
+  --re:#DC2626;--rb:#FEF2F2;
+  --gr:#6B7280;--grb:#F3F4F6;
+}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:var(--t);overflow:hidden;}
+html,body{height:100%;}
+
+.shell{display:flex;width:100%;height:100vh;overflow:hidden;background:var(--bg);position:relative;}
+
+/* ── Sidebar ── */
+.sb{width:192px;background:var(--w);border-right:1px solid var(--bo);display:flex;flex-direction:column;flex-shrink:0;z-index:1;}
+.sb-logo{padding:14px 12px;border-bottom:1px solid var(--bo);display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--b);}
+.sb-dot{width:22px;height:22px;background:var(--b);border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.sb-lbl{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.07em;text-transform:uppercase;padding:10px 12px 4px;}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:12px;color:var(--t2);cursor:pointer;transition:background .1s;}
+.sb-item:hover{background:var(--bg);}
+.sb-item.active{background:var(--bl);color:var(--b);font-weight:500;}
+
+/* ── Main column ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;z-index:1;}
+
+/* Topbar */
+.topbar{padding:13px 24px;border-bottom:1px solid var(--bo);background:var(--w);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.page-title{font-size:20px;font-weight:700;}
+
+/* Buttons */
+.btn-p{background:var(--b);color:white;border:none;border-radius:var(--r);padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-p:hover{background:var(--bh);}
+.btn-s{background:var(--w);color:var(--t);border:1px solid var(--bs);border-radius:var(--r);padding:7px 14px;font-size:12px;cursor:pointer;}
+.btn-s:hover{background:var(--bg);}
+.btn-g{background:transparent;color:var(--t2);border:none;border-radius:var(--r);padding:6px 10px;font-size:12px;cursor:pointer;}
+.btn-g:hover{background:var(--bg);}
+.btn-lnk{background:none;border:none;color:var(--b);font-size:12px;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;}
+
+/* ── Header — pattern Leaves ── */
+.hdr{padding:20px 24px 0;background:var(--w);border-bottom:1px solid var(--bo);flex-shrink:0;}
+.hdr-total-label{font-size:13px;color:var(--t2);margin-bottom:4px;}
+.hdr-total{display:flex;align-items:baseline;gap:6px;margin-bottom:20px;}
+.hdr-total-num{font-size:36px;font-weight:700;color:var(--t);line-height:1;}
+.hdr-total-unit{font-size:16px;color:var(--t2);}
+.hdr-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.hdr-card{border:1px solid var(--bo);border-radius:var(--r);padding:16px;background:var(--w);}
+.hdr-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.hdr-card-label{font-size:13px;font-weight:500;color:var(--t);}
+.hdr-card-num{display:flex;align-items:baseline;gap:4px;margin-bottom:4px;}
+.hdr-card-big{font-size:24px;font-weight:700;color:var(--t);line-height:1;}
+.hdr-card-unit{font-size:13px;color:var(--t2);}
+.hdr-card-sub{font-size:11px;color:var(--t2);}
+.hdr-card-link{font-size:12px;color:var(--b);border:none;background:none;padding:0;font-family:inherit;margin-top:8px;display:inline-block;cursor:pointer;}
+.hdr-card-link:hover{text-decoration:underline;}
+.prog-wrap{margin-top:8px;}
+.prog-label{display:flex;justify-content:space-between;font-size:10px;color:var(--t2);margin-bottom:4px;}
+.prog-bar{height:4px;background:var(--bo);border-radius:99px;overflow:hidden;}
+.prog-fill{height:4px;border-radius:99px;}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 8px;border-radius:99px;white-space:nowrap;}
+.bp{background:var(--ob);color:var(--o);}
+.bv{background:var(--gb);color:var(--g);}
+.bd{background:var(--grb);color:var(--gr);}
+.br{background:var(--rb);color:var(--re);}
+.ba{background:var(--bl);color:var(--b);}
+.bwarn{background:#FEF3C7;color:#92400E;}
+
+/* Tabs */
+.tab-row{display:flex;padding:0 24px;background:var(--w);border-top:1px solid var(--bo);}
+.tab{padding:10px 16px;font-size:13px;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;user-select:none;}
+.tab:hover{color:var(--t);}
+.tab.active{color:var(--b);border-bottom-color:var(--b);font-weight:500;}
+
+/* Toolbar */
+.tb{padding:10px 24px;border-bottom:1px solid var(--bo);background:var(--w);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--bs);border-radius:var(--rs);padding:5px 10px;font-size:11px;color:var(--t2);cursor:pointer;background:var(--w);user-select:none;}
+.chip:hover{background:var(--bg);}
+.chip.on{border-color:var(--b);color:var(--b);background:var(--bl);}
+.filter-anchor{position:relative;}
+.fp{position:absolute;top:100%;left:0;background:var(--w);border:1px solid var(--bs);border-radius:var(--r);box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:50;padding:6px;min-width:176px;margin-top:4px;display:none;}
+.fo{display:flex;align-items:center;gap:8px;padding:6px 8px;font-size:12px;cursor:pointer;border-radius:var(--rs);color:var(--t);}
+.fo:hover{background:var(--bg);}
+
+/* Content */
+.content{flex:1;display:flex;overflow:hidden;}
+.tarea{flex:1;overflow-y:auto;padding:16px 24px;min-width:0;}
+
+/* Table */
+table{width:100%;border-collapse:collapse;background:var(--w);border:1px solid var(--bo);border-radius:var(--r);font-size:12px;}
+thead th{padding:9px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t2);letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--bo);background:var(--bg);white-space:nowrap;cursor:pointer;user-select:none;}
+th.num,td.num{text-align:right;}
+thead th:hover{color:var(--t);}
+tbody tr{border-bottom:1px solid var(--bo);cursor:pointer;transition:background .1s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--bg);}
+tbody tr.sel{background:var(--bl);}
+td{padding:10px 12px;color:var(--t);vertical-align:middle;}
+td.m{color:var(--t2);}
+.ck{width:32px;}
+input[type=checkbox]{width:13px;height:13px;cursor:pointer;accent-color:var(--b);}
+
+/* Footer */
+.tfoot{padding:10px 24px;border-top:1px solid var(--bo);background:var(--w);display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--t2);flex-shrink:0;}
+.pager{display:flex;gap:3px;align-items:center;}
+.pg{min-width:24px;height:24px;padding:0 6px;border:1px solid var(--bo);border-radius:var(--rs);background:var(--w);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);}
+.pg.on{background:var(--b);color:white;border-color:var(--b);}
+.pg:hover:not(.on){background:var(--bg);}
+
+/* ── Overlay ── */
+.overlay{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(17,24,39,.25);
+  z-index:998;cursor:pointer;
+}
+.overlay.on{display:block;}
+
+/* ── Drawer — fixed, pleine hauteur ── */
+.drawer{
+  position:fixed;top:0;right:0;
+  width:0;height:100vh;
+  background:var(--w);
+  border-left:1px solid var(--bo);
+  box-shadow:-4px 0 24px rgba(0,0,0,.10);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+  transition:width .22s ease;
+  z-index:999;
+}
+.drawer.open{width:420px;}
+
+.dr-h{padding:16px 20px;border-bottom:1px solid var(--bo);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.dr-t{font-size:14px;font-weight:600;}
+.dr-x{width:28px;height:28px;border:1px solid var(--bo);border-radius:var(--rs);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:14px;}
+.dr-x:hover{background:var(--bg);}
+.dr-b{flex:1;overflow-y:auto;padding:20px;}
+.dr-f{padding:14px 20px;border-top:1px solid var(--bo);display:flex;gap:8px;justify-content:flex-end;flex-shrink:0;}
+
+/* Form */
+.field{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.field label{font-size:11px;font-weight:600;color:var(--t);}
+.field input,.field select,.field textarea{
+  border:1px solid var(--bs);border-radius:var(--r);
+  padding:8px 10px;font-size:12px;color:var(--t);
+  background:var(--w);width:100%;font-family:inherit;
+}
+.field input:focus,.field select:focus{outline:none;border-color:var(--b);box-shadow:0 0 0 3px rgba(0,87,255,.1);}
+.field input.prefilled{background:#FFFBF0;border-color:#FCD34D;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fhint{font-size:10px;color:var(--t3);margin-top:2px;}
+.sec{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:.05em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid var(--bo);margin-bottom:16px;}
+.auto-rule{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bl);border-radius:var(--r);margin-bottom:14px;}
+.ar-txt{font-size:11px;color:var(--b);}
+
+/* Upload zone */
+.upz{border:2px dashed var(--bs);border-radius:var(--r);padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg);}
+.upz:hover{border-color:var(--b);background:var(--bl);}
+.up-file{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--w);border:1px solid var(--bo);border-radius:var(--r);}
+.uf-ico{width:30px;height:30px;background:var(--rb);border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--re);flex-shrink:0;}
+.uf-rm{background:none;border:none;color:var(--t3);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:3px;margin-left:auto;}
+.uf-rm:hover{color:var(--re);}
+
+/* Stepper */
+.stepper{display:flex;align-items:center;margin-bottom:20px;}
+.step{display:flex;align-items:center;gap:5px;font-size:11px;}
+.step-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--bs);background:var(--w);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:var(--t2);flex-shrink:0;transition:all .2s;}
+.step-dot.done{background:var(--g);border-color:var(--g);color:white;}
+.step-dot.active{background:var(--b);border-color:var(--b);color:white;}
+.step-lbl{color:var(--t2);}
+.step-lbl.active{color:var(--b);font-weight:500;}
+.step-lbl.done{color:var(--g);}
+.step-line{flex:1;height:1px;background:var(--bo);margin:0 8px;}
+.step-line.done{background:var(--g);}
+
+/* OCR */
+.ocr-bar{height:3px;background:var(--bl);border-radius:99px;overflow:hidden;margin:14px 0;}
+.ocr-prog{height:3px;background:var(--b);border-radius:99px;animation:scan 2.2s ease-in-out forwards;}
+@keyframes scan{0%{width:0}60%{width:75%}100%{width:100%}}
+.ocr-notice{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#FFFBF0;border:1px solid #FCD34D;border-radius:var(--r);font-size:11px;color:#92400E;margin-bottom:16px;}
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+
+<!-- Drawer — fixed, pleine hauteur -->
+<div class="drawer" id="drawer">
+  <div class="dr-h">
+    <div class="dr-t" id="dr-title">Ajouter une note de frais</div>
+    <button class="dr-x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="dr-b" id="dr-body"></div>
+  <div class="dr-f" id="dr-foot"></div>
+</div>
+
+<div class="shell">
+
+  <!-- Sidebar -->
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-dot">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
+          <rect x="1" y="1" width="4" height="4" rx="1"/>
+          <rect x="7" y="1" width="4" height="4" rx="1"/>
+          <rect x="1" y="7" width="4" height="4" rx="1"/>
+          <rect x="7" y="7" width="4" height="4" rx="1"/>
+        </svg>
+      </div>
+      PayFit
+    </div>
+    <div style="padding:6px 8px;border-bottom:1px solid var(--bo);">
+      <div style="display:flex;align-items:center;gap:5px;padding:5px 8px;background:var(--bg);border-radius:var(--r);font-size:11px;color:var(--t3);">
+        <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5"/><path d="M11 11l3 3"/></svg>
+        Rechercher...
+      </div>
+    </div>
+    <div style="flex:1;padding:4px 0;overflow-y:auto;">
+      <div class="sb-lbl">The essentials</div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+        Tableau de bord
+      </div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 2a4 4 0 100 8A4 4 0 008 2zM2 14s1-3 6-3 6 3 6 3"/></svg>
+        Fiche de paie
+      </div>
+      <div class="sb-lbl">Daily basis</div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v3l2 2"/></svg>
+        Congés
+      </div>
+      <div class="sb-item active">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1"/><path d="M5 7h6M5 10h4"/></svg>
+        Notes de frais
+      </div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 4 4 4-6"/></svg>
+        Performance
+      </div>
+      <div class="sb-lbl">Mon entreprise</div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="10" height="11" rx="1"/><path d="M6 7h4M6 10h4"/></svg>
+        Documents
+      </div>
+      <div class="sb-item">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 14s2-3 6-3 6 3 6 3M8 2a3 3 0 100 6 3 3 0 000-6z"/></svg>
+        Mes collègues
+      </div>
+    </div>
+    <div style="padding:10px 12px;border-top:1px solid var(--bo);display:flex;align-items:center;gap:8px;">
+      <div style="width:24px;height:24px;background:var(--b);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:700;flex-shrink:0;">MD</div>
+      <div>
+        <div style="font-weight:500;font-size:11px;">Damien M.</div>
+        <div style="font-size:10px;color:var(--t3);">Design Manager</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="page-title">Notes de frais</div>
+      <button class="btn-p" onclick="openDrawer()">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v10M3 8h10"/></svg>
+        Ajouter une note
+      </button>
+    </div>
+
+    <!-- Header — pattern Leaves -->
+    <div class="hdr">
+      <div class="hdr-total-label">Total des notes de frais soumises cette année</div>
+      <div class="hdr-total">
+        <span class="hdr-total-num">1 583</span>
+        <span class="hdr-total-unit">€</span>
+      </div>
+      <div class="hdr-cards">
+        <!-- Ce mois -->
+        <div class="hdr-card">
+          <div class="hdr-card-top">
+            <span class="hdr-card-label">Ce mois (mars)</span>
+            <span class="badge bwarn">Proche du plafond</span>
+          </div>
+          <div class="hdr-card-num"><span class="hdr-card-big">342</span><span class="hdr-card-unit">,50 €</span></div>
+          <div class="hdr-card-sub">sur 500 € / mois autorisés</div>
+          <div class="prog-wrap">
+            <div class="prog-label"><span>Consommé</span><span>68%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:68%;background:var(--o);"></div></div>
+          </div>
+          <button class="hdr-card-link">Voir les détails</button>
+        </div>
+        <!-- En attente -->
+        <div class="hdr-card">
+          <div class="hdr-card-top"><span class="hdr-card-label">En attente de validation</span></div>
+          <div class="hdr-card-num"><span class="hdr-card-big" style="color:var(--o);" id="pending-num">2</span><span class="hdr-card-unit">notes</span></div>
+          <div class="hdr-card-sub" id="pending-amt">407,64 € en attente</div>
+          <div class="prog-wrap">
+            <div class="prog-label"><span>Taux de validation</span><span id="ratio-lbl">74%</span></div>
+            <div class="prog-bar"><div class="prog-fill" id="ratio-bar" style="width:74%;background:var(--g);"></div></div>
+          </div>
+          <button class="hdr-card-link" onclick="filterByStatus('pending')">Voir les notes en attente</button>
+        </div>
+        <!-- Validées -->
+        <div class="hdr-card">
+          <div class="hdr-card-top"><span class="hdr-card-label">Remboursées cette année</span></div>
+          <div class="hdr-card-num"><span class="hdr-card-big" style="color:var(--g);">1 175</span><span class="hdr-card-unit">,36 €</span></div>
+          <div class="hdr-card-sub">sur 8 notes validées</div>
+          <div class="prog-wrap">
+            <div class="prog-label"><span>Cumul annuel</span><span>39%</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:39%;background:var(--b);"></div></div>
+          </div>
+          <button class="hdr-card-link" onclick="filterByStatus('validated')">Voir les notes validées</button>
+        </div>
+      </div>
+      <div class="tab-row">
+        <div class="tab active" id="tab-mes" onclick="switchTab('mes')">Mes notes</div>
+        <div class="tab" id="tab-solde" onclick="switchTab('solde')">Mon solde</div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="tb">
+      <div class="filter-anchor">
+        <div class="chip" onclick="toggleFP('fp-st')">
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+          Ajouter un filtre
+        </div>
+        <div class="fp" id="fp-st">
+          <div class="fo" onclick="applyF('status','pending',this)"><input type="checkbox"/> En attente</div>
+          <div class="fo" onclick="applyF('status','validated',this)"><input type="checkbox"/> Validée</div>
+          <div class="fo" onclick="applyF('status','draft',this)"><input type="checkbox"/> Brouillon</div>
+          <div class="fo" onclick="applyF('status','rejected',this)"><input type="checkbox"/> Refusée</div>
+        </div>
+      </div>
+      <div id="active-chips" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
+      <div style="margin-left:auto;">
+        <select style="font-size:11px;border:1px solid var(--bs);border-radius:var(--rs);padding:4px 8px;color:var(--t2);background:var(--w);">
+          <option>Mars 2026</option><option>Février 2026</option><option>Janvier 2026</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="content">
+      <div class="tarea">
+        <table>
+          <thead>
+            <tr>
+              <th class="ck"><input type="checkbox" onchange="toggleAll(this)"/></th>
+              <th onclick="sortBy('type')">Type de frais ↕</th>
+              <th onclick="sortBy('sub')">Sous-type ↕</th>
+              <th onclick="sortBy('date')">Date ↕</th>
+              <th class="num" onclick="sortBy('amount')">Montant ↕</th>
+              <th onclick="sortBy('status')">Statut</th>
+              <th>TVA</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="tfoot">
+      <div>1–<span id="showing">6</span> sur 27 notes de frais</div>
+      <div style="font-size:12px;font-weight:600;color:var(--t);"><span style="font-weight:400;color:var(--t2);margin-right:4px;">Total mars</span>342,50 €</div>
+      <div class="pager">
+        <button class="pg">‹</button>
+        <button class="pg on">1</button>
+        <button class="pg">2</button>
+        <button class="pg">3</button>
+        <button class="pg">4</button>
+        <button class="pg">5</button>
+        <span style="font-size:11px;color:var(--t3);padding:0 2px;">…</span>
+        <button class="pg">10</button>
+        <button class="pg">›</button>
+        <span style="margin-left:12px;color:var(--t2);">Par page</span>
+        <select style="margin-left:6px;font-size:11px;border:1px solid var(--bs);border-radius:var(--rs);padding:3px 6px;background:var(--w);color:var(--t2);">
+          <option>10</option><option>25</option><option>50</option>
+        </select>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+const vatRates={transport:0,'transport-pro':.2,repas:.1,hotel:.2,equipement:.2,autre:.2};
+const allData=[
+  {type:'🏨 Hôtel / Logement',cat:'hotel',sub:'WFA',date:'2025-09-13',dateStr:'13 sept. 2025',amount:275.64,status:'pending',vat:'Auto 20%'},
+  {type:'🖥️ Équipement',cat:'equipement',sub:'N/A',date:'2025-06-26',dateStr:'26 juin 2025',amount:123,status:'validated',vat:'Auto 20%'},
+  {type:'🏨 Hôtel / Logement',cat:'hotel',sub:'WFA',date:'2025-09-13',dateStr:'13 sept. 2025',amount:275.64,status:'validated',vat:'Auto 20%'},
+  {type:'🚌 Transport domicile',cat:'transport',sub:'Abonnement',date:'2026-03-01',dateStr:'1 mars 2026',amount:132,status:'pending',vat:'50% auto'},
+  {type:'🍽️ Repas',cat:'repas',sub:'Client',date:'2026-03-15',dateStr:'15 mars 2026',amount:68.5,status:'draft',vat:'Auto 10%'},
+  {type:'🖥️ Équipement',cat:'equipement',sub:'N/A',date:'2025-06-26',dateStr:'26 juin 2025',amount:89,status:'rejected',vat:'Auto 20%'},
+];
+
+let aF={status:[]}, sortK=null, sortD=1, drawerFile=null;
+
+function fmt(n){return n.toFixed(2).replace('.',',')+'&thinsp;€';}
+function sbadge(s){
+  const m={pending:['bp','En attente'],validated:['bv','Validée'],draft:['bd','Brouillon'],rejected:['br','Refusée']};
+  return `<span class="badge ${m[s]?.[0]||'bd'}">${m[s]?.[1]||s}</span>`;
+}
+
+function render(){
+  let rows=allData.filter(r=>!aF.status.length||aF.status.includes(r.status));
+  if(sortK) rows.sort((a,b)=>{
+    let va=a[sortK],vb=b[sortK];
+    if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}
+    return va<vb?-sortD:va>vb?sortD:0;
+  });
+  const tb=document.getElementById('tbody');
+  tb.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="ck"><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td>${r.type}</td>
+      <td class="m">${r.sub}</td>
+      <td class="m">${r.dateStr}</td>
+      <td class="num">${fmt(r.amount)}</td>
+      <td>${sbadge(r.status)}</td>
+      <td><span class="badge ba">${r.vat}</span></td>`;
+    tr.onclick=()=>openDetail(r,tr);
+    tb.appendChild(tr);
+  });
+  document.getElementById('showing').textContent=rows.length;
+  updateStats();
+}
+
+function updateStats(){
+  const pending=allData.filter(r=>r.status==='pending');
+  const validated=allData.filter(r=>r.status==='validated');
+  const ratio=allData.length>0?Math.round(validated.length/allData.length*100):0;
+  document.getElementById('pending-num').textContent=pending.length;
+  document.getElementById('pending-amt').textContent=
+    pending.reduce((s,r)=>s+r.amount,0).toFixed(2).replace('.',',')+' € en attente';
+  document.getElementById('ratio-lbl').textContent=ratio+'%';
+  document.getElementById('ratio-bar').style.width=ratio+'%';
+}
+
+function sortBy(k){if(sortK===k)sortD*=-1;else{sortK=k;sortD=1;}render();}
+function toggleAll(cb){document.querySelectorAll('#tbody input[type=checkbox]').forEach(c=>c.checked=cb.checked);}
+
+function toggleFP(id){
+  const fp=document.getElementById(id);
+  fp.style.display=fp.style.display==='none'||fp.style.display===''?'block':'none';
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.filter-anchor')) document.querySelectorAll('.fp').forEach(p=>p.style.display='none');
+});
+
+function applyF(key,val,el){
+  const cb=el.querySelector('input');cb.checked=!cb.checked;
+  if(cb.checked){if(!aF[key].includes(val))aF[key].push(val);}
+  else{aF[key]=aF[key].filter(v=>v!==val);}
+  updateChips();render();
+}
+function updateChips(){
+  const c=document.getElementById('active-chips');c.innerHTML='';
+  aF.status.forEach(f=>{
+    const d=document.createElement('div');
+    d.className='chip on';
+    d.innerHTML=`${f} <span style="margin-left:3px;opacity:.7;font-size:10px;cursor:pointer;" onclick="removeF('${f}')">✕</span>`;
+    c.appendChild(d);
+  });
+}
+function removeF(v){
+  aF.status=aF.status.filter(x=>x!==v);
+  document.querySelectorAll('.fo input').forEach(cb=>{
+    if(cb.closest('.fo').textContent.toLowerCase().trim().startsWith(v))cb.checked=false;
+  });
+  updateChips();render();
+}
+function filterByStatus(s){
+  aF.status=[s];
+  document.querySelectorAll('.fo input').forEach(cb=>{
+    cb.checked=cb.closest('.fo').textContent.toLowerCase().trim().startsWith(s);
+  });
+  updateChips();render();
+}
+function switchTab(t){
+  document.getElementById('tab-mes').classList.toggle('active',t==='mes');
+  document.getElementById('tab-solde').classList.toggle('active',t==='solde');
+  if(t==='solde'){
+    document.getElementById('tbody').innerHTML=`
+      <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--t2);font-size:12px;">
+        Vue "Mon solde" — synthèse annuelle par catégorie
+      </td></tr>`;
+  } else render();
+}
+
+/* ── Drawer ── */
+function openDrawer(){
+  drawerFile=null;
+  document.getElementById('dr-title').textContent='Ajouter une note de frais';
+  renderStep1();
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('overlay').classList.remove('on');
+  document.querySelectorAll('#tbody tr').forEach(t=>t.classList.remove('sel'));
+}
+
+function stepHTML(a){
+  const s=[{n:1,l:'Justificatif'},{n:2,l:'Vérification'},{n:3,l:'Confirmation'}];
+  return `<div class="stepper">${s.map((x,i)=>{
+    const c=x.n<a?'done':x.n===a?'active':'';
+    const line=i<s.length-1?`<div class="step-line${x.n<a?' done':''}"></div>`:'';
+    return `<div class="step"><div class="step-dot ${c}">${x.n<a?'✓':x.n}</div><span class="step-lbl ${c}">${x.l}</span></div>${line}`;
+  }).join('')}</div>`;
+}
+
+/* Étape 1 — Upload */
+function renderStep1(){
+  document.getElementById('dr-title').textContent='Ajouter une note de frais';
+  document.getElementById('dr-body').innerHTML=`
+    ${stepHTML(1)}
+    <div class="sec">Justificatif(s) de note de frais</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:14px;">Un seul document à la fois</div>
+    <div class="upz" id="upz" ondragover="event.preventDefault()" ondrop="handleUpload(event)">
+      <div style="width:52px;height:52px;margin:0 auto 12px;">
+        <svg viewBox="0 0 52 52" fill="none" width="52" height="52">
+          <rect x="7" y="4" width="30" height="38" rx="3" fill="white" stroke="#D1D5DB" stroke-width="1.5"/>
+          <path d="M12 18h18M12 24h18M12 30h12" stroke="#9CA3AF" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="26" y="28" width="20" height="20" rx="3" fill="white" stroke="#0057FF" stroke-width="1.5"/>
+          <path d="M36 32v12M31 38h10" stroke="#0057FF" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <button class="btn-lnk" onclick="simulateUpload()">Sélectionner un document</button>
+      <div style="font-size:12px;color:var(--t2);margin-top:6px;">ou le glisser-déposer ici</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:8px;">Taille max : 5 Mo · JPG, PNG, PDF</div>
+    </div>
+    <div id="fp-preview" style="margin-top:10px;"></div>
+    <div style="margin-top:20px;text-align:center;">
+      <button class="btn-lnk" onclick="goManual()">Je préfère effectuer manuellement ma demande de note de frais</button>
+    </div>`;
+  document.getElementById('dr-foot').innerHTML=`
+    <button class="btn-g" onclick="closeDrawer()">Annuler</button>
+    <button class="btn-p" id="btn-next" style="font-size:12px;padding:8px 16px;" disabled onclick="goStep2()">
+      Analyser le justificatif
+    </button>`;
+}
+
+function simulateUpload(){
+  drawerFile={name:'Recu_Hotel_Paris.pdf',size:'1,2 Mo'};
+  showPreview();
+  document.getElementById('btn-next').disabled=false;
+}
+function handleUpload(e){
+  e.preventDefault();
+  const f=e.dataTransfer.files[0];
+  if(f){
+    drawerFile={name:f.name,size:f.size>1048576?(f.size/1048576).toFixed(1)+' Mo':Math.round(f.size/1024)+' Ko'};
+    showPreview();
+    document.getElementById('btn-next').disabled=false;
+  }
+}
+function showPreview(){
+  const fp=document.getElementById('fp-preview');
+  if(!fp||!drawerFile)return;
+  const ext=(drawerFile.name.split('.').pop()||'DOC').toUpperCase().slice(0,3);
+  fp.innerHTML=`
+    <div class="up-file">
+      <div class="uf-ico">${ext}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${drawerFile.name}</div>
+        <div style="font-size:10px;color:var(--t3);">${drawerFile.size}</div>
+      </div>
+      <button class="uf-rm" onclick="drawerFile=null;this.closest('.up-file').remove();document.getElementById('upz').style.display='';document.getElementById('btn-next').disabled=true;">✕</button>
+    </div>`;
+  document.getElementById('upz').style.display='none';
+}
+
+/* Étape 2 — OCR scanning */
+function goStep2(){
+  document.getElementById('dr-title').textContent='Analyse en cours…';
+  document.getElementById('dr-body').innerHTML=`
+    ${stepHTML(2)}
+    <div style="padding:48px 0;text-align:center;">
+      <div style="font-size:40px;margin-bottom:16px;">🔍</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:8px;">Lecture du justificatif</div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:20px;">Notre OCR extrait automatiquement les informations de votre reçu…</div>
+      <div class="ocr-bar"><div class="ocr-prog"></div></div>
+      <div style="font-size:11px;color:var(--t3);" id="ocr-st">Extraction des données en cours…</div>
+    </div>`;
+  document.getElementById('dr-foot').innerHTML='';
+  setTimeout(()=>{
+    const el=document.getElementById('ocr-st');
+    if(el) el.textContent='Données extraites avec succès ✓';
+    setTimeout(renderStep3, 600);
+  }, 2200);
+}
+
+/* Étape 3 — Vérification */
+function renderStep3(){
+  document.getElementById('dr-title').textContent='Vérifier les informations';
+  document.getElementById('dr-body').innerHTML=`
+    ${stepHTML(3)}
+    <div class="ocr-notice">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#D97706" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v4M8 11h.01"/></svg>
+      Champs pré-remplis par l'OCR — merci de vérifier avant de soumettre
+    </div>
+    <div class="sec">Justificatif</div>
+    <div class="up-file" style="margin-bottom:20px;">
+      <div class="uf-ico">PDF</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${drawerFile?.name||'Recu.pdf'}</div>
+        <div style="font-size:10px;color:var(--t3);">${drawerFile?.size||'—'} · Analysé</div>
+      </div>
+      <span class="badge bv">✓ Reconnu</span>
+    </div>
+    <div class="sec">Détails de la dépense</div>
+    <div class="field">
+      <label>Type de frais *</label>
+      <select id="f-type" onchange="handleType(this.value)">
+        <option value="hotel" selected>🏨 Hôtel / Logement</option>
+        <option value="transport">🚌 Transport domicile-travail</option>
+        <option value="transport-pro">🚆 Transport professionnel</option>
+        <option value="repas">🍽️ Repas</option>
+        <option value="equipement">🖥️ Équipement</option>
+        <option value="autre">📄 Autre</option>
+      </select>
+    </div>
+    <div id="auto-rule-wrap"></div>
+    <div class="frow">
+      <div class="field">
+        <label>Date *</label>
+        <input type="date" id="f-date" value="2026-03-15" class="prefilled"/>
+        <div class="fhint">Extrait du reçu</div>
+      </div>
+      <div class="field">
+        <label>Montant TTC *</label>
+        <input type="text" id="f-amount" value="275,64 €" class="prefilled" oninput="updateVAT()"/>
+        <div class="fhint">Extrait du reçu</div>
+      </div>
+    </div>
+    <div class="field" id="vat-field">
+      <label>TVA récupérable</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="f-vat" value="45,94 € (20%)" readonly style="flex:1;background:var(--bg);"/>
+        <span class="badge ba">Auto</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Libellé</label>
+      <input type="text" id="f-desc" value="Hôtel Mercure Paris Centre" class="prefilled"/>
+      <div class="fhint">Extrait du reçu</div>
+    </div>
+    <div class="field">
+      <label>Projet (optionnel)</label>
+      <select>
+        <option value="">Aucun projet</option>
+        <option>Projet Alpha</option>
+        <option>Commercial</option>
+      </select>
+    </div>`;
+  document.getElementById('dr-foot').innerHTML=`
+    <button class="btn-g" onclick="renderStep1()">← Retour</button>
+    <button class="btn-s" onclick="saveDraft()" style="font-size:12px;">Brouillon</button>
+    <button class="btn-p" onclick="submitExpense()" style="font-size:12px;padding:8px 16px;">Soumettre</button>`;
+}
+
+function handleType(val){
+  const w=document.getElementById('auto-rule-wrap');
+  const vf=document.getElementById('vat-field');
+  if(val==='transport'){
+    w.innerHTML=`<div class="auto-rule"><span class="ar-txt">🎯 Règle entreprise : 50% appliqué automatiquement</span><span class="badge ba">Auto</span></div>`;
+    if(vf) vf.style.display='none';
+  } else {
+    w.innerHTML='';
+    if(vf) vf.style.display='';
+    updateVAT();
+  }
+}
+function updateVAT(){
+  const t=document.getElementById('f-type')?.value;
+  const r=(document.getElementById('f-amount')?.value||'').replace(/[^0-9,.]/g,'').replace(',','.');
+  const a=parseFloat(r)||0;
+  const rate=vatRates[t]||0;
+  const v=document.getElementById('f-vat');
+  if(v) v.value=rate>0?(a*rate/(1+rate)).toFixed(2).replace('.',',')+' € ('+Math.round(rate*100)+'%)':'—';
+}
+
+function saveDraft(){
+  allData.unshift({type:'🏨 Hôtel / Logement',cat:'hotel',sub:'N/A',date:'2026-03-15',dateStr:'15 mars 2026',amount:275.64,status:'draft',vat:'Auto 20%'});
+  render();closeDrawer();
+}
+function submitExpense(){
+  const t=document.getElementById('f-type');
+  const label=t.options[t.selectedIndex].text;
+  const a=parseFloat((document.getElementById('f-amount')?.value||'0').replace(/[^0-9,.]/g,'').replace(',','.'))||0;
+  allData.unshift({type:label,cat:t.value,sub:'—',date:'2026-03-15',dateStr:'15 mars 2026',amount:a,status:'pending',vat:'Auto'});
+  render();closeDrawer();
+}
+
+/* Saisie manuelle */
+function goManual(){
+  document.getElementById('dr-title').textContent='Saisie manuelle';
+  document.getElementById('dr-body').innerHTML=`
+    ${stepHTML(3)}
+    <div class="sec">Détails de la dépense</div>
+    <div class="field">
+      <label>Type de frais *</label>
+      <select id="f-type" onchange="handleType(this.value)">
+        <option value="">Sélectionner…</option>
+        <option value="transport">🚌 Transport domicile-travail</option>
+        <option value="transport-pro">🚆 Transport professionnel</option>
+        <option value="repas">🍽️ Repas</option>
+        <option value="hotel">🏨 Hôtel / Logement</option>
+        <option value="equipement">🖥️ Équipement</option>
+        <option value="autre">📄 Autre</option>
+      </select>
+    </div>
+    <div id="auto-rule-wrap"></div>
+    <div class="frow">
+      <div class="field"><label>Date *</label><input type="date" id="f-date" value="2026-03-27"/></div>
+      <div class="field"><label>Montant TTC *</label><input type="text" id="f-amount" placeholder="0,00 €" oninput="updateVAT()"/></div>
+    </div>
+    <div class="field" id="vat-field">
+      <label>TVA récupérable</label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="text" id="f-vat" readonly style="flex:1;background:var(--bg);"/>
+        <span class="badge ba">Auto</span>
+      </div>
+    </div>
+    <div class="field"><label>Libellé</label><input type="text" id="f-desc" placeholder="Ex : Déjeuner client"/></div>
+    <div class="field"><label>Projet (optionnel)</label><select><option value="">Aucun projet</option><option>Projet Alpha</option><option>Commercial</option></select></div>`;
+  document.getElementById('dr-foot').innerHTML=`
+    <button class="btn-g" onclick="renderStep1()">← Retour</button>
+    <button class="btn-p" onclick="submitExpense()" style="font-size:12px;padding:8px 16px;">Soumettre</button>`;
+}
+
+/* Détail note existante */
+function openDetail(r,tr){
+  document.querySelectorAll('#tbody tr').forEach(t=>t.classList.remove('sel'));
+  tr.classList.add('sel');
+  document.getElementById('dr-title').textContent=r.type.replace(/^[^\s]+ /,'');
+  document.getElementById('dr-body').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:var(--r);">
+        <div style="font-size:24px;">${r.type.split(' ')[0]}</div>
+        <div>
+          <div style="font-weight:600;font-size:14px;">${r.type.replace(/^[^\s]+ /,'')}</div>
+          <div style="font-size:12px;color:var(--t2);">${r.sub} · ${r.dateStr} · ${fmt(r.amount)}</div>
+        </div>
+      </div>
+      <div>${sbadge(r.status)}</div>
+      ${r.status==='rejected'?`
+        <div style="padding:10px 12px;background:var(--rb);border-radius:var(--r);border-left:3px solid var(--re);">
+          <div style="font-size:12px;font-weight:600;color:var(--re);margin-bottom:4px;">Motif de refus</div>
+          <div style="font-size:12px;color:var(--re);">Justificatif manquant ou illisible.</div>
+        </div>
+        <button class="btn-p" style="font-size:12px;width:100%;justify-content:center;" onclick="openDrawer()">Modifier et resoumettre</button>
+      `:''}
+      <div class="sec">Justificatif</div>
+      <div class="up-file">
+        <div class="uf-ico">PDF</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:500;">Recu.pdf</div>
+          <div style="font-size:10px;color:var(--t3);">245 Ko · il y a 2 jours</div>
+        </div>
+        <button style="background:none;border:1px solid var(--bo);border-radius:var(--rs);padding:3px 10px;font-size:11px;cursor:pointer;color:var(--t2);">↓</button>
+      </div>
+      <div class="sec">Activité</div>
+      <div style="display:flex;gap:10px;margin-bottom:8px;">
+        <div style="width:24px;height:24px;background:var(--bl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--b);flex-shrink:0;">MD</div>
+        <div>
+          <div style="font-size:12px;font-weight:500;">Vous <span style="font-weight:400;color:var(--t2);">avez soumis cette note</span></div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px;">Il y a 2 jours</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:flex-start;">
+        <div style="width:24px;height:24px;background:var(--bl);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--b);flex-shrink:0;">MD</div>
+        <textarea style="flex:1;border:1px solid var(--bo);border-radius:var(--r);padding:8px 10px;font-size:12px;font-family:inherit;resize:none;height:56px;" placeholder="Ajouter un commentaire…"></textarea>
+      </div>
+    </div>`;
+  document.getElementById('dr-foot').innerHTML=`<button class="btn-g" onclick="closeDrawer()">Fermer</button>`;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('overlay').classList.add('on');
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
