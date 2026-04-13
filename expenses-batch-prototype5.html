@@ -1,0 +1,3458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayFit · Expenses · Batch upload prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   UNITY DS TOKENS — locked to the values in the reference doc
+   ============================================================ */
+:root {
+  /* Surface */
+  --canvas: #f8f9fc;
+  --surface-neutral: #ffffff;
+  --surface-neutral-low: #f5f6f9;
+  --surface-neutral-lowest: #eceff4;
+  --surface-primary: #0a73eb;
+  --surface-primary-hover: #0d62c4;
+  --surface-primary-pressed: #0b56ac;
+  --surface-primary-low: #e6f1fb;
+  --surface-danger: #e21328;
+  --surface-danger-low: #ffd6da;
+  --surface-danger-lowest: #ffebed;
+  --surface-success: #0b993c;
+  --surface-success-low: #bff8d3;
+  --surface-success-lowest: #e4fbec;
+  --surface-warning: #ffc800;
+  --surface-warning-low: #ffe899;
+  --surface-warning-lowest: #fff8e6;
+  --surface-info: #5fd2ff;
+  --surface-info-lowest: #e6f8ff;
+
+  /* Content */
+  --content-default: #030e1d;
+  --content-low: #364251;
+  --content-lowest: #626f7e;
+  --content-disabled: #8793a1;
+  --content-primary: #0a73eb;
+  --content-danger: #cf1125;
+  --content-success: #0b993c;
+  --content-warning: #f0ac00;
+  --content-inverted: #ffffff;
+
+  /* Border */
+  --border-default: #e0e5eb;
+  --border-high: #a8b3c1;
+  --border-danger: #ffebed;
+
+  /* Spacing */
+  --space-50: 4px;
+  --space-100: 8px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-300: 24px;
+  --space-400: 32px;
+  --space-500: 40px;
+  --space-600: 48px;
+
+  /* Radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--content-default);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+
+input, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+a { color: var(--content-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ============================================================
+   PROTOTYPE CHROME (top bar with state switcher)
+   ============================================================ */
+.proto-chrome {
+  background: #030e1d;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  border-bottom: 1px solid #1a2433;
+}
+.proto-chrome strong {
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.proto-chrome .proto-divider {
+  width: 1px;
+  height: 16px;
+  background: #1a2433;
+}
+.proto-chrome .proto-flow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.proto-chrome .proto-step {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #1a2433;
+  color: #8793a1;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-size: 11px;
+  font-weight: 500;
+}
+.proto-chrome .proto-step:hover { background: #25324a; color: #fff; }
+.proto-chrome .proto-step.active { background: #0a73eb; color: #fff; }
+.proto-chrome .proto-spacer { flex: 1; }
+.proto-chrome .proto-hint {
+  color: #626f7e;
+  font-size: 11px;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+.app {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 260px;
+  background: var(--canvas);
+  padding: 24px 16px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  border-right: 1px solid transparent;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 18px;
+}
+.logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+}
+.bell {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-lowest);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.bell:hover { background: rgba(0,0,0,0.04); }
+
+.search-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: white;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--content-disabled);
+  font-size: 13px;
+}
+
+.nav-section { display: flex; flex-direction: column; gap: 2px; }
+.nav-label {
+  font-size: 12px;
+  color: var(--content-lowest);
+  padding: 0 12px 6px;
+  font-weight: 400;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--content-low);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.nav-item:hover { background: rgba(0,0,0,0.04); }
+.nav-item.active {
+  background: var(--surface-neutral);
+  color: var(--content-default);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(3,14,29,0.04);
+}
+.nav-item svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--content-lowest); }
+.nav-item.active svg { color: var(--content-primary); }
+
+.user-card {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.user-card:hover { background: rgba(0,0,0,0.04); }
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5c074 0%, #d89351 100%);
+  flex-shrink: 0;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 13px; font-weight: 500; color: var(--content-default); }
+.user-company { font-size: 11px; color: var(--content-lowest); }
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 32px 40px;
+  background: var(--surface-neutral);
+  border-top-left-radius: 24px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+  margin-right: 16px;
+  border-radius: 24px;
+  box-shadow: 0 1px 3px rgba(3,14,29,0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 36px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  transition: all 0.12s;
+}
+.btn-primary {
+  background: var(--surface-primary);
+  color: var(--content-inverted);
+}
+.btn-primary:hover { background: var(--surface-primary-hover); }
+.btn-primary:active { background: var(--surface-primary-pressed); }
+.btn-primary:disabled {
+  background: var(--surface-neutral-low);
+  color: var(--content-disabled);
+  cursor: not-allowed;
+}
+.btn-secondary {
+  background: white;
+  color: var(--content-low);
+  border: 0.5px solid var(--border-high);
+}
+.btn-secondary:hover { background: var(--surface-neutral-low); }
+
+.btn-filter {
+  padding: 8px 14px;
+  background: white;
+  border: 0.5px solid var(--border-high);
+  border-radius: var(--radius-sm);
+  color: var(--content-low);
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-filter:hover { background: var(--surface-neutral-low); }
+
+/* ============================================================
+   YTD SUMMARY CARD
+   ============================================================ */
+.ytd-summary {
+  background: white;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.ytd-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+.ytd-stat {
+  position: relative;
+}
+.ytd-stat:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -16px;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background: var(--border-default);
+}
+.ytd-stat-label {
+  font-size: 12px;
+  color: var(--content-lowest);
+  margin-bottom: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.ytd-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--content-default);
+  line-height: 1.2;
+}
+.ytd-stat-value.pending {
+  color: var(--content-warning);
+}
+
+/* ============================================================
+   LIST CONTROLS (filter + view toggle)
+   ============================================================ */
+.list-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.view-toggle {
+  display: inline-flex;
+  background: white;
+  border: 0.5px solid var(--border-high);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+.view-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--content-lowest);
+  background: transparent;
+  transition: all 0.12s;
+}
+.view-toggle-btn:hover {
+  color: var(--content-default);
+}
+.view-toggle-btn.active {
+  background: var(--surface-primary-low);
+  color: var(--content-primary);
+}
+
+/* ============================================================
+   PAYSLIP GROUPS (per-payslip view)
+   ============================================================ */
+.payslip-group {
+  background: white;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.payslip-group-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.payslip-group-header:hover {
+  background: var(--surface-neutral-low);
+}
+.payslip-group-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.payslip-group-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-success-lowest);
+  color: var(--content-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.payslip-group-month {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--content-default);
+}
+.payslip-group-meta {
+  font-size: 12px;
+  color: var(--content-lowest);
+  margin-top: 2px;
+}
+.payslip-group-amount {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.payslip-group-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-default);
+}
+.payslip-group-chevron {
+  color: var(--content-lowest);
+  transition: transform 0.2s;
+}
+.payslip-group.expanded .payslip-group-chevron {
+  transform: rotate(180deg);
+}
+.payslip-group-body {
+  display: none;
+  border-top: 0.5px solid var(--border-default);
+  background: var(--surface-neutral-low);
+}
+.payslip-group.expanded .payslip-group-body {
+  display: block;
+}
+.payslip-expense-row {
+  padding: 12px 20px 12px 68px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  border-bottom: 0.5px solid var(--border-default);
+  transition: background 0.1s;
+}
+.payslip-expense-row:last-child {
+  border-bottom: none;
+}
+.payslip-expense-row:hover {
+  background: white;
+}
+.payslip-expense-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--content-default);
+  font-weight: 500;
+}
+.payslip-expense-meta {
+  font-size: 11px;
+  color: var(--content-lowest);
+  margin-top: 2px;
+  font-weight: 400;
+}
+.payslip-expense-amount {
+  font-size: 13px;
+  color: var(--content-default);
+  font-weight: 500;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+.table-wrap {
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: white;
+}
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.expense-table thead th {
+  background: var(--surface-neutral-low);
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 500;
+  color: var(--content-low);
+  font-size: 13px;
+  border-bottom: 0.5px solid var(--border-default);
+}
+.expense-table thead th .arrow { color: var(--content-lowest); margin-left: 4px; }
+.expense-table tbody td {
+  padding: 14px 16px;
+  border-bottom: 0.5px solid var(--border-default);
+  color: var(--content-default);
+}
+.expense-table tbody tr:last-child td { border-bottom: none; }
+.expense-table tbody tr { cursor: pointer; transition: background 0.1s; }
+.expense-table tbody tr:hover { background: var(--surface-neutral-low); }
+
+.cell-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cell-type { display: flex; align-items: center; gap: 8px; }
+.type-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-lowest);
+  flex-shrink: 0;
+}
+
+/* Status badges */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.badge-pending { background: var(--surface-warning-lowest); color: #8a5a00; }
+.badge-validated { background: var(--surface-success-lowest); color: var(--content-success); }
+.badge-refused { background: var(--surface-danger-lowest); color: var(--content-danger); }
+.badge-cancelled { background: var(--surface-neutral-lowest); color: var(--content-lowest); }
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--surface-neutral-low);
+  font-size: 13px;
+  color: var(--content-low);
+  border-top: 0.5px solid var(--border-default);
+}
+.page-numbers { display: flex; gap: 4px; align-items: center; }
+.page-num {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  color: var(--content-low);
+}
+.page-num:hover { background: white; }
+.page-num.active { background: white; color: var(--content-default); font-weight: 500; }
+.page-arrow {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  color: var(--content-lowest);
+}
+.page-arrow:hover { background: white; }
+.per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.per-page-select {
+  padding: 4px 28px 4px 10px;
+  border: 0.5px solid var(--border-high);
+  border-radius: var(--radius-xs);
+  background: white;
+  font-size: 13px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4L5 7L8 4' stroke='%23626f7e' stroke-width='1.3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+}
+
+/* ============================================================
+   SIDE PANEL
+   ============================================================ */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3,14,29,0.32);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+  z-index: 50;
+}
+.scrim.open { opacity: 1; pointer-events: auto; }
+
+.side-panel {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  bottom: 16px;
+  width: 440px;
+  max-width: calc(100vw - 32px);
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px rgba(3,14,29,0.18);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(calc(100% + 32px));
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 100;
+  overflow: hidden;
+}
+.side-panel.open { transform: translateX(0); }
+
+.panel-header {
+  padding: 20px 24px 16px;
+  border-bottom: 0.5px solid var(--border-default);
+  flex-shrink: 0;
+}
+.panel-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.panel-title {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  color: var(--content-default);
+}
+.panel-subtitle {
+  font-size: 13px;
+  color: var(--content-lowest);
+  margin-top: 4px;
+  line-height: 18px;
+}
+.panel-subtitle.success {
+  color: var(--content-success);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.panel-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-lowest);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.panel-close:hover { background: var(--surface-neutral-low); }
+
+/* ============================================================
+   EXPENSE DETAIL PANEL (read view of a submitted expense)
+   ============================================================ */
+.detail-expense-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 0.5px solid var(--border-default);
+}
+.detail-expense-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-primary-low);
+  color: var(--content-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.detail-expense-icon.refused {
+  background: var(--surface-danger-lowest);
+  color: var(--content-danger);
+}
+.detail-expense-info {
+  flex: 1;
+  min-width: 0;
+}
+.detail-expense-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--content-default);
+  line-height: 20px;
+  margin-bottom: 4px;
+}
+.detail-expense-meta {
+  font-size: 12px;
+  color: var(--content-lowest);
+  line-height: 18px;
+}
+.detail-expense-amount {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--content-default);
+  margin-top: 6px;
+}
+.detail-expense-badge {
+  margin-top: 8px;
+}
+
+/* Payslip info block — the headline new feature */
+.payslip-info {
+  margin: 16px 24px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.payslip-info.validated {
+  background: var(--surface-success-lowest);
+  border: 0.5px solid #b3edc4;
+}
+.payslip-info.pending {
+  background: var(--surface-warning-lowest);
+  border: 0.5px solid #ffe899;
+}
+.payslip-info-icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.payslip-info.validated .payslip-info-icon { color: var(--content-success); }
+.payslip-info.pending .payslip-info-icon { color: var(--content-warning); }
+.payslip-info-text {
+  flex: 1;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--content-low);
+}
+.payslip-info-text strong {
+  font-weight: 600;
+  color: var(--content-default);
+}
+.payslip-info.validated .payslip-info-text strong {
+  color: #086e2c;
+}
+
+/* Detail sections */
+.detail-section {
+  padding: 16px 24px;
+  border-bottom: 0.5px solid var(--border-default);
+}
+.detail-section:last-child {
+  border-bottom: none;
+}
+.detail-section-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--content-lowest);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+}
+.detail-justif {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface-neutral-low);
+  border-radius: var(--radius-sm);
+}
+.detail-justif-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-xs);
+  background: white;
+  color: var(--content-danger);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 600;
+}
+.detail-justif-info {
+  flex: 1;
+  min-width: 0;
+}
+.detail-justif-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--content-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.detail-justif-meta {
+  font-size: 11px;
+  color: var(--content-lowest);
+  margin-top: 2px;
+}
+.detail-justif-actions {
+  display: flex;
+  gap: 4px;
+}
+.detail-justif-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-lowest);
+  cursor: pointer;
+  background: white;
+  border: 0.5px solid var(--border-default);
+}
+.detail-justif-btn:hover {
+  background: var(--surface-neutral-lowest);
+  color: var(--content-default);
+}
+
+/* Activity log */
+.activity-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: white;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+}
+.activity-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  background: transparent;
+  color: var(--content-default);
+}
+.activity-input input::placeholder {
+  color: var(--content-disabled);
+}
+.activity-send {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-primary);
+  cursor: pointer;
+}
+.activity-event {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.activity-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f5c074 0%, #d89351 100%);
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.activity-content {
+  flex: 1;
+  font-size: 13px;
+  color: var(--content-low);
+  line-height: 19px;
+}
+.activity-content strong {
+  font-weight: 600;
+  color: var(--content-default);
+}
+.activity-date {
+  font-size: 11px;
+  color: var(--content-lowest);
+  margin-top: 2px;
+}
+
+/* Progress bar */
+.progress-track {
+  width: 100%;
+  height: 4px;
+  background: var(--surface-neutral-lowest);
+  border-radius: var(--radius-pill);
+  margin-top: 16px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--content-success);
+  border-radius: var(--radius-pill);
+  transition: width 0.4s ease;
+}
+
+/* Add more strip */
+.add-more {
+  padding: 12px 24px;
+  background: var(--surface-neutral-low);
+  border-bottom: 0.5px solid var(--border-default);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.add-more-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--content-lowest);
+}
+.add-more-link {
+  font-size: 12px;
+  color: var(--content-primary);
+  font-weight: 500;
+  cursor: pointer;
+}
+.add-more-link:hover {
+  text-decoration: underline;
+}
+.add-more-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.add-more-sep {
+  font-size: 12px;
+  color: var(--content-disabled);
+}
+
+/* Manual card form — wider field grid for compact layout */
+.field-row {
+  display: flex;
+  gap: 10px;
+}
+.field-row .field {
+  flex: 1;
+  min-width: 0;
+}
+.field-label-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.field-optional {
+  font-size: 11px;
+  color: var(--content-lowest);
+  font-weight: 400;
+}
+/* Compact justificatif drop area inside a manual card */
+.card-justif-drop {
+  border: 1px dashed var(--border-high);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--content-lowest);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.card-justif-drop:hover {
+  border-color: var(--surface-primary);
+  background: var(--surface-primary-low);
+  color: var(--content-primary);
+}
+.card-justif-drop a {
+  color: var(--content-primary);
+  font-weight: 500;
+}
+
+/* Panel body */
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+.panel-body::-webkit-scrollbar { width: 8px; }
+.panel-body::-webkit-scrollbar-thumb {
+  background: var(--surface-neutral-lowest);
+  border-radius: 4px;
+}
+
+/* Empty drop zone */
+.drop-zone {
+  border: 1.5px dashed var(--border-high);
+  border-radius: var(--radius-md);
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--canvas);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.drop-zone:hover {
+  border-color: var(--surface-primary);
+  background: var(--surface-primary-low);
+}
+.drop-zone-icon {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.drop-zone-link {
+  display: block;
+  font-size: 14px;
+  color: var(--content-primary);
+  text-decoration: underline;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.drop-zone-or {
+  font-size: 13px;
+  color: var(--content-low);
+  margin-bottom: 14px;
+}
+.drop-zone-meta {
+  font-size: 12px;
+  color: var(--content-lowest);
+  line-height: 18px;
+}
+.drop-zone-meta-strong {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  background: white;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  color: var(--content-low);
+  border: 0.5px solid var(--border-default);
+}
+
+.manual-link {
+  text-align: center;
+  margin-top: 16px;
+}
+.manual-link a {
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+/* ============================================================
+   QUEUE CARDS
+   ============================================================ */
+.queue-card {
+  background: white;
+  border: 0.5px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+  transition: all 0.15s;
+}
+.queue-card:hover { border-color: var(--border-high); }
+.queue-card.warning {
+  border: 1px solid var(--content-warning);
+  background: var(--surface-warning-lowest);
+}
+.queue-card.warning:hover { border-color: var(--content-warning); }
+
+.queue-card-row {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.queue-card.warning .queue-card-row { background: var(--surface-warning-lowest); }
+
+.card-thumb {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-neutral-lowest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--content-lowest);
+}
+.queue-card.warning .card-thumb {
+  background: white;
+  color: var(--content-warning);
+}
+
+.card-info {
+  flex: 1;
+  min-width: 0;
+}
+.card-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--content-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
+}
+.card-meta {
+  font-size: 11px;
+  color: var(--content-lowest);
+  margin-top: 2px;
+  line-height: 16px;
+}
+.card-meta.warning {
+  color: var(--content-warning);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-amount {
+  text-align: right;
+  flex-shrink: 0;
+}
+.card-amount-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--content-default);
+}
+.card-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--content-success);
+}
+.status-text {
+  font-size: 10px;
+  color: var(--content-success);
+  font-weight: 500;
+}
+.card-chevron {
+  flex-shrink: 0;
+  color: var(--content-lowest);
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+/* Card delete on hover */
+.card-delete {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-xs);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  color: var(--content-lowest);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.card-delete:hover { background: var(--surface-danger-lowest); color: var(--content-danger); }
+.queue-card:hover .card-delete { display: flex; }
+
+/* Expanded form inside card */
+.card-form {
+  padding: 4px 14px 14px;
+  background: white;
+  border-top: 0.5px solid var(--border-default);
+  display: none;
+}
+.queue-card.expanded .card-form { display: block; }
+.queue-card.expanded { background: white; }
+.queue-card.warning.expanded { background: white; }
+.queue-card.expanded .queue-card-row { background: white; }
+
+.field {
+  margin-top: 12px;
+}
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--content-default);
+  margin-bottom: 4px;
+}
+.field-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-high);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  color: var(--content-default);
+  background: white;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.field-input:focus {
+  border-color: var(--surface-primary);
+  box-shadow: 0 0 0 3px var(--surface-primary-low);
+}
+.field-input::placeholder { color: var(--content-disabled); }
+
+.field-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 0.5px solid var(--border-high);
+  border-radius: var(--radius-xs);
+  font-size: 13px;
+  background: white;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4L5 7L8 4' stroke='%23626f7e' stroke-width='1.3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  outline: none;
+}
+.field-select:focus {
+  border-color: var(--surface-primary);
+  box-shadow: 0 0 0 3px var(--surface-primary-low);
+}
+.field-select.placeholder { color: var(--content-disabled); }
+
+/* Panel footer */
+.panel-footer {
+  padding: 14px 24px 18px;
+  border-top: 0.5px solid var(--border-default);
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+  background: white;
+}
+.panel-footer .btn { flex: 1; justify-content: center; padding: 10px 16px; }
+.panel-footer .btn-primary { flex: 1.6; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--content-default);
+  color: white;
+  padding: 12px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  box-shadow: 0 8px 24px rgba(3,14,29,0.24);
+  opacity: 0;
+  transition: all 0.3s;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.toast-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--content-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   ERROR CARD STATE (failed OCR / unreadable file)
+   ============================================================ */
+.queue-card.error {
+  border: 1px solid var(--content-danger);
+  background: var(--surface-danger-lowest);
+}
+.queue-card.error .queue-card-row { background: var(--surface-danger-lowest); }
+.queue-card.error .card-thumb {
+  background: white;
+  color: var(--content-danger);
+}
+.card-meta.error {
+  color: var(--content-danger);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.queue-card.error .card-delete {
+  display: flex;
+  background: white;
+  border: 0.5px solid var(--content-danger);
+  color: var(--content-danger);
+}
+.queue-card.error .card-delete:hover {
+  background: var(--content-danger);
+  color: white;
+}
+
+/* ============================================================
+   CONFIRMATION DIALOG (mid-batch close)
+   ============================================================ */
+.dialog-scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(3,14,29,0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog-scrim.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.dialog {
+  background: white;
+  border-radius: var(--radius-lg);
+  width: 420px;
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 24px 64px rgba(3,14,29,0.32);
+  transform: scale(0.96);
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+.dialog-scrim.open .dialog { transform: scale(1); }
+.dialog-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-warning-lowest);
+  color: var(--content-warning);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+.dialog-body {
+  padding: 24px;
+}
+.dialog-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--content-default);
+  line-height: 24px;
+  margin-bottom: 8px;
+}
+.dialog-text {
+  font-size: 14px;
+  color: var(--content-low);
+  line-height: 22px;
+}
+.dialog-footer {
+  padding: 14px 24px 18px;
+  background: var(--surface-neutral-low);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.dialog-footer .btn { padding: 9px 16px; }
+.btn-danger {
+  background: var(--surface-danger);
+  color: white;
+}
+.btn-danger:hover { background: #b80f20; }
+
+/* ============================================================
+   DRAG-OVER STATE
+   ============================================================ */
+.drop-zone.drag-over {
+  border-color: var(--surface-primary);
+  background: var(--surface-primary-low);
+  border-style: solid;
+}
+.side-panel.drag-over::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 2px dashed var(--surface-primary);
+  border-radius: var(--radius-md);
+  background: rgba(10, 115, 235, 0.06);
+  pointer-events: none;
+  z-index: 10;
+}
+.side-panel.drag-over::after {
+  content: 'Déposez vos fichiers ici';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--surface-primary);
+  color: white;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 11;
+  box-shadow: 0 4px 16px rgba(10, 115, 235, 0.3);
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PROTOTYPE CHROME (state switcher — not part of the product)
+     ============================================================ -->
+<div class="proto-chrome">
+  <strong>PROTOTYPE</strong>
+  <div class="proto-divider"></div>
+  <span style="color:#8793a1;">Theme 3 · Friction 1 · Batch upload</span>
+  <div class="proto-divider"></div>
+  <div class="proto-flow">
+    <div class="proto-step active" onclick="goto('list')">List view</div>
+    <div class="proto-step" onclick="goto('empty')">1. Empty drop</div>
+    <div class="proto-step" onclick="goto('review')">2. Review (2 to fix)</div>
+    <div class="proto-step" onclick="goto('ready')">3. All ready</div>
+    <div class="proto-step" onclick="goto('submitted')">4. Submitted</div>
+    <div class="proto-step" onclick="goto('errors')">⚠ Error state</div>
+    <div class="proto-divider"></div>
+    <div class="proto-step" id="payslip-toggle" onclick="togglePayslipLayer()">💰 Payslip layer: OFF</div>
+  </div>
+  <div class="proto-spacer"></div>
+  <span class="proto-hint">Drop real files into the panel · Tap yellow cards to fix</span>
+</div>
+
+<div class="app">
+
+  <!-- ============================================================
+       SIDEBAR
+       ============================================================ -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="logo">
+        <div class="logo-mark">P</div>
+        <span>PayFit</span>
+      </div>
+      <div class="bell">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 2C6 2 4 4 4 7V10L2.5 12H15.5L14 10V7C14 4 12 2 9 2Z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M7 14C7 15 8 16 9 16C10 16 11 15 11 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="search-field">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M9.5 9.5L12 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span>Supporting text</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">The essentials</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Payslip
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Daily basis</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Leaves
+      </div>
+      <div class="nav-item active">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="10" y="2" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Expenses
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Performance &amp; Engagement
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Salary advance
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">My company</div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        Documents
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="2" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="10" y="10" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.3"/></svg>
+        My colleagues
+      </div>
+    </div>
+
+    <div class="user-card">
+      <div class="user-avatar"></div>
+      <div class="user-info">
+        <div class="user-name">User full name</div>
+        <div class="user-company">User company name</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M4 9L7 12L10 9M4 5L7 2L10 5" stroke="#626f7e" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <main class="main">
+    <div class="main-header">
+      <h1 class="page-title">Expenses</h1>
+      <button class="btn btn-primary" onclick="openPanel()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+          <path d="M8 5V11M5 8H11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+        </svg>
+        Add expense
+      </button>
+    </div>
+
+    <!-- YTD Summary card — hidden by default, toggled by Payslip layer -->
+    <div id="ytd-summary" class="ytd-summary" style="display:none">
+      <div class="ytd-stats">
+        <div class="ytd-stat">
+          <div class="ytd-stat-label">Remboursé en 2026</div>
+          <div class="ytd-stat-value" id="ytd-reimbursed">— €</div>
+        </div>
+        <div class="ytd-stat">
+          <div class="ytd-stat-label">En attente</div>
+          <div class="ytd-stat-value pending" id="ytd-pending">— €</div>
+        </div>
+        <div class="ytd-stat">
+          <div class="ytd-stat-label">Dépenses cette année</div>
+          <div class="ytd-stat-value" id="ytd-count">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="list-controls">
+      <button class="btn-filter">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 4V10M4 7H10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        Ajouter un filtre
+      </button>
+      <div class="view-toggle" id="view-toggle" style="display:none">
+        <button class="view-toggle-btn active" data-view="list" onclick="setView('list')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 3.5H12M2 7H12M2 10.5H12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Liste
+        </button>
+        <button class="view-toggle-btn" data-view="payslip" onclick="setView('payslip')">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="10" height="10" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M5 5H9M5 7H9M5 9H7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Par fiche de paie
+        </button>
+      </div>
+    </div>
+
+    <div id="list-container">
+      <!-- Rendered by JS — see renderList() and renderPayslipView() -->
+    </div>
+  </main>
+</div>
+
+<!-- ============================================================
+     SCRIM
+     ============================================================ -->
+<div class="scrim" id="scrim" onclick="handleScrimClick()"></div>
+
+<!-- ============================================================
+     SIDE PANEL — all states swap inside this container
+     ============================================================ -->
+<aside class="side-panel" id="panel">
+  <!-- Content injected by JS -->
+</aside>
+
+<!-- ============================================================
+     TOAST
+     ============================================================ -->
+<div class="toast" id="toast">
+  <div class="toast-check">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+      <path d="M2 5.5L4.5 8L9 3" stroke="white" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <span id="toast-message">5 dépenses soumises avec succès</span>
+</div>
+
+<!-- ============================================================
+     CONFIRMATION DIALOG (mid-batch close)
+     ============================================================ -->
+<div class="dialog-scrim" id="dialog-scrim">
+  <div class="dialog">
+    <div class="dialog-body">
+      <div class="dialog-icon">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M11 2L21 19H1L11 2Z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M11 9V13M11 15V15.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="dialog-title" id="dialog-title">Vous avez 5 dépenses non soumises</div>
+      <div class="dialog-text">Si vous fermez maintenant, toutes les dépenses ajoutées à ce lot seront perdues. Voulez-vous vraiment continuer&nbsp;?</div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn btn-secondary" onclick="dismissDialog()">Reprendre</button>
+      <button class="btn btn-danger" onclick="confirmClose()">Tout supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE — mock receipt data
+// ============================================================
+const initialBatch = [
+  {
+    id: 1,
+    ready: true,
+    name: 'Déjeuner client — Le Bistrot',
+    type: 'Repas d\'affaires',
+    date: '12 septembre 2025',
+    amount: '42,50 €'
+  },
+  {
+    id: 2,
+    ready: true,
+    name: 'Taxi G7 — Gare de Lyon',
+    type: 'Transport',
+    date: '12 septembre 2025',
+    amount: '28,40 €'
+  },
+  {
+    id: 3,
+    ready: false,
+    name: 'receipt_IMG_4892.jpg',
+    missing: 'Type et nom à compléter',
+    type: '',
+    nameFilled: '',
+    date: '12 septembre 2025',
+    amount: '15,90 €'
+  },
+  {
+    id: 4,
+    ready: true,
+    name: 'Hôtel Mercure — Lyon',
+    type: 'Hébergement',
+    date: '13 septembre 2025',
+    amount: '142,00 €'
+  },
+  {
+    id: 5,
+    ready: false,
+    name: 'receipt_scan_03.pdf',
+    missing: 'Montant à confirmer',
+    type: 'Transport',
+    nameFilled: 'Parking — Aéroport CDG',
+    date: '14 septembre 2025',
+    amount: '',
+    amountFilled: ''
+  }
+];
+
+let batch = JSON.parse(JSON.stringify(initialBatch));
+let currentState = 'list';
+let expandedId = null;
+
+// ============================================================
+// EXPENSE DATA MODEL — drives the list, summary, and detail panel
+// ============================================================
+// `expenses` is the source of truth for everything outside the batch panel.
+// When the user submits a batch, those new expenses are pushed here with
+// status 'pending'. The list view, YTD summary, and per-payslip breakdown
+// all read from this array.
+//
+// Each expense has:
+//   id, name, type, dateISO (YYYY-MM-DD), amount (number), status,
+//   submittedISO (when soumitted), approvedISO (when validated, or null)
+
+const TODAY = new Date('2026-04-08'); // Prototype "today" — matches the user's reality
+
+// PayFit cutoff convention (placeholder — to validate with product)
+// Expenses validated on or before the 25th of month M → reimbursed on M's payslip
+// After the 25th → next month's payslip
+const PAYSLIP_CUTOFF_DAY = 25;
+
+const FRENCH_MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                       'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+
+let expenses = [
+  // Validated, already paid out (older months)
+  { id: 'e001', name: 'Hôtel Cervantes — Madrid', type: 'Hébergement',
+    dateISO: '2025-09-13', amount: 275.64, status: 'validated',
+    submittedISO: '2025-09-15', approvedISO: '2025-09-18',
+    fileName: 'hotel_cervantes.pdf' },
+  { id: 'e002', name: 'amazon.pdf', type: 'Équipement',
+    dateISO: '2025-06-26', amount: 123.00, status: 'validated',
+    submittedISO: '2025-06-28', approvedISO: '2025-07-02',
+    fileName: 'amazon.pdf' },
+  { id: 'e003', name: 'invoice.pdf', type: 'Équipement',
+    dateISO: '2025-12-15', amount: 89.50, status: 'validated',
+    submittedISO: '2025-12-16', approvedISO: '2025-12-20',
+    fileName: 'invoice.pdf' },
+  { id: 'e004', name: 'SNCF — Paris-Lyon', type: 'Transport',
+    dateISO: '2026-01-08', amount: 145.20, status: 'validated',
+    submittedISO: '2026-01-10', approvedISO: '2026-01-14',
+    fileName: 'sncf_billet.pdf' },
+  { id: 'e005', name: 'Restaurant Le Procope', type: 'Repas d\'affaires',
+    dateISO: '2026-01-22', amount: 87.40, status: 'validated',
+    submittedISO: '2026-01-23', approvedISO: '2026-01-25',
+    fileName: 'procope_recu.jpg' },
+  { id: 'e006', name: 'Carburant Total', type: 'Transport',
+    dateISO: '2026-02-05', amount: 65.30, status: 'validated',
+    submittedISO: '2026-02-06', approvedISO: '2026-02-09',
+    fileName: 'total_essence.jpg' },
+  { id: 'e007', name: 'Parking Vinci CDG', type: 'Transport',
+    dateISO: '2026-02-14', amount: 38.00, status: 'validated',
+    submittedISO: '2026-02-16', approvedISO: '2026-02-18',
+    fileName: 'vinci_parking.pdf' },
+  { id: 'e008', name: 'FNAC — Casque audio', type: 'Équipement',
+    dateISO: '2026-02-20', amount: 159.99, status: 'validated',
+    submittedISO: '2026-02-22', approvedISO: '2026-02-24',
+    fileName: 'fnac_facture.pdf' },
+  { id: 'e009', name: 'Café de Flore', type: 'Repas d\'affaires',
+    dateISO: '2026-03-04', amount: 24.80, status: 'validated',
+    submittedISO: '2026-03-05', approvedISO: '2026-03-07',
+    fileName: 'flore_ticket.jpg' },
+  { id: 'e010', name: 'Hôtel Ibis — Toulouse', type: 'Hébergement',
+    dateISO: '2026-03-11', amount: 98.00, status: 'validated',
+    submittedISO: '2026-03-12', approvedISO: '2026-03-15',
+    fileName: 'ibis_toulouse.pdf' },
+  { id: 'e011', name: 'Uber — Trajet client', type: 'Transport',
+    dateISO: '2026-03-18', amount: 22.50, status: 'validated',
+    submittedISO: '2026-03-19', approvedISO: '2026-03-21',
+    fileName: 'uber_recu.pdf' },
+  // Pending validation (current cycle)
+  { id: 'e012', name: 'Hotel Cervantes — Lisbonne', type: 'Hébergement',
+    dateISO: '2026-03-28', amount: 312.40, status: 'pending',
+    submittedISO: '2026-04-02', approvedISO: null,
+    fileName: 'hotel_cervantes_2.pdf' },
+  { id: 'e013', name: 'Repas équipe — Q1', type: 'Repas d\'affaires',
+    dateISO: '2026-04-01', amount: 187.50, status: 'pending',
+    submittedISO: '2026-04-03', approvedISO: null,
+    fileName: 'repas_q1.pdf' },
+  // Refused
+  { id: 'e014', name: 'RCYE9X3EN5.pdf', type: 'Hébergement',
+    dateISO: '2025-09-13', amount: 275.64, status: 'refused',
+    submittedISO: '2025-09-14', approvedISO: null,
+    fileName: 'RCYE9X3EN5.pdf',
+    refusalReason: 'Justificatif illisible. Merci de soumettre une photo plus nette du reçu original.',
+    refusedBy: 'Marie Dupont' },
+  // Cancelled
+  { id: 'e015', name: 'invoice.pdf', type: 'Équipement',
+    dateISO: '2025-06-26', amount: 123.00, status: 'cancelled',
+    submittedISO: '2025-06-27', approvedISO: null,
+    fileName: 'invoice_cancelled.pdf' }
+];
+
+let nextExpenseId = 16;
+let payslipViewActive = false; // toggle: false = standard list, true = grouped by payslip
+let openExpenseId = null; // id of expense currently shown in detail panel
+
+// ============================================================
+// PAYSLIP HELPERS
+// ============================================================
+// Compute which payslip month an expense will be / was reimbursed on,
+// based on the approval date and the cutoff convention.
+function payslipMonthForApproval(approvedISO) {
+  if (!approvedISO) return null;
+  const d = new Date(approvedISO);
+  let year = d.getFullYear();
+  let month = d.getMonth(); // 0-indexed
+  if (d.getDate() > PAYSLIP_CUTOFF_DAY) {
+    month += 1;
+    if (month > 11) { month = 0; year += 1; }
+  }
+  return { year, month, label: `${FRENCH_MONTHS[month]} ${year}` };
+}
+
+// Format an ISO date as a long French date
+function formatDateLong(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return `${d.getDate()} ${FRENCH_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+// Format a number as French euros
+function formatEuro(n) {
+  return n.toFixed(2).replace('.', ',') + ' €';
+}
+
+// Compute YTD totals (current calendar year of TODAY)
+function computeYTD() {
+  const year = TODAY.getFullYear();
+  let reimbursed = 0;
+  let pending = 0;
+  let count = 0;
+  expenses.forEach(e => {
+    const d = new Date(e.dateISO);
+    if (d.getFullYear() !== year) return;
+    if (e.status === 'cancelled' || e.status === 'refused') return;
+    count++;
+    if (e.status === 'validated') reimbursed += e.amount;
+    else if (e.status === 'pending') pending += e.amount;
+  });
+  return { reimbursed, pending, count };
+}
+
+// Group expenses by their payslip month for the payslip view.
+// Returns an array of { label, year, month, expenses[], total }
+// sorted from most recent to oldest.
+function groupByPayslip() {
+  const groups = {};
+  expenses.forEach(e => {
+    if (e.status !== 'validated' || !e.approvedISO) return;
+    const ps = payslipMonthForApproval(e.approvedISO);
+    if (!ps) return;
+    const key = `${ps.year}-${String(ps.month).padStart(2, '0')}`;
+    if (!groups[key]) {
+      groups[key] = { key, label: ps.label, year: ps.year, month: ps.month, expenses: [], total: 0 };
+    }
+    groups[key].expenses.push(e);
+    groups[key].total += e.amount;
+  });
+  return Object.values(groups).sort((a, b) => b.key.localeCompare(a.key));
+}
+
+// ============================================================
+// PANEL TEMPLATES
+// ============================================================
+function templateEmpty() {
+  return `
+    <div class="panel-header">
+      <div class="panel-header-row">
+        <div>
+          <div class="panel-title">Add expense</div>
+          <div class="panel-subtitle">Glissez un ou plusieurs justificatifs</div>
+        </div>
+        <div class="panel-close" onclick="closePanel()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <input type="file" id="file-picker" multiple accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="handleFilePicker(event)">
+      <div class="drop-zone" onclick="document.getElementById('file-picker').click()">
+        <div class="drop-zone-icon">
+          <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
+            <rect x="28" y="20" width="40" height="56" rx="3" fill="white" stroke="#0a73eb" stroke-width="1.5"/>
+            <path d="M36 32H60M36 40H56M36 48H58" stroke="#0a73eb" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M40 60C42 62 46 65 48 65C50 65 54 62 56 60" stroke="#0a73eb" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M20 16L24 12M28 12L24 12L24 16M76 16L72 12M68 12L72 12L72 16M20 80L24 84M28 84L24 84L24 80M76 80L72 84M68 84L72 84L72 80" stroke="#f0ac00" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <a href="#" class="drop-zone-link" onclick="event.preventDefault();event.stopPropagation();document.getElementById('file-picker').click()">Sélectionner des documents</a>
+        <div class="drop-zone-or">ou les glisser-déposer ici</div>
+        <div class="drop-zone-meta">
+          La taille des fichiers doit être inférieure à 5 Mo<br>
+          Formats acceptés : JPG, PNG, PDF
+        </div>
+        <div class="drop-zone-meta-strong">Jusqu'à 10 fichiers à la fois</div>
+      </div>
+      <div class="manual-link">
+        <a href="#" onclick="event.preventDefault();addManualCard()">Je préfère effectuer manuellement ma demande de note de frais</a>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-secondary" onclick="closePanel()">Discard</button>
+      <button class="btn btn-primary" disabled>Add expense</button>
+    </div>
+  `;
+}
+
+function templateBatch(state) {
+  // state = 'review' or 'ready'
+  const readyCount = batch.filter(c => c.ready).length;
+  const errorCount = batch.filter(c => c.error).length;
+  const warningCount = batch.filter(c => !c.ready && !c.error).length;
+  const totalCount = batch.length;
+  const allReady = readyCount === totalCount && errorCount === 0;
+  const hasErrors = errorCount > 0;
+  const total = batch.filter(c => c.ready && c.amount).reduce((sum, c) => {
+    const num = parseFloat(c.amount.replace(',', '.').replace(' €', ''));
+    return sum + (isNaN(num) ? 0 : num);
+  }, 0);
+  const totalFormatted = total.toFixed(2).replace('.', ',') + ' €';
+  const progress = (readyCount / totalCount) * 100;
+
+  let title, subtitle;
+  if (allReady) {
+    title = `${totalCount} ${totalCount > 1 ? 'dépenses prêtes' : 'dépense prête'}`;
+    subtitle = `<div class="panel-subtitle success">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2 7L5.5 10.5L12 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Tout est vérifié · Total : ${totalFormatted}
+    </div>`;
+  } else if (hasErrors && warningCount === 0) {
+    // Only errors blocking — emphasize removal
+    title = `${totalCount} ${totalCount > 1 ? 'dépenses à vérifier' : 'dépense à vérifier'}`;
+    subtitle = `<div class="panel-subtitle" style="color: var(--content-danger);">${errorCount} ${errorCount > 1 ? 'fichiers illisibles, à supprimer' : 'fichier illisible, à supprimer'}</div>`;
+  } else {
+    title = `${totalCount} ${totalCount > 1 ? 'dépenses à vérifier' : 'dépense à vérifier'}`;
+    const parts = [];
+    if (readyCount > 0) parts.push(`${readyCount} ${readyCount > 1 ? 'prêtes' : 'prête'}`);
+    if (warningCount > 0) parts.push(`${warningCount} à compléter`);
+    if (errorCount > 0) parts.push(`<span style="color: var(--content-danger);">${errorCount} en erreur</span>`);
+    subtitle = `<div class="panel-subtitle">${parts.join(' · ')}</div>`;
+  }
+
+  let cardsHtml = batch.map(card => renderCard(card)).join('');
+
+  let submitLabel, submitDisabled;
+  if (allReady) {
+    submitLabel = `Soumettre ${totalCount > 1 ? `les ${totalCount} dépenses` : 'la dépense'}`;
+    submitDisabled = false;
+  } else if (hasErrors) {
+    submitLabel = `Soumettre (${errorCount} ${errorCount > 1 ? 'erreurs à régler' : 'erreur à régler'})`;
+    submitDisabled = true;
+  } else {
+    submitLabel = `Soumettre (${readyCount}/${totalCount} prêtes)`;
+    submitDisabled = true;
+  }
+
+  return `
+    <div class="panel-header">
+      <div class="panel-header-row">
+        <div>
+          <div class="panel-title">${title}</div>
+          ${subtitle}
+        </div>
+        <div class="panel-close" onclick="closePanel()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width: ${progress}%"></div>
+      </div>
+    </div>
+    <div class="add-more">
+      <div class="add-more-text">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M7 10V4M7 4L4 7M7 4L10 7" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 11V12C2 12.5523 2.44772 13 3 13H11C11.5523 13 12 12.5523 12 12V11" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <span>Glissez d'autres justificatifs (${totalCount}/10)</span>
+      </div>
+      <div class="add-more-actions">
+        <span class="add-more-link" onclick="document.getElementById('file-picker-batch').click()">Parcourir</span>
+        <span class="add-more-sep">·</span>
+        <span class="add-more-link" onclick="addManualCard()">Saisie manuelle</span>
+      </div>
+    </div>
+    <input type="file" id="file-picker-batch" multiple accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="handleFilePicker(event)">
+    <div class="panel-body" style="padding-top: 12px;">
+      ${cardsHtml}
+    </div>
+    <div class="panel-footer">
+      <button class="btn btn-secondary" onclick="closePanel()">Annuler</button>
+      <button class="btn btn-primary" ${submitDisabled ? 'disabled' : `onclick="submitBatch()"`}>${submitLabel}</button>
+    </div>
+  `;
+}
+
+function renderCard(card) {
+  const isExpanded = expandedId === card.id && !card.ready && !card.error;
+  let stateClass = '';
+  if (card.error) stateClass = 'error';
+  else if (!card.ready) stateClass = 'warning';
+  const expandedClass = isExpanded ? 'expanded' : '';
+
+  const statusBlock = card.ready
+    ? `<div class="card-status">
+         <div class="status-dot"></div>
+         <span class="status-text">Prête</span>
+       </div>`
+    : '';
+
+  let metaBlock;
+  if (card.error) {
+    metaBlock = `<div class="card-meta error">
+         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+           <circle cx="5" cy="5" r="4" stroke="currentColor" stroke-width="1" fill="none"/>
+           <path d="M3.5 3.5L6.5 6.5M6.5 3.5L3.5 6.5" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+         </svg>
+         <span>${card.errorMessage || 'Impossible de lire ce fichier'}</span>
+       </div>`;
+  } else if (card.ready) {
+    metaBlock = `<div class="card-meta">${card.type} · ${card.date}</div>`;
+  } else if (card.manual) {
+    metaBlock = `<div class="card-meta warning">
+         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+           <path d="M2 8L5 5M5 5L8 2L8.5 2.5L5.5 5.5M5 5L5.5 5.5M5.5 5.5L8 8" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+         </svg>
+         <span>Saisie manuelle — à compléter</span>
+       </div>`;
+  } else {
+    metaBlock = `<div class="card-meta warning">
+         <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+           <path d="M5 1L9 8.5H1L5 1Z" stroke="currentColor" stroke-width="1" fill="none" stroke-linejoin="round"/>
+           <path d="M5 4V5.8M5 6.8V7" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+         </svg>
+         <span>${card.missing}</span>
+       </div>`;
+  }
+
+  const amountDisplay = card.error ? '' : (card.amount || (card.amountFilled || '— €'));
+
+  // Card name display: manual cards show the typed name or a placeholder
+  let displayName;
+  if (card.manual) {
+    displayName = (card.nameFilled && card.nameFilled.trim()) ? card.nameFilled : 'Nouvelle dépense';
+  } else if (card.ready) {
+    displayName = card.name;
+  } else {
+    displayName = card.nameFilled || card.name;
+  }
+
+  // Thumbnail icon: pencil for manual, document for file-based
+  const thumbIcon = card.manual
+    ? `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+         <path d="M11 2L14 5L5.5 13.5L2 14L2.5 10.5L11 2Z" stroke="currentColor" stroke-width="1.1" fill="none" stroke-linejoin="round"/>
+         <path d="M9 4L12 7" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+       </svg>`
+    : `<svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+         <rect x="2.5" y="1" width="11" height="14" rx="1.5" stroke="currentColor" stroke-width="1"/>
+         <path d="M5 4.5H11M5 7H10M5 9.5H8" stroke="currentColor" stroke-width="0.8" stroke-linecap="round"/>
+       </svg>`;
+
+  let formHtml = '';
+  if (isExpanded) {
+    // Hardcoded forms for the demo cards (ids 3 and 5) keep their bespoke behavior
+    if (card.id === 3) {
+      formHtml = `
+        <div class="card-form">
+          <div class="field">
+            <label class="field-label">Nom de la dépense</label>
+            <input type="text" class="field-input" placeholder="Ex : Café avec partenaire" id="card-3-name" oninput="updateCard3()">
+          </div>
+          <div class="field">
+            <label class="field-label">Type de dépense</label>
+            <select class="field-select placeholder" id="card-3-type" onchange="updateCard3()">
+              <option value="">Sélectionnez un type</option>
+              <option>Repas d'affaires</option>
+              <option>Transport</option>
+              <option>Hébergement</option>
+              <option>Équipement</option>
+              <option>Autre</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else if (card.id === 5) {
+      formHtml = `
+        <div class="card-form">
+          <div class="field">
+            <label class="field-label">Montant TTC</label>
+            <input type="text" class="field-input" placeholder="0,00 €" id="card-5-amount" oninput="updateCard5()">
+          </div>
+          <div class="field">
+            <label class="field-label" style="color: var(--content-lowest); font-weight: 400;">Type de dépense</label>
+            <div style="padding: 8px 10px; background: var(--surface-neutral-low); border-radius: var(--radius-xs); font-size: 13px; color: var(--content-low);">${card.type}</div>
+          </div>
+        </div>
+      `;
+    } else if (card.manual) {
+      // Full manual entry form: Nom, Type, Date, Montant, Justificatif (optional)
+      const nameVal = card.nameFilled || '';
+      const typeVal = card.type || '';
+      const dateVal = card.dateISO || '';
+      const amountVal = card.amount || '';
+      const justifVal = card.justifName || '';
+      formHtml = `
+        <div class="card-form">
+          <div class="field">
+            <label class="field-label">Nom de la dépense</label>
+            <input type="text" class="field-input" placeholder="Ex : Déjeuner client — Le Bistrot" value="${escapeHtml(nameVal)}" oninput="updateManualCard(${card.id}, 'name', this.value)">
+          </div>
+          <div class="field">
+            <label class="field-label">Type de dépense</label>
+            <select class="field-select ${typeVal ? '' : 'placeholder'}" onchange="updateManualCard(${card.id}, 'type', this.value); this.classList.toggle('placeholder', !this.value)">
+              <option value="">Sélectionnez un type</option>
+              <option ${typeVal === 'Repas d\'affaires' ? 'selected' : ''}>Repas d'affaires</option>
+              <option ${typeVal === 'Transport' ? 'selected' : ''}>Transport</option>
+              <option ${typeVal === 'Hébergement' ? 'selected' : ''}>Hébergement</option>
+              <option ${typeVal === 'Équipement' ? 'selected' : ''}>Équipement</option>
+              <option ${typeVal === 'Autre' ? 'selected' : ''}>Autre</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label class="field-label">Date</label>
+              <input type="date" class="field-input" value="${dateVal}" oninput="updateManualCard(${card.id}, 'date', this.value)">
+            </div>
+            <div class="field">
+              <label class="field-label">Montant TTC</label>
+              <input type="text" class="field-input" placeholder="0,00 €" value="${escapeHtml(amountVal)}" oninput="updateManualCard(${card.id}, 'amount', this.value)">
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label-row">
+              <label class="field-label" style="margin-bottom:0">Justificatif</label>
+              <span class="field-optional">facultatif</span>
+            </div>
+            ${justifVal
+              ? `<div style="padding: 8px 12px; background: var(--surface-neutral-low); border-radius: var(--radius-xs); font-size: 13px; color: var(--content-low); display: flex; align-items: center; gap: 8px;">
+                   <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1"/></svg>
+                   <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(justifVal)}</span>
+                   <span style="cursor:pointer; color: var(--content-lowest);" onclick="removeManualJustif(${card.id})">✕</span>
+                 </div>`
+              : `<div class="card-justif-drop" onclick="document.getElementById('manual-file-${card.id}').click()">
+                   <a href="#" onclick="event.preventDefault();event.stopPropagation();document.getElementById('manual-file-${card.id}').click()">Ajouter un fichier</a> ou le glisser-déposer
+                 </div>
+                 <input type="file" id="manual-file-${card.id}" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="handleManualJustif(${card.id}, event)">`
+            }
+          </div>
+        </div>
+      `;
+    } else {
+      // Generic form for dropped-file warning cards: render only the missing fields
+      const needsName = !card.nameFilled || card.nameFilled.trim() === '';
+      const needsType = !card.type || card.type.trim() === '';
+      const needsAmount = !card.amount || card.amount.trim() === '';
+      let fields = '';
+      if (needsName) {
+        fields += `
+          <div class="field">
+            <label class="field-label">Nom de la dépense</label>
+            <input type="text" class="field-input" placeholder="Ex : Restaurant Le Procope" oninput="updateGenericCard(${card.id}, 'name', this.value)">
+          </div>`;
+      }
+      if (needsType) {
+        fields += `
+          <div class="field">
+            <label class="field-label">Type de dépense</label>
+            <select class="field-select placeholder" onchange="updateGenericCard(${card.id}, 'type', this.value); this.classList.toggle('placeholder', !this.value)">
+              <option value="">Sélectionnez un type</option>
+              <option>Repas d'affaires</option>
+              <option>Transport</option>
+              <option>Hébergement</option>
+              <option>Équipement</option>
+              <option>Autre</option>
+            </select>
+          </div>`;
+      }
+      if (needsAmount) {
+        fields += `
+          <div class="field">
+            <label class="field-label">Montant TTC</label>
+            <input type="text" class="field-input" placeholder="0,00 €" oninput="updateGenericCard(${card.id}, 'amount', this.value)">
+          </div>`;
+      }
+      formHtml = `<div class="card-form">${fields}</div>`;
+    }
+  }
+
+  const isPlaceholderName = card.manual && (!card.nameFilled || !card.nameFilled.trim());
+
+  return `
+    <div class="queue-card ${stateClass} ${expandedClass}" data-id="${card.id}">
+      <div class="queue-card-row" onclick="toggleCard(${card.id})">
+        <div class="card-thumb">
+          ${thumbIcon}
+        </div>
+        <div class="card-info">
+          <div class="card-name" style="${isPlaceholderName ? 'color: var(--content-disabled); font-style: italic;' : ''}">${escapeHtml(displayName)}</div>
+          ${metaBlock}
+        </div>
+        <div class="card-amount">
+          <div class="card-amount-value">${amountDisplay}</div>
+          ${statusBlock}
+        </div>
+        <div class="card-delete" onclick="event.stopPropagation(); deleteCard(${card.id})">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M3 4H11M5 4V3C5 2.4 5.4 2 6 2H8C8.6 2 9 2.4 9 3V4M5 4V11C5 11.6 5.4 12 6 12H8C8.6 12 9 11.6 9 11V4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+      ${formHtml}
+    </div>
+  `;
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// ============================================================
+// MANUAL CARD HANDLERS
+// ============================================================
+function addManualCard() {
+  // Enforce 10-card cap
+  if (batch.length >= 10) {
+    showToast('Limite de 10 dépenses atteinte');
+    return;
+  }
+  const newCard = {
+    id: nextCardId++,
+    manual: true,
+    ready: false,
+    nameFilled: '',
+    type: '',
+    dateISO: '',
+    amount: '',
+    justifName: ''
+  };
+  batch.push(newCard);
+  expandedId = newCard.id;
+  // If we were on the empty state, switch to batch view
+  if (currentState === 'empty') {
+    currentState = 'review';
+    setActiveStep('review');
+  }
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+  // Focus the first field of the new card after re-render
+  setTimeout(() => {
+    const firstInput = document.querySelector(`.queue-card[data-id="${newCard.id}"] .card-form input`);
+    if (firstInput) firstInput.focus();
+  }, 50);
+}
+
+function updateManualCard(id, field, value) {
+  const card = batch.find(c => c.id === id);
+  if (!card || !card.manual) return;
+
+  if (field === 'name') card.nameFilled = value;
+  else if (field === 'type') card.type = value;
+  else if (field === 'date') {
+    card.dateISO = value;
+    // Also format a human-readable version for the card meta when ready
+    if (value) {
+      const d = new Date(value);
+      const months = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+      card.date = `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    } else {
+      card.date = '';
+    }
+  } else if (field === 'amount') card.amount = value;
+
+  // Update the visible card name and amount in real time without re-rendering the whole form
+  // (re-rendering would steal focus from the input the user is typing in)
+  const cardEl = document.querySelector(`.queue-card[data-id="${id}"]`);
+  if (cardEl) {
+    const nameEl = cardEl.querySelector('.card-name');
+    if (nameEl) {
+      const displayName = (card.nameFilled && card.nameFilled.trim()) ? card.nameFilled : 'Nouvelle dépense';
+      nameEl.textContent = displayName;
+      nameEl.style.cssText = (card.nameFilled && card.nameFilled.trim())
+        ? ''
+        : 'color: var(--content-disabled); font-style: italic;';
+    }
+    const amountEl = cardEl.querySelector('.card-amount-value');
+    if (amountEl) {
+      amountEl.textContent = card.amount ? (card.amount.includes('€') ? card.amount : card.amount + ' €') : '— €';
+    }
+  }
+
+  // Check if all required fields are now filled
+  const hasName = card.nameFilled && card.nameFilled.trim();
+  const hasType = card.type && card.type.trim();
+  const hasDate = card.dateISO && card.dateISO.trim();
+  const hasAmount = card.amount && card.amount.trim();
+
+  if (hasName && hasType && hasDate && hasAmount) {
+    card.ready = true;
+    card.name = card.nameFilled;
+    if (!card.amount.includes('€')) card.amount = card.amount + ' €';
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+    // Auto-expand the next card needing attention, if any
+    const nextWarning = batch.find(c => !c.ready && !c.error);
+    if (nextWarning) {
+      setTimeout(() => {
+        expandedId = nextWarning.id;
+        document.getElementById('panel').innerHTML = templateBatch(currentState);
+      }, 250);
+    }
+  }
+}
+
+function handleManualJustif(id, event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  // Validate
+  const isValidType = /\.(jpg|jpeg|png|pdf)$/i.test(file.name);
+  const isValidSize = file.size <= 5 * 1024 * 1024;
+  if (!isValidType) {
+    showToast('Format non supporté (JPG, PNG, PDF uniquement)');
+    return;
+  }
+  if (!isValidSize) {
+    showToast('Fichier trop volumineux (5 Mo max)');
+    return;
+  }
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+  card.justifName = file.name;
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+  // Re-expand the card we just added the file to
+  expandedId = id;
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+function removeManualJustif(id) {
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+  card.justifName = '';
+  expandedId = id;
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+// ============================================================
+// INTERACTIONS
+// ============================================================
+function openPanel() {
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  goto('empty');
+}
+
+function handleScrimClick() {
+  // Route to the right close function based on what's currently open
+  if (currentState === 'detail') {
+    closeExpenseDetail();
+  } else {
+    closePanel();
+  }
+}
+
+function closePanel(skipConfirm) {
+  // If there's an active batch and user didn't submit, ask first
+  const hasBatch = batch.length > 0 && currentState !== 'list' && currentState !== 'empty' && currentState !== 'submitted';
+  if (hasBatch && !skipConfirm) {
+    showCloseDialog();
+    return;
+  }
+  document.getElementById('scrim').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  setTimeout(() => {
+    batch = [];
+    expandedId = null;
+    setActiveStep('list');
+    currentState = 'list';
+  }, 300);
+}
+
+function showCloseDialog() {
+  const count = batch.length;
+  document.getElementById('dialog-title').textContent =
+    `Vous avez ${count} ${count > 1 ? 'dépenses non soumises' : 'dépense non soumise'}`;
+  document.getElementById('dialog-scrim').classList.add('open');
+}
+
+function dismissDialog() {
+  document.getElementById('dialog-scrim').classList.remove('open');
+}
+
+function confirmClose() {
+  document.getElementById('dialog-scrim').classList.remove('open');
+  closePanel(true);
+}
+
+function goto(state) {
+  // The prototype state-switcher should never trigger the unsaved-batch dialog —
+  // it's a demo control, not a real user action. Hard-reset before switching.
+  batch = [];
+  openExpenseId = null;
+  currentState = state;
+  setActiveStep(state);
+
+  if (state === 'list') {
+    document.getElementById('scrim').classList.remove('open');
+    document.getElementById('panel').classList.remove('open');
+    setTimeout(() => {
+      batch = JSON.parse(JSON.stringify(initialBatch));
+      expandedId = null;
+    }, 300);
+    return;
+  }
+
+  // Open panel if not already
+  if (!document.getElementById('panel').classList.contains('open')) {
+    document.getElementById('scrim').classList.add('open');
+    document.getElementById('panel').classList.add('open');
+  }
+
+  if (state === 'empty') {
+    batch = [];
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateEmpty();
+    attachDropZoneHandlers();
+  } else if (state === 'review') {
+    batch = JSON.parse(JSON.stringify(initialBatch));
+    expandedId = 3; // auto-expand the first card needing attention
+    document.getElementById('panel').innerHTML = templateBatch('review');
+  } else if (state === 'ready') {
+    // Mark all cards as ready
+    batch = JSON.parse(JSON.stringify(initialBatch));
+    batch[2].ready = true;
+    batch[2].name = 'Café avec partenaire';
+    batch[2].type = 'Repas d\'affaires';
+    batch[4].ready = true;
+    batch[4].name = batch[4].nameFilled || 'Parking — Aéroport CDG';
+    batch[4].amount = '115,00 €';
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch('ready');
+  } else if (state === 'errors') {
+    // Mixed state showing all 3 card states, including errors
+    batch = [
+      {
+        id: 101, ready: true,
+        name: 'Déjeuner client — Le Bistrot',
+        type: 'Repas d\'affaires',
+        date: '12 septembre 2025',
+        amount: '42,50 €'
+      },
+      {
+        id: 102, error: true,
+        name: 'IMG_4521.jpg',
+        errorMessage: 'Fichier illisible — image trop floue'
+      },
+      {
+        id: 103, ready: true,
+        name: 'Hôtel Mercure — Lyon',
+        type: 'Hébergement',
+        date: '13 septembre 2025',
+        amount: '142,00 €'
+      },
+      {
+        id: 104, error: true,
+        name: 'scan_corrupted.pdf',
+        errorMessage: 'PDF endommagé, impossible à lire'
+      },
+      {
+        id: 105, ready: false,
+        name: 'receipt_taxi.jpg',
+        missing: 'Type de dépense à compléter',
+        type: '',
+        nameFilled: 'Course taxi',
+        date: '14 septembre 2025',
+        amount: '32,80 €'
+      }
+    ];
+    expandedId = null;
+    currentState = 'review';
+    document.getElementById('panel').innerHTML = templateBatch('review');
+  } else if (state === 'submitted') {
+    const count = batch.length || 5;
+    batch = [];
+    currentState = 'list';
+    document.getElementById('scrim').classList.remove('open');
+    document.getElementById('panel').classList.remove('open');
+    setTimeout(() => {
+      setActiveStep('list');
+      renderList(); // Re-render so the freshly submitted expenses appear
+      const verb = count > 1 ? 'dépenses soumises' : 'dépense soumise';
+      showToast(`${count} ${verb} · Seront remboursées sur la prochaine paie après validation`);
+    }, 320);
+  }
+}
+
+function setActiveStep(state) {
+  document.querySelectorAll('.proto-step').forEach((el, i) => {
+    el.classList.remove('active');
+  });
+  const stateMap = { list: 0, empty: 1, review: 2, ready: 3, submitted: 4, errors: 5 };
+  const idx = stateMap[state];
+  if (idx !== undefined) {
+    document.querySelectorAll('.proto-step')[idx]?.classList.add('active');
+  }
+}
+
+function toggleCard(id) {
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+  if (card.ready) return; // ready cards don't expand in this prototype
+  if (card.error) return; // error cards must be deleted, not expanded
+  expandedId = expandedId === id ? null : id;
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+function deleteCard(id) {
+  batch = batch.filter(c => c.id !== id);
+  if (expandedId === id) expandedId = null;
+  if (batch.length === 0) {
+    goto('empty');
+    return;
+  }
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+function updateCard3() {
+  const nameInput = document.getElementById('card-3-name');
+  const typeSelect = document.getElementById('card-3-type');
+  if (!nameInput || !typeSelect) return;
+
+  const card = batch.find(c => c.id === 3);
+  card.nameFilled = nameInput.value;
+  card.typeFilled = typeSelect.value;
+
+  // Update select placeholder color
+  if (typeSelect.value) typeSelect.classList.remove('placeholder');
+  else typeSelect.classList.add('placeholder');
+
+  // Mark ready if both are filled
+  if (nameInput.value.trim() && typeSelect.value) {
+    card.ready = true;
+    card.name = nameInput.value;
+    card.type = typeSelect.value;
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+    // Auto-expand the next card needing attention
+    const nextWarning = batch.find(c => !c.ready);
+    if (nextWarning) {
+      setTimeout(() => {
+        expandedId = nextWarning.id;
+        document.getElementById('panel').innerHTML = templateBatch(currentState);
+      }, 300);
+    }
+  }
+}
+
+function updateCard5() {
+  const amountInput = document.getElementById('card-5-amount');
+  if (!amountInput) return;
+
+  const card = batch.find(c => c.id === 5);
+  card.amountFilled = amountInput.value;
+
+  if (amountInput.value.trim()) {
+    card.ready = true;
+    card.amount = amountInput.value.includes('€') ? amountInput.value : amountInput.value + ' €';
+    card.name = card.nameFilled || card.name;
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+  }
+}
+
+function submitBatch() {
+  // Convert each ready card in the batch into a real expense and push to the list
+  const todayISO = TODAY.toISOString().slice(0, 10);
+  const readyCards = batch.filter(c => c.ready);
+  if (readyCards.length === 0) return;
+
+  readyCards.forEach(card => {
+    // Parse the amount string ("42,50 €" or "42.50") into a number
+    let amountNum = 0;
+    if (typeof card.amount === 'string') {
+      const cleaned = card.amount.replace('€', '').replace(',', '.').trim();
+      amountNum = parseFloat(cleaned) || 0;
+    }
+    // Card date can be a French long string ("12 septembre 2025") or already ISO
+    let dateISO = card.dateISO;
+    if (!dateISO && card.date) {
+      // Best-effort parse from "12 septembre 2025" -> "2025-09-12"
+      const parts = card.date.split(' ');
+      if (parts.length === 3) {
+        const d = parts[0].padStart(2, '0');
+        const monthIdx = FRENCH_MONTHS.indexOf(parts[1].toLowerCase());
+        const m = monthIdx >= 0 ? String(monthIdx + 1).padStart(2, '0') : '01';
+        dateISO = `${parts[2]}-${m}-${d}`;
+      } else {
+        dateISO = todayISO;
+      }
+    }
+    expenses.push({
+      id: 'e' + String(nextExpenseId++).padStart(3, '0'),
+      name: card.name || 'Nouvelle dépense',
+      type: card.type || 'Autre',
+      dateISO: dateISO || todayISO,
+      amount: amountNum,
+      status: 'pending',
+      submittedISO: todayISO,
+      approvedISO: null,
+      fileName: card.fileName || (card.manual ? 'saisie_manuelle.pdf' : 'document.pdf')
+    });
+  });
+
+  goto('submitted');
+}
+
+function updateGenericCard(id, field, value) {
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+
+  if (field === 'name') card.nameFilled = value;
+  else if (field === 'type') card.type = value;
+  else if (field === 'amount') card.amount = value;
+
+  // Check if card is now complete (all originally-missing fields filled)
+  const hasName = card.nameFilled && card.nameFilled.trim();
+  const hasType = card.type && card.type.trim();
+  const hasAmount = card.amount && card.amount.trim();
+
+  if (hasName && hasType && hasAmount) {
+    card.ready = true;
+    card.name = card.nameFilled;
+    if (!card.amount.includes('€')) card.amount = card.amount + ' €';
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+    // Auto-expand the next warning card
+    const nextWarning = batch.find(c => !c.ready && !c.error);
+    if (nextWarning) {
+      setTimeout(() => {
+        expandedId = nextWarning.id;
+        document.getElementById('panel').innerHTML = templateBatch(currentState);
+      }, 250);
+    }
+  }
+}
+
+// ============================================================
+// MANUAL CARD HANDLING
+// ============================================================
+// A manual card is a queue card with `manual: true` and no underlying file.
+// All four fields (name, type, date, amount) are required to mark it ready.
+// Justificatif is optional — the user may have lost the receipt entirely.
+
+function addManualCard() {
+  // Enforce 10-card max (manual + dropped count together)
+  if (batch.length >= 10) {
+    showToast('Limite de 10 dépenses atteinte');
+    return;
+  }
+  const newCard = {
+    id: nextCardId++,
+    manual: true,
+    ready: false,
+    name: 'Nouvelle dépense',
+    nameFilled: '',
+    type: '',
+    date: '',
+    dateISO: '',
+    amount: '',
+    justifName: ''
+  };
+  batch.push(newCard);
+  // Switch to review state and auto-expand the new card so the form is visible
+  currentState = 'review';
+  setActiveStep('review');
+  expandedId = newCard.id;
+  document.getElementById('panel').innerHTML = templateBatch('review');
+  // Scroll the new card into view and focus the first field
+  setTimeout(() => {
+    const cardEl = document.querySelector(`.queue-card[data-id="${newCard.id}"]`);
+    if (cardEl) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const firstInput = cardEl.querySelector('input[type="text"]');
+      if (firstInput) firstInput.focus();
+    }
+  }, 100);
+}
+
+function updateManualCard(id, field, value) {
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+
+  // Track which input is currently focused so we can restore focus after re-render
+  const activeEl = document.activeElement;
+  const isInputFocused = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'SELECT');
+  let focusKey = null;
+  if (isInputFocused) {
+    const cardEl = activeEl.closest('.queue-card');
+    if (cardEl && cardEl.dataset.id == id) {
+      // Identify the field by its position in the form
+      const inputs = Array.from(cardEl.querySelectorAll('input, select'));
+      focusKey = inputs.indexOf(activeEl);
+    }
+  }
+
+  if (field === 'name') {
+    card.nameFilled = value;
+  } else if (field === 'type') {
+    card.type = value;
+  } else if (field === 'date') {
+    card.dateISO = value;
+    // Format ISO date (YYYY-MM-DD) to French display
+    if (value) {
+      const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+                      'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+      const [y, m, d] = value.split('-');
+      card.date = `${parseInt(d, 10)} ${months[parseInt(m, 10) - 1]} ${y}`;
+    } else {
+      card.date = '';
+    }
+  } else if (field === 'amount') {
+    card.amount = value;
+  }
+
+  // Completeness check: 4 mandatory fields
+  const hasName = card.nameFilled && card.nameFilled.trim();
+  const hasType = card.type && card.type.trim();
+  const hasDate = card.dateISO && card.dateISO.trim();
+  const hasAmount = card.amount && card.amount.trim();
+
+  if (hasName && hasType && hasDate && hasAmount) {
+    // All fields filled — promote to ready
+    card.ready = true;
+    card.name = card.nameFilled;
+    if (!card.amount.includes('€')) card.amount = card.amount.trim() + ' €';
+    expandedId = null;
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+    // Auto-expand the next warning card if any
+    const nextWarning = batch.find(c => !c.ready && !c.error);
+    if (nextWarning) {
+      setTimeout(() => {
+        expandedId = nextWarning.id;
+        document.getElementById('panel').innerHTML = templateBatch(currentState);
+      }, 250);
+    }
+    return;
+  }
+
+  // Otherwise, only re-render if the change affects the collapsed view
+  // (name change updates the title, type/date/amount change updates the meta).
+  // For text inputs we want to avoid re-rendering on every keystroke (which loses focus).
+  // For select and date pickers, re-render is fine because they don't lose typing flow.
+  if (field === 'type' || field === 'date') {
+    document.getElementById('panel').innerHTML = templateBatch(currentState);
+    // Restore focus after re-render
+    if (focusKey !== null) {
+      setTimeout(() => {
+        const cardEl = document.querySelector(`.queue-card[data-id="${id}"]`);
+        if (cardEl) {
+          const inputs = cardEl.querySelectorAll('input, select');
+          if (inputs[focusKey]) inputs[focusKey].focus();
+        }
+      }, 0);
+    }
+  }
+  // For name and amount text inputs, just update the data — DOM stays alive,
+  // re-render happens on next field change or on completion.
+}
+
+function handleManualJustif(id, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+  card.justifName = file.name;
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+function removeManualJustif(id) {
+  const card = batch.find(c => c.id === id);
+  if (!card) return;
+  card.justifName = '';
+  document.getElementById('panel').innerHTML = templateBatch(currentState);
+}
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-message').textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// DRAG & DROP — real file handling
+// ============================================================
+// We attach drop handlers to two surfaces:
+//   1. The empty drop zone (when batch is empty)
+//   2. The whole side panel (once a batch exists, drop anywhere)
+// Both surfaces feed the same `processFiles` pipeline.
+
+let dragCounter = 0;
+
+function attachDropZoneHandlers() {
+  // Called after templateEmpty() renders. The drop zone is the visible target.
+  const dz = document.querySelector('.drop-zone');
+  if (!dz) return;
+  ['dragenter', 'dragover'].forEach(evt => {
+    dz.addEventListener(evt, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      dz.classList.add('drag-over');
+    });
+  });
+  ['dragleave', 'drop'].forEach(evt => {
+    dz.addEventListener(evt, e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (evt === 'dragleave' && e.target !== dz) return;
+      dz.classList.remove('drag-over');
+    });
+  });
+  dz.addEventListener('drop', e => {
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) processFiles(files);
+  });
+}
+
+// Document-level listeners catch drops on the side panel during batch state.
+// These are attached once on init.
+function attachGlobalDropHandlers() {
+  document.addEventListener('dragenter', e => {
+    if (!e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    dragCounter++;
+    const panel = document.getElementById('panel');
+    if (panel.classList.contains('open') && currentState !== 'empty') {
+      panel.classList.add('drag-over');
+    }
+  });
+  document.addEventListener('dragover', e => {
+    if (!e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+  document.addEventListener('dragleave', e => {
+    if (!e.dataTransfer || !e.dataTransfer.types.includes('Files')) return;
+    dragCounter--;
+    if (dragCounter <= 0) {
+      dragCounter = 0;
+      document.getElementById('panel').classList.remove('drag-over');
+    }
+  });
+  document.addEventListener('drop', e => {
+    e.preventDefault();
+    dragCounter = 0;
+    document.getElementById('panel').classList.remove('drag-over');
+    // Only handle drops on the panel when it's open and not in empty state
+    // (empty state has its own dz handler that fires first via stopPropagation)
+    const panel = document.getElementById('panel');
+    if (!panel.classList.contains('open')) return;
+    if (currentState === 'empty') return; // dz handler took it
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) processFiles(files);
+  });
+  // Prevent the browser from opening dropped files outside the panel
+  window.addEventListener('dragover', e => e.preventDefault());
+  window.addEventListener('drop', e => e.preventDefault());
+}
+
+// ============================================================
+// SIMULATED OCR — turns dropped files into queue cards
+// ============================================================
+// Outcomes are stochastic to make the prototype feel realistic:
+//   ~60% ready (OCR succeeds)
+//   ~25% warning (some fields missing)
+//   ~15% error (OCR fails entirely or file invalid)
+// Real images get a thumbnail; PDFs get the document icon.
+//
+// Note: this is a prototype simulation. In production, the backend would
+// return real OCR results and confidence scores.
+
+let nextCardId = 1000;
+
+const sampleNames = [
+  { name: 'Restaurant Le Procope', type: 'Repas d\'affaires' },
+  { name: 'Uber — Trajet bureau', type: 'Transport' },
+  { name: 'Hôtel Ibis — Toulouse', type: 'Hébergement' },
+  { name: 'Carburant Total', type: 'Transport' },
+  { name: 'Café de Flore', type: 'Repas d\'affaires' },
+  { name: 'Parking Vinci', type: 'Transport' },
+  { name: 'FNAC — Fournitures', type: 'Équipement' },
+  { name: 'SNCF — Paris-Lyon', type: 'Transport' }
+];
+
+function handleFilePicker(event) {
+  const files = Array.from(event.target.files);
+  if (files.length > 0) processFiles(files);
+  event.target.value = ''; // reset so the same file can be picked again
+}
+
+function processFiles(files) {
+  // Enforce 10-file max
+  const remaining = 10 - batch.length;
+  if (remaining <= 0) {
+    showToast('Limite de 10 fichiers atteinte');
+    return;
+  }
+  const accepted = files.slice(0, remaining);
+  const rejected = files.length - accepted.length;
+
+  // Validate file types and sizes, then process
+  const validFiles = [];
+  accepted.forEach(file => {
+    const isValidType = /\.(jpg|jpeg|png|pdf)$/i.test(file.name);
+    const isValidSize = file.size <= 5 * 1024 * 1024;
+    if (!isValidType || !isValidSize) {
+      // Add as error card immediately
+      batch.push({
+        id: nextCardId++,
+        error: true,
+        name: file.name,
+        errorMessage: !isValidType ? 'Format non supporté' : 'Fichier trop volumineux (5 Mo max)'
+      });
+    } else {
+      validFiles.push(file);
+    }
+  });
+
+  // Simulate OCR for each valid file
+  validFiles.forEach((file, idx) => {
+    const roll = Math.random();
+    const sample = sampleNames[Math.floor(Math.random() * sampleNames.length)];
+    const amount = (Math.random() * 200 + 5).toFixed(2).replace('.', ',') + ' €';
+    const day = Math.floor(Math.random() * 28) + 1;
+    const date = `${day} septembre 2025`;
+
+    let card;
+    if (roll < 0.15) {
+      // Error: OCR fails
+      card = {
+        id: nextCardId++,
+        error: true,
+        name: file.name,
+        errorMessage: 'Impossible de lire ce fichier'
+      };
+    } else if (roll < 0.40) {
+      // Warning: missing one field (either type OR name, not both)
+      const missingType = Math.random() < 0.5;
+      card = {
+        id: nextCardId++,
+        ready: false,
+        name: file.name,
+        nameFilled: missingType ? sample.name : '',
+        missing: missingType ? 'Type de dépense à compléter' : 'Nom de la dépense à compléter',
+        type: missingType ? '' : sample.type,
+        date: date,
+        amount: amount
+      };
+    } else {
+      // Ready: full OCR success
+      card = {
+        id: nextCardId++,
+        ready: true,
+        name: sample.name,
+        type: sample.type,
+        date: date,
+        amount: amount
+      };
+    }
+    batch.push(card);
+  });
+
+  // Switch to review state
+  currentState = 'review';
+  setActiveStep('review');
+  // Auto-expand the first warning card (not error — errors must be removed)
+  const firstWarning = batch.find(c => !c.ready && !c.error);
+  expandedId = firstWarning ? firstWarning.id : null;
+  document.getElementById('panel').innerHTML = templateBatch('review');
+
+  if (rejected > 0) {
+    setTimeout(() => showToast(`${rejected} fichier${rejected > 1 ? 's' : ''} ignoré${rejected > 1 ? 's' : ''} (limite de 10)`), 200);
+  }
+}
+
+// ============================================================
+// LIST RENDERING (data-driven)
+// ============================================================
+let currentView = 'list'; // 'list' or 'payslip'
+
+// SVG icons for expense types — keyed by type
+function expenseTypeIcon(type) {
+  if (type === 'Hébergement' || type === 'Hotel / Logement') {
+    return `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 15V6L9 3L15 6V15M3 15H15M3 15H1.5M15 15H16.5M6 15V10H12V15M7 7.5V8.5M11 7.5V8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+  if (type === 'Transport') {
+    return `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 12V8C3 7 4 6 5 6H13C14 6 15 7 15 8V12M3 12H15M3 12V14M15 12V14M5 9H6M12 9H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+  if (type === 'Repas d\'affaires') {
+    return `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 3V8C5 9 4 10 4 11V15M5 3V8C5 9 6 10 6 11V15M5 3H6M13 3V8C13 9.5 12 10 12 11V15M13 3C14 3 14 4 14 5V8C14 9.5 13 10 13 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+  // Default: Équipement / generic
+  return `<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="4" width="12" height="9" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M6 13V15M12 13V15M5 15H13" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
+}
+
+function badgeForStatus(status) {
+  if (status === 'pending') return '<span class="badge badge-pending">En attente de validation</span>';
+  if (status === 'validated') return '<span class="badge badge-validated">Validée</span>';
+  if (status === 'refused') return '<span class="badge badge-refused">Refusée</span>';
+  if (status === 'cancelled') return '<span class="badge badge-cancelled">Annulée</span>';
+  return '';
+}
+
+function renderList() {
+  if (currentView === 'payslip') {
+    renderPayslipView();
+  } else {
+    renderTable();
+  }
+  renderYTDSummary();
+}
+
+function renderTable() {
+  const container = document.getElementById('list-container');
+  // Sort expenses: most recent first by submission date, then by date
+  const sorted = [...expenses].sort((a, b) => {
+    const aDate = a.submittedISO || a.dateISO;
+    const bDate = b.submittedISO || b.dateISO;
+    return bDate.localeCompare(aDate);
+  });
+
+  const rowsHtml = sorted.map(e => {
+    return `
+      <tr onclick="openExpenseDetail('${e.id}')">
+        <td class="cell-name">${escapeHtml(e.name)}</td>
+        <td><div class="cell-type"><span class="type-icon">${expenseTypeIcon(e.type)}</span>${escapeHtml(e.type)}</div></td>
+        <td>${formatDateLong(e.dateISO)}</td>
+        <td>${formatEuro(e.amount)}</td>
+        <td>${badgeForStatus(e.status)}</td>
+      </tr>
+    `;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="table-wrap">
+      <table class="expense-table">
+        <thead>
+          <tr>
+            <th>Name <span class="arrow">↑</span></th>
+            <th>Expense Type <span class="arrow">↑</span></th>
+            <th>Date <span class="arrow">↑</span></th>
+            <th>Amount <span class="arrow">↑</span></th>
+            <th>Status <span class="arrow">↑</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml || '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--content-lowest);">Aucune note de frais</td></tr>'}
+        </tbody>
+      </table>
+      <div class="pagination">
+        <span>1-${sorted.length} out of ${sorted.length} demandes de notes de frais</span>
+        <div class="page-numbers">
+          <span class="page-arrow">‹</span>
+          <span class="page-num active">1</span>
+          <span class="page-arrow">›</span>
+        </div>
+        <div class="per-page">
+          <span>Demandes par page</span>
+          <select class="per-page-select"><option>10</option></select>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+let expandedPayslipKey = null;
+
+function renderPayslipView() {
+  const container = document.getElementById('list-container');
+  const groups = groupByPayslip();
+
+  // Also surface pending expenses as a special "À venir" group at the top
+  const pendingExpenses = expenses.filter(e => e.status === 'pending');
+  const pendingTotal = pendingExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+  let groupsHtml = '';
+
+  if (pendingExpenses.length > 0) {
+    const isExpanded = expandedPayslipKey === 'pending';
+    const rowsHtml = pendingExpenses.map(e => `
+      <div class="payslip-expense-row" onclick="openExpenseDetail('${e.id}')">
+        <div style="flex:1;min-width:0;">
+          <div class="payslip-expense-name">${escapeHtml(e.name)}</div>
+          <div class="payslip-expense-meta">${escapeHtml(e.type)} · ${formatDateLong(e.dateISO)}</div>
+        </div>
+        <div class="payslip-expense-amount">${formatEuro(e.amount)}</div>
+      </div>
+    `).join('');
+    groupsHtml += `
+      <div class="payslip-group ${isExpanded ? 'expanded' : ''}" data-key="pending">
+        <div class="payslip-group-header" onclick="togglePayslipGroup('pending')">
+          <div class="payslip-group-title">
+            <div class="payslip-group-icon" style="background:var(--surface-warning-lowest);color:var(--content-warning);">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M9 5V9L11.5 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="payslip-group-month">À venir</div>
+              <div class="payslip-group-meta">${pendingExpenses.length} ${pendingExpenses.length > 1 ? 'dépenses en attente de validation' : 'dépense en attente de validation'}</div>
+            </div>
+          </div>
+          <div class="payslip-group-amount">
+            <div class="payslip-group-total" style="color:var(--content-warning);">${formatEuro(pendingTotal)}</div>
+            <div class="payslip-group-chevron">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="payslip-group-body">${rowsHtml}</div>
+      </div>
+    `;
+  }
+
+  groupsHtml += groups.map(g => {
+    const isExpanded = expandedPayslipKey === g.key;
+    const rowsHtml = g.expenses.map(e => `
+      <div class="payslip-expense-row" onclick="openExpenseDetail('${e.id}')">
+        <div style="flex:1;min-width:0;">
+          <div class="payslip-expense-name">${escapeHtml(e.name)}</div>
+          <div class="payslip-expense-meta">${escapeHtml(e.type)} · ${formatDateLong(e.dateISO)}</div>
+        </div>
+        <div class="payslip-expense-amount">${formatEuro(e.amount)}</div>
+      </div>
+    `).join('');
+    return `
+      <div class="payslip-group ${isExpanded ? 'expanded' : ''}" data-key="${g.key}">
+        <div class="payslip-group-header" onclick="togglePayslipGroup('${g.key}')">
+          <div class="payslip-group-title">
+            <div class="payslip-group-icon">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="3" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M2.5 7H15.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 1.5V4M12 1.5V4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div>
+              <div class="payslip-group-month">Paie de ${g.label}</div>
+              <div class="payslip-group-meta">${g.expenses.length} ${g.expenses.length > 1 ? 'dépenses remboursées' : 'dépense remboursée'}</div>
+            </div>
+          </div>
+          <div class="payslip-group-amount">
+            <div class="payslip-group-total">${formatEuro(g.total)}</div>
+            <div class="payslip-group-chevron">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+        <div class="payslip-group-body">${rowsHtml}</div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = groupsHtml || '<div style="text-align:center;padding:48px;color:var(--content-lowest);">Aucune dépense remboursée pour le moment</div>';
+}
+
+function togglePayslipGroup(key) {
+  expandedPayslipKey = expandedPayslipKey === key ? null : key;
+  renderPayslipView();
+}
+
+function setView(view) {
+  currentView = view;
+  document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+  renderList();
+}
+
+function renderYTDSummary() {
+  const summary = document.getElementById('ytd-summary');
+  if (!payslipViewActive) {
+    summary.style.display = 'none';
+    return;
+  }
+  summary.style.display = '';
+  document.getElementById('view-toggle').style.display = '';
+  const ytd = computeYTD();
+  document.getElementById('ytd-reimbursed').textContent = formatEuro(ytd.reimbursed);
+  document.getElementById('ytd-pending').textContent = formatEuro(ytd.pending);
+  document.getElementById('ytd-count').textContent = String(ytd.count);
+}
+
+function setPayslipLayer(active) {
+  payslipViewActive = active;
+  if (active) {
+    document.getElementById('ytd-summary').style.display = '';
+    document.getElementById('view-toggle').style.display = '';
+  } else {
+    document.getElementById('ytd-summary').style.display = 'none';
+    document.getElementById('view-toggle').style.display = 'none';
+    currentView = 'list';
+  }
+  renderList();
+}
+
+function togglePayslipLayer() {
+  setPayslipLayer(!payslipViewActive);
+  const btn = document.getElementById('payslip-toggle');
+  if (btn) {
+    btn.textContent = payslipViewActive ? '💰 Payslip layer: ON' : '💰 Payslip layer: OFF';
+    btn.classList.toggle('active', payslipViewActive);
+  }
+}
+
+// ============================================================
+// EXPENSE DETAIL PANEL
+// ============================================================
+function openExpenseDetail(id) {
+  const expense = expenses.find(e => e.id === id);
+  if (!expense) return;
+  openExpenseId = id;
+  document.getElementById('scrim').classList.add('open');
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('panel').innerHTML = templateExpenseDetail(expense);
+  currentState = 'detail';
+}
+
+function closeExpenseDetail() {
+  openExpenseId = null;
+  document.getElementById('scrim').classList.remove('open');
+  document.getElementById('panel').classList.remove('open');
+  setTimeout(() => {
+    currentState = 'list';
+  }, 300);
+}
+
+function templateExpenseDetail(expense) {
+  const isRefused = expense.status === 'refused';
+  const isValidated = expense.status === 'validated';
+  const isPending = expense.status === 'pending';
+
+  // Payslip info block — the headline new feature
+  let payslipBlock = '';
+  if (isValidated) {
+    const ps = payslipMonthForApproval(expense.approvedISO);
+    if (ps) {
+      payslipBlock = `
+        <div class="payslip-info validated">
+          <div class="payslip-info-icon">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 9L7 14L16 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="payslip-info-text">
+            Cette dépense sera remboursée sur votre <strong>fiche de paie de ${ps.label}</strong>.
+          </div>
+        </div>
+      `;
+    }
+  } else if (isPending) {
+    payslipBlock = `
+      <div class="payslip-info pending">
+        <div class="payslip-info-icon">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="currentColor" stroke-width="1.4"/><path d="M9 5V9L11.5 11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="payslip-info-text">
+          Le remboursement sera effectué <strong>sur la prochaine paie après validation</strong> par votre manager.
+        </div>
+      </div>
+    `;
+  }
+
+  // Action button
+  let actionBtn = '';
+  if (isPending) {
+    actionBtn = `
+      <div style="padding: 0 24px 16px;">
+        <button class="btn btn-secondary" style="width:100%;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 4.5L9.5 9.5M9.5 4.5L4.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Annuler la demande
+        </button>
+      </div>
+    `;
+  } else if (isRefused) {
+    actionBtn = `
+      <div style="padding: 0 24px 16px;">
+        <button class="btn btn-primary" style="width:100%;justify-content:center;">
+          Modifier et resoumettre
+        </button>
+      </div>
+    `;
+  }
+
+  // Refusal alert (if refused)
+  let refusalBlock = '';
+  if (isRefused) {
+    refusalBlock = `
+      <div class="payslip-info" style="background:var(--surface-danger-lowest);border:0.5px solid #f8c4ca;">
+        <div class="payslip-info-icon" style="color:var(--content-danger);">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.4"/><path d="M9 5V10M9 12V12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="payslip-info-text">
+          <div style="font-weight:600;color:var(--content-danger);margin-bottom:4px;">Motif du refus</div>
+          ${escapeHtml(expense.refusalReason || 'Aucun motif fourni')}
+          <div style="font-size:11px;color:var(--content-lowest);margin-top:6px;">${escapeHtml(expense.refusedBy || 'Manager')} · ${formatDateLong(expense.submittedISO)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Activity events
+  let activityHtml = '';
+  if (expense.approvedISO) {
+    activityHtml += `
+      <div class="activity-event">
+        <div class="activity-avatar" style="background:linear-gradient(135deg,#bff8d3,#85e9a8);color:#086e2c;">MD</div>
+        <div class="activity-content">
+          <strong>Marie Dupont</strong> a validé la note de frais
+          <div class="activity-date">${formatDateLong(expense.approvedISO)}</div>
+        </div>
+      </div>
+    `;
+  }
+  if (isRefused) {
+    activityHtml += `
+      <div class="activity-event">
+        <div class="activity-avatar" style="background:linear-gradient(135deg,#ffd6da,#f8a5ad);color:#7a0c18;">MD</div>
+        <div class="activity-content">
+          <strong>${escapeHtml(expense.refusedBy || 'Marie Dupont')}</strong> a refusé la note de frais
+          <div class="activity-date">${formatDateLong(expense.submittedISO)}</div>
+        </div>
+      </div>
+    `;
+  }
+  activityHtml += `
+    <div class="activity-event">
+      <div class="activity-avatar">U</div>
+      <div class="activity-content">
+        <strong>Vous</strong> avez soumis la note de frais
+        <div class="activity-date">${formatDateLong(expense.submittedISO)}</div>
+      </div>
+    </div>
+  `;
+
+  return `
+    <div class="panel-header">
+      <div class="panel-header-row">
+        <div class="panel-title">Détails</div>
+        <div class="panel-close" onclick="closeExpenseDetail()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-body" style="padding:0;">
+      <div class="detail-expense-card">
+        <div class="detail-expense-icon ${isRefused ? 'refused' : ''}">
+          ${expenseTypeIcon(expense.type)}
+        </div>
+        <div class="detail-expense-info">
+          <div class="detail-expense-name">${escapeHtml(expense.name)}</div>
+          <div class="detail-expense-meta">${escapeHtml(expense.type)} · ${formatDateLong(expense.dateISO)}</div>
+          <div class="detail-expense-amount">${formatEuro(expense.amount)}</div>
+          <div class="detail-expense-badge">${badgeForStatus(expense.status)}</div>
+        </div>
+      </div>
+
+      ${refusalBlock}
+      ${payslipBlock}
+      ${actionBtn}
+
+      <div class="detail-section">
+        <div class="detail-section-label">Justificatif</div>
+        <div class="detail-justif">
+          <div class="detail-justif-icon">PDF</div>
+          <div class="detail-justif-info">
+            <div class="detail-justif-name">${escapeHtml(expense.fileName || 'document.pdf')}</div>
+            <div class="detail-justif-meta">Ajouté le ${formatDateLong(expense.submittedISO)}</div>
+          </div>
+          <div class="detail-justif-actions">
+            <div class="detail-justif-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7C2 7 4 3 7 3C10 3 12 7 12 7C12 7 10 11 7 11C4 11 2 7 2 7Z" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.2"/></svg>
+            </div>
+            <div class="detail-justif-btn">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2V9M7 9L4 6M7 9L10 6M2 11V12C2 12.5 2.5 13 3 13H11C11.5 13 12 12.5 12 12V11" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-label">Activité</div>
+        <div class="activity-input">
+          <input type="text" placeholder="Écrire un commentaire…">
+          <div class="activity-send">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L12 2L7 12L6 8L2 7Z" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        ${activityHtml}
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn btn-secondary" style="flex:1;justify-content:center;" onclick="closeExpenseDetail()">Fermer</button>
+    </div>
+  `;
+}
+
+// Initialize
+setActiveStep('list');
+attachGlobalDropHandlers();
+renderList();
+</script>
+</body>
+</html>
