@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expenses Revival · Design → Eng Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:              #0F1419;
+    --ink-soft:         #2A3139;
+    --ink-muted:        #6B7280;
+    --paper:            #F7F5F0;
+    --paper-warm:       #EFECE4;
+    --rule:             #1F2933;
+    --rule-soft:        #D9D4C8;
+    --accent:           #2D5BFF;     /* PayFit-ish blue, dev-signal */
+    --accent-deep:      #1E3FB8;
+    --signal-green:     #137752;
+    --signal-amber:     #B45309;
+    --signal-red:       #B42318;
+
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(15,20,25,0.04) 1px, transparent 0);
+    background-size: 24px 24px;
+  }
+
+  /* ─────────────── Layout ─────────────── */
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 48px;
+  }
+
+  /* ─────────────── Sticky nav ─────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(247,245,240,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .topbar-inner {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 48px;
+    max-width: 1120px; margin: 0 auto;
+  }
+  .brand {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .brand .dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    margin-right: 8px; vertical-align: middle;
+  }
+  .topnav { display: flex; gap: 28px; }
+  .topnav a {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .topnav a:hover { color: var(--ink); }
+
+  /* ─────────────── Hero ─────────────── */
+  .hero {
+    padding: 96px 0 72px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .hero-meta {
+    display: flex; gap: 32px; flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 40px;
+  }
+  .hero-meta span strong {
+    color: var(--ink); font-weight: 600;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(52px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin-bottom: 32px;
+    font-variation-settings: "opsz" 144;
+  }
+  .hero h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent-deep);
+  }
+  .hero-lede {
+    font-size: 20px;
+    line-height: 1.5;
+    max-width: 620px;
+    color: var(--ink-soft);
+    margin-bottom: 56px;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    padding-top: 40px;
+    border-top: 1px solid var(--rule);
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-value.neg { color: var(--signal-red); }
+  .stat-sub {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+  }
+
+  /* ─────────────── Section ─────────────── */
+  section.chapter {
+    padding: 96px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .chapter-header {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+  .chapter-number {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    padding-top: 14px;
+  }
+  .chapter-number strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 48px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    margin-top: 4px;
+  }
+  .chapter h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(36px, 4.5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+    font-variation-settings: "opsz" 144;
+  }
+  .chapter-intro {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    max-width: 720px;
+  }
+
+  /* ─────────────── Research block ─────────────── */
+  .sources-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule-soft);
+    border: 1px solid var(--rule-soft);
+    margin-bottom: 48px;
+  }
+  .source {
+    background: var(--paper);
+    padding: 28px 24px;
+  }
+  .source-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    border: 1px solid var(--rule-soft);
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+  }
+  .source-name {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .source-desc {
+    font-size: 13px;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+
+  .findings {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 56px 48px;
+    border-radius: 4px;
+  }
+  .findings-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(247,245,240,0.5);
+    margin-bottom: 24px;
+  }
+  .findings h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.15;
+    margin-bottom: 36px;
+    letter-spacing: -0.015em;
+    max-width: 720px;
+  }
+  .findings-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(247,245,240,0.15);
+  }
+  .finding-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--accent);
+    margin-bottom: 12px;
+    opacity: 0.9;
+  }
+  .finding-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(247,245,240,0.85);
+  }
+  .finding-text strong {
+    color: var(--paper);
+    font-weight: 600;
+  }
+
+  .dust-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 36px;
+    padding: 14px 20px;
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2px;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    transition: transform 0.2s;
+  }
+  .dust-link:hover {
+    transform: translateX(4px);
+  }
+  .dust-link .arrow { color: var(--accent); }
+
+  /* ─────────────── Chantier cards ─────────────── */
+  .chantiers {
+    display: grid;
+    gap: 24px;
+  }
+  .chantier {
+    display: grid;
+    grid-template-columns: 80px 1fr 200px;
+    gap: 32px;
+    padding: 36px 36px 36px 32px;
+    background: var(--paper-warm);
+    border: 1px solid var(--rule-soft);
+    border-left: 3px solid var(--accent);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease, border-left-color 0.25s ease;
+    position: relative;
+  }
+  .chantier:hover {
+    transform: translateX(4px);
+    border-left-color: var(--ink);
+  }
+  .chantier.done { border-left-color: var(--signal-green); }
+  .chantier.proto { border-left-color: var(--accent); }
+  .chantier.explo { border-left-color: var(--signal-amber); }
+
+  .chantier-num {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 64px;
+    line-height: 0.9;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+  }
+  .chantier-body h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 26px;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin-bottom: 10px;
+  }
+  .chantier-tagline {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 20px;
+    font-style: italic;
+    font-family: var(--font-display);
+  }
+  .chantier-desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+  }
+  .chantier-meta {
+    display: flex; gap: 20px; flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .chantier-meta span strong { color: var(--ink); font-weight: 600; }
+
+  .chantier-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+    text-align: right;
+  }
+  .status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 2px;
+    background: var(--paper);
+    border: 1px solid var(--rule-soft);
+  }
+  .status.done   { color: var(--signal-green); border-color: var(--signal-green); }
+  .status.proto  { color: var(--accent-deep);  border-color: var(--accent); }
+  .status.explo  { color: var(--signal-amber); border-color: var(--signal-amber); }
+
+  .open-link {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+  }
+  .open-link .arr { display: inline-block; transition: transform 0.2s; }
+  .chantier:hover .open-link .arr { transform: translateX(3px); }
+
+  /* ─────────────── Discussion section ─────────────── */
+  .discussion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  .topic {
+    padding: 32px;
+    background: var(--paper);
+    border: 1px solid var(--rule-soft);
+    border-radius: 2px;
+  }
+  .topic-kicker {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .topic h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 1.2;
+    margin-bottom: 14px;
+    letter-spacing: -0.01em;
+  }
+  .topic ul {
+    list-style: none;
+  }
+  .topic li {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    padding-left: 18px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .topic li::before {
+    content: '—';
+    position: absolute; left: 0;
+    color: var(--accent);
+  }
+
+  /* ─────────────── Footer ─────────────── */
+  footer {
+    padding: 80px 0 96px;
+    text-align: center;
+  }
+  footer .closing {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 300;
+    font-size: 48px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 32px;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  footer .sig {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* ─────────────── Responsive ─────────────── */
+  @media (max-width: 900px) {
+    .container { padding: 0 24px; }
+    .topbar-inner { padding: 14px 24px; }
+    .topnav { display: none; }
+    .hero { padding: 56px 0 48px; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+    .chapter { padding: 56px 0; }
+    .chapter-header { grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
+    .sources-grid { grid-template-columns: repeat(2, 1fr); }
+    .findings-list { grid-template-columns: 1fr; gap: 24px; }
+    .findings { padding: 32px 24px; }
+    .chantier { grid-template-columns: 1fr; gap: 16px; padding: 24px; }
+    .chantier-side { align-items: flex-start; text-align: left; flex-direction: row; gap: 16px; }
+    .discussion-grid { grid-template-columns: 1fr; }
+    footer .closing { font-size: 32px; }
+  }
+
+  /* ─────────────── Reveal anim ─────────────── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────── Top nav ─────────────── -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="dot"></span>Expenses Revival · S1 2026</div>
+    <nav class="topnav">
+      <a href="#research">01 Research</a>
+      <a href="#migration">02 Migration</a>
+      <a href="#explorations">03 Explorations</a>
+      <a href="#discussion">04 Discussion</a>
+    </nav>
+  </div>
+</div>
+
+<!-- ─────────────── Hero ─────────────── -->
+<header class="hero">
+  <div class="container">
+    <div class="hero-meta reveal">
+      <span><strong>Design → Eng Sync</strong></span>
+      <span>Thu 16 Apr · 14:15</span>
+      <span>Employee profile · FR first</span>
+      <span>Discovery → Build handover</span>
+    </div>
+    <h1 class="reveal">
+      Where we are on <em>Expenses</em>,<br>
+      and what we need from you.
+    </h1>
+    <p class="hero-lede reveal">
+      A 15-minute walkthrough of the research, the Unity migration,
+      and the three design explorations we've been running.
+      No final decisions yet &mdash; this is where we size what's buildable,
+      what's not, and what we want to fight for.
+    </p>
+
+    <div class="hero-stats reveal">
+      <div>
+        <div class="stat-label">MRR</div>
+        <div class="stat-value">~€100k</div>
+        <div class="stat-sub">at €3 / employee</div>
+      </div>
+      <div>
+        <div class="stat-label">Rollout</div>
+        <div class="stat-value">~80k</div>
+        <div class="stat-sub">employees · 35% of base</div>
+      </div>
+      <div>
+        <div class="stat-label">Usage · 6M YoY</div>
+        <div class="stat-value neg">−6%</div>
+        <div class="stat-sub">the reason we're here</div>
+      </div>
+      <div>
+        <div class="stat-label">Scope S1</div>
+        <div class="stat-value">Employee</div>
+        <div class="stat-sub">admin / manager → S2</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─────────────── 01 · Research ─────────────── -->
+<section class="chapter" id="research">
+  <div class="container">
+    <div class="chapter-header reveal">
+      <div class="chapter-number">Chapter<strong>01</strong></div>
+      <div>
+        <h2>What the data told us.</h2>
+        <p class="chapter-intro">
+          Before touching a single screen, we pulled from four sources to make sure
+          we were solving the right problems &mdash; not just the loud ones.
+        </p>
+      </div>
+    </div>
+
+    <div class="sources-grid reveal">
+      <div class="source">
+        <span class="source-tag">Qual</span>
+        <div class="source-name">Customer feedback</div>
+        <p class="source-desc">Support tickets, CSM notes, direct admin calls. The noisy, high-signal complaints.</p>
+      </div>
+      <div class="source">
+        <span class="source-tag">Quant</span>
+        <div class="source-name">CES &amp; NPS comments</div>
+        <p class="source-desc">Verbatim from in-product surveys. Where employees tell us what actually hurts.</p>
+      </div>
+      <div class="source">
+        <span class="source-tag">Backlog</span>
+        <div class="source-name">Productboard ideas</div>
+        <p class="source-desc">Feature requests aggregated by customer weight. Signals what competitors are doing better.</p>
+      </div>
+      <div class="source">
+        <span class="source-tag">AI-assisted</span>
+        <div class="source-name">Dust synthesis</div>
+        <p class="source-desc">Cross-source clustering to surface themes, not anecdotes. Link below.</p>
+      </div>
+    </div>
+
+    <div class="findings reveal">
+      <div class="findings-label">Three findings we anchored the design on</div>
+      <h3>
+        Mobile submission is a strength, not the problem.
+        The pain starts <em style="font-style: italic; color: var(--accent);">after</em> you hit submit.
+      </h3>
+      <div class="findings-list">
+        <div>
+          <div class="finding-num">01</div>
+          <div class="finding-text">
+            <strong>Status opacity.</strong> Employees submit an expense and enter
+            a black box. No visibility on approval, no signal when refused,
+            no clear path to resubmit.
+          </div>
+        </div>
+        <div>
+          <div class="finding-num">02</div>
+          <div class="finding-text">
+            <strong>Mileage trust gap.</strong> The IK estimate shown in-app
+            doesn't match the payslip amount (French tax brackets).
+            Every surprise erodes trust.
+          </div>
+        </div>
+        <div>
+          <div class="finding-num">03</div>
+          <div class="finding-text">
+            <strong>One-by-one submission fatigue.</strong> Field workers and
+            frequent submitters pile up receipts because submitting 8 expenses
+            means repeating the same form 8 times.
+          </div>
+        </div>
+      </div>
+
+      <a class="dust-link" href="https://app.dust.tt/share/frame/25201154-b8ef-4abd-a5ce-add6b25b147d" target="_blank" rel="noopener">
+        <span class="arrow">↗</span> Open the Dust synthesis frame
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 02 · Migration ─────────────── -->
+<section class="chapter" id="migration">
+  <div class="container">
+    <div class="chapter-header reveal">
+      <div class="chapter-number">Chapter<strong>02</strong></div>
+      <div>
+        <h2>Unity migration, as&nbsp;is.</h2>
+        <p class="chapter-intro">
+          Before we redesign anything, we migrate the existing employee flows
+          onto Unity DS. Same features, same logic &mdash; just brought onto the
+          current design system with a few non-structural polish passes along the way.
+        </p>
+      </div>
+    </div>
+
+    <div class="chantiers">
+      <a class="chantier done" href="https://www.figma.com/design/58ibQtZ2P4iROoNz2Zw9Wp/S1_2026-Expenses-x-Unity?node-id=1-91" target="_blank" rel="noopener">
+        <div class="chantier-num">I.</div>
+        <div class="chantier-body">
+          <h3>Unity migration · employee profile</h3>
+          <div class="chantier-tagline">Keep the function, upgrade the skin.</div>
+          <p class="chantier-desc">
+            Full re-skin of the employee expense flows on Unity DS: list view, detail side panel,
+            creation flow, mileage form. Functional parity with today &mdash; plus a handful of
+            small correctness fixes (states, empty states, consistent spacing).
+            No scope change, no logic change.
+          </p>
+          <div class="chantier-meta">
+            <span>Scope · <strong>Employee FR</strong></span>
+            <span>Pattern · <strong>Side panel</strong></span>
+            <span>Deps · <strong>Unity DS</strong></span>
+          </div>
+        </div>
+        <div class="chantier-side">
+          <span class="status done">Ready for dev</span>
+          <span class="open-link">Open Figma <span class="arr">→</span></span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 03 · Explorations ─────────────── -->
+<section class="chapter" id="explorations">
+  <div class="container">
+    <div class="chapter-header reveal">
+      <div class="chapter-number">Chapter<strong>03</strong></div>
+      <div>
+        <h2>Three explorations, three pain points.</h2>
+        <p class="chapter-intro">
+          On top of the migration, we've been exploring three parallel tracks &mdash;
+          each tied to one of the research findings. These are where we want
+          your reality check on faisabilité, effort, and risk.
+        </p>
+      </div>
+    </div>
+
+    <div class="chantiers">
+
+      <a class="chantier explo" href="https://www.figma.com/design/58ibQtZ2P4iROoNz2Zw9Wp/S1_2026-Expenses-x-Unity?node-id=378-21872" target="_blank" rel="noopener">
+        <div class="chantier-num">II.</div>
+        <div class="chantier-body">
+          <h3>Mileage &middot; estimation transparency</h3>
+          <div class="chantier-tagline">Close the gap between what we show and what they get.</div>
+          <p class="chantier-desc">
+            Short-term fix for the IK bracket mismatch: surface the fact that
+            the displayed amount is an <em>estimation</em>, not the final payslip value.
+            Uses the Unity Informational Alert under the Montant field, with tooltip
+            on the list view. No logic change &mdash; purely a trust &amp; clarity layer.
+            A deeper module redesign is scoped for Q2 2026.
+          </p>
+          <div class="chantier-meta">
+            <span>Impact · <strong>Trust</strong></span>
+            <span>Risk · <strong>Low</strong></span>
+            <span>Dep · <strong>Alert · Tooltip</strong></span>
+          </div>
+        </div>
+        <div class="chantier-side">
+          <span class="status explo">Mockups done</span>
+          <span class="open-link">Open Figma <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="chantier proto" href="https://damienboyer777.github.io/expense_refacto/expenses-batch-prototype4" target="_blank" rel="noopener">
+        <div class="chantier-num">III.</div>
+        <div class="chantier-body">
+          <h3>Bulk submission &middot; the batch tray</h3>
+          <div class="chantier-tagline">8 receipts, one flow &mdash; not eight.</div>
+          <p class="chantier-desc">
+            Interactive prototype (Model A): batch tray with accordion cards,
+            drag-and-drop, simulated OCR outcomes, failed-OCR states, and manual entry as
+            hybrid card. Client-side batching submits as individual expenses, so the backend
+            contract doesn't change. OCR POC running in parallel (Mindee v5 / AWS / HF)
+            &mdash; this is where we need you most.
+          </p>
+          <div class="chantier-meta">
+            <span>Impact · <strong>Speed</strong></span>
+            <span>Risk · <strong>OCR accuracy</strong></span>
+            <span>Dep · <strong>OCR provider · API</strong></span>
+          </div>
+        </div>
+        <div class="chantier-side">
+          <span class="status proto">Interactive proto</span>
+          <span class="open-link">Open proto <span class="arr">→</span></span>
+        </div>
+      </a>
+
+      <a class="chantier explo" href="https://www.figma.com/design/58ibQtZ2P4iROoNz2Zw9Wp/S1_2026-Expenses-x-Unity?node-id=426-14155" target="_blank" rel="noopener">
+        <div class="chantier-num">IV.</div>
+        <div class="chantier-body">
+          <h3>Expenses overview cards</h3>
+          <div class="chantier-tagline">Status, at a glance, before the list.</div>
+          <p class="chantier-desc">
+            Entry-level overview above the expense list &mdash; pending, refused,
+            to-resubmit, reimbursed. Directly addresses finding #01 (status opacity).
+            Pairs with the status stepper in the detail side panel and the
+            rejection / resubmission loop (Theme 1).
+          </p>
+          <div class="chantier-meta">
+            <span>Impact · <strong>Transparency</strong></span>
+            <span>Risk · <strong>Data freshness</strong></span>
+            <span>Dep · <strong>Card · Badge · Counters</strong></span>
+          </div>
+        </div>
+        <div class="chantier-side">
+          <span class="status explo">Mockups done</span>
+          <span class="open-link">Open Figma <span class="arr">→</span></span>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── 04 · Discussion ─────────────── -->
+<section class="chapter" id="discussion">
+  <div class="container">
+    <div class="chapter-header reveal">
+      <div class="chapter-number">Chapter<strong>04</strong></div>
+      <div>
+        <h2>What we want to talk about.</h2>
+        <p class="chapter-intro">
+          Rather than a flat Q&amp;A, here's the shape of the conversation
+          I'd like us to have &mdash; feel free to push back on any of it.
+        </p>
+      </div>
+    </div>
+
+    <div class="discussion-grid reveal">
+      <div class="topic">
+        <div class="topic-kicker">Topic 01 · Tech debt</div>
+        <h4>Dual codebase &amp; the new repo strategy</h4>
+        <ul>
+          <li>Where does Unity migration land — Jetlang admin or Classic employee?</li>
+          <li>Are we anchoring migration to the new repo / event-driven architecture work?</li>
+          <li>What's the minimum fallback path if we ship incrementally?</li>
+        </ul>
+      </div>
+
+      <div class="topic">
+        <div class="topic-kicker">Topic 02 · OCR &amp; bulk</div>
+        <h4>OCR POC, provider, and contract</h4>
+        <ul>
+          <li>State of the Mindee v5 / AWS / HF benchmark &mdash; any early signals?</li>
+          <li>How do failure modes from OCR map onto the batch tray states?</li>
+          <li>Client-side batching vs. true bulk endpoint &mdash; what's the cost delta?</li>
+        </ul>
+      </div>
+
+      <div class="topic">
+        <div class="topic-kicker">Topic 03 · Data freshness</div>
+        <h4>Status signals in near-real-time</h4>
+        <ul>
+          <li>Overview cards + stepper + toasts all rely on fresh status data.</li>
+          <li>Polling, push, or event-driven &mdash; what's realistic for S1?</li>
+          <li>What does "approved / refused" latency look like today?</li>
+        </ul>
+      </div>
+
+      <div class="topic">
+        <div class="topic-kicker">Topic 04 · Scope &amp; sequencing</div>
+        <h4>What lands in S1, what slips to S2</h4>
+        <ul>
+          <li>Migration is the floor &mdash; non-negotiable.</li>
+          <li>Rejection loop + status stepper: highest user impact, lowest tech risk.</li>
+          <li>Bulk: high impact, highest tech risk &mdash; can we ring-fence?</li>
+          <li>IK deep redesign → Q2 2026, but the estimation fix should ship S1.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────────── Footer ─────────────── -->
+<footer>
+  <div class="container">
+    <p class="closing reveal">
+      The goal isn't a bigger feature.<br>
+      It's a <em style="color: var(--accent-deep);">quieter one</em> &mdash; one that finishes the job.
+    </p>
+    <div class="sig reveal">
+      Damien · Design · Expenses Revival
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Smooth anchor offset for sticky nav
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 60;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
