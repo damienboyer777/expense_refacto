@@ -527,8 +527,8 @@
   <div class="container">
     <div class="hero-meta reveal">
       <span><strong>Design → Eng Sync</strong></span>
-      <span>Thu 16 Apr · 14:15</span>
-      <span>Employee profile · FR first</span>
+      <span>Mon 20 Apr · 14:15</span>
+      <span>Employee profile</span>
       <span>Discovery → Build handover</span>
     </div>
     <h1 class="reveal">
@@ -544,14 +544,14 @@
 
     <div class="hero-stats reveal">
       <div>
-        <div class="stat-label">MRR</div>
-        <div class="stat-value">~€100k</div>
-        <div class="stat-sub">at €3 / employee</div>
+        <div class="stat-label">Feedback analysed</div>
+        <div class="stat-value">574</div>
+        <div class="stat-sub">CS · Productboard · CSAT/NPS/CES</div>
       </div>
       <div>
-        <div class="stat-label">Rollout</div>
-        <div class="stat-value">~80k</div>
-        <div class="stat-sub">employees · 35% of base</div>
+        <div class="stat-label">Issues identified</div>
+        <div class="stat-value">31</div>
+        <div class="stat-sub">11 critical · across 4 profiles</div>
       </div>
       <div>
         <div class="stat-label">Usage · 6M YoY</div>
@@ -583,62 +583,92 @@
 
     <div class="sources-grid reveal">
       <div class="source">
-        <span class="source-tag">Qual</span>
-        <div class="source-name">Customer feedback</div>
-        <p class="source-desc">Support tickets, CSM notes, direct admin calls. The noisy, high-signal complaints.</p>
+        <span class="source-tag">553 entries</span>
+        <div class="source-name">CS &amp; Productboard</div>
+        <p class="source-desc">Support tickets, CSM notes, feature requests weighted by customer impact. The bulk of the signal.</p>
       </div>
       <div class="source">
-        <span class="source-tag">Quant</span>
-        <div class="source-name">CES &amp; NPS comments</div>
-        <p class="source-desc">Verbatim from in-product surveys. Where employees tell us what actually hurts.</p>
+        <span class="source-tag">21 entries</span>
+        <div class="source-name">CSAT · NPS · CES</div>
+        <p class="source-desc">In-product survey verbatims. Unfiltered employee voice &mdash; including one calling the product "très light et peu performant".</p>
       </div>
       <div class="source">
-        <span class="source-tag">Backlog</span>
-        <div class="source-name">Productboard ideas</div>
-        <p class="source-desc">Feature requests aggregated by customer weight. Signals what competitors are doing better.</p>
+        <span class="source-tag">4 profiles</span>
+        <div class="source-name">Profile clustering</div>
+        <p class="source-desc">Employee (8 issues), Admin (12), Manager (6), Cross-profile (5). Each with distinct pain hierarchies.</p>
       </div>
       <div class="source">
         <span class="source-tag">AI-assisted</span>
         <div class="source-name">Dust synthesis</div>
-        <p class="source-desc">Cross-source clustering to surface themes, not anecdotes. Link below.</p>
+        <p class="source-desc">Cross-source analysis to surface patterns, not anecdotes. Full interactive frame linked below.</p>
       </div>
     </div>
 
     <div class="findings reveal">
-      <div class="findings-label">Three findings we anchored the design on</div>
+      <div class="findings-label">Key findings from the employee profile (our S1 scope)</div>
       <h3>
-        Mobile submission is a strength, not the problem.
-        The pain starts <em style="font-style: italic; color: var(--accent);">after</em> you hit submit.
+        Employees face 8 distinct issues &mdash; 2 critical.<br>
+        The pain concentrates on <em style="font-style: italic; color: var(--accent);">what happens after</em> they submit.
       </h3>
       <div class="findings-list">
         <div>
           <div class="finding-num">01</div>
           <div class="finding-text">
-            <strong>Status opacity.</strong> Employees submit an expense and enter
-            a black box. No visibility on approval, no signal when refused,
-            no clear path to resubmit.
+            <strong>Payslip opacity.</strong> Employees can't track year-to-date expenses
+            on their payslip, and reimbursement display (gross vs. net) creates confusion.
+            Two UK clients flagged this &mdash; high-priority.
           </div>
         </div>
         <div>
           <div class="finding-num">02</div>
           <div class="finding-text">
-            <strong>Mileage trust gap.</strong> The IK estimate shown in-app
-            doesn't match the payslip amount (French tax brackets).
-            Every surprise erodes trust.
+            <strong>Rejection black hole.</strong> Admins have no comment field to
+            explain refusal reasons. Employees resubmit blind.
+            Admin #5 in the report &mdash; directly drives our rejection loop design.
           </div>
         </div>
         <div>
           <div class="finding-num">03</div>
           <div class="finding-text">
-            <strong>One-by-one submission fatigue.</strong> Field workers and
-            frequent submitters pile up receipts because submitting 8 expenses
-            means repeating the same form 8 times.
+            <strong>Submission friction at scale.</strong> CES verbatim: employees want
+            multi-file drag-and-drop + monthly totals. Current flow is one-by-one,
+            no bulk, no overview.
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 40px; padding-top: 32px; border-top: 1px solid rgba(247,245,240,0.15);">
+        <div class="findings-label">What we're deferring to S2 (admin + manager)</div>
+        <div class="findings-list">
+          <div>
+            <div class="finding-num">A</div>
+            <div class="finding-text">
+              <strong>Admin: receipt viewing integration.</strong> Critical &mdash; fragmented
+              workflow forces admins to navigate between 3 sections to validate a single expense.
+              Up to 70% time savings estimated.
+            </div>
+          </div>
+          <div>
+            <div class="finding-num">B</div>
+            <div class="finding-text">
+              <strong>Admin: custom categories.</strong> Critical &mdash; we offer 7 categories vs.
+              competitors' 20+. A client explicitly called the product "très light."
+              Competitive gap.
+            </div>
+          </div>
+          <div>
+            <div class="finding-num">C</div>
+            <div class="finding-text">
+              <strong>Manager: 2-level approval.</strong> Critical retention risk &mdash; one client
+              stated they won't use the expense module without it.
+              Top Productboard request.
+            </div>
           </div>
         </div>
       </div>
 
       <a class="dust-link" href="https://app.dust.tt/share/frame/25201154-b8ef-4abd-a5ce-add6b25b147d" target="_blank" rel="noopener">
-        <span class="arrow">↗</span> Open the Dust synthesis frame
+        <span class="arrow">↗</span> Open the full Dust synthesis (574 data points)
       </a>
     </div>
   </div>
@@ -794,27 +824,7 @@
 
     <div class="discussion-grid reveal">
       <div class="topic">
-        <div class="topic-kicker">Topic 01 · Tech debt</div>
-        <h4>Dual codebase &amp; the new repo strategy</h4>
-        <ul>
-          <li>Where does Unity migration land — Jetlang admin or Classic employee?</li>
-          <li>Are we anchoring migration to the new repo / event-driven architecture work?</li>
-          <li>What's the minimum fallback path if we ship incrementally?</li>
-        </ul>
-      </div>
-
-      <div class="topic">
-        <div class="topic-kicker">Topic 02 · OCR &amp; bulk</div>
-        <h4>OCR POC, provider, and contract</h4>
-        <ul>
-          <li>State of the Mindee v5 / AWS / HF benchmark &mdash; any early signals?</li>
-          <li>How do failure modes from OCR map onto the batch tray states?</li>
-          <li>Client-side batching vs. true bulk endpoint &mdash; what's the cost delta?</li>
-        </ul>
-      </div>
-
-      <div class="topic">
-        <div class="topic-kicker">Topic 03 · Data freshness</div>
+        <div class="topic-kicker">Topic 01 · Data freshness</div>
         <h4>Status signals in near-real-time</h4>
         <ul>
           <li>Overview cards + stepper + toasts all rely on fresh status data.</li>
@@ -824,7 +834,7 @@
       </div>
 
       <div class="topic">
-        <div class="topic-kicker">Topic 04 · Scope &amp; sequencing</div>
+        <div class="topic-kicker">Topic 02 · Scope &amp; sequencing</div>
         <h4>What lands in S1, what slips to S2</h4>
         <ul>
           <li>Migration is the floor &mdash; non-negotiable.</li>
@@ -840,10 +850,6 @@
 <!-- ─────────────── Footer ─────────────── -->
 <footer>
   <div class="container">
-    <p class="closing reveal">
-      The goal isn't a bigger feature.<br>
-      It's a <em style="color: var(--accent-deep);">quieter one</em> &mdash; one that finishes the job.
-    </p>
     <div class="sig reveal">
       Damien · Design · Expenses Revival
     </div>
