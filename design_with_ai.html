@@ -861,6 +861,7 @@
       <ul class="nav-list">
         <li class="nav-item"><a href="#self-assessment" data-page="self-assessment">Team self-assessment</a></li>
         <li class="nav-item"><a href="#use-cases" data-page="use-cases">Use cases library</a></li>
+        <li class="nav-item"><a href="#early-learnings" data-page="early-learnings">Early learnings</a></li>
       </ul>
     </div>
 
@@ -872,6 +873,7 @@
         <li class="nav-item"><a href="#install-claude-code" data-page="install-claude-code">Install Claude Code</a></li>
         <li class="nav-item"><a href="#claude-md" data-page="claude-md">CLAUDE.md setup</a></li>
         <li class="nav-item"><a href="#mcp" data-page="mcp">MCP &amp; Figma</a></li>
+        <li class="nav-item"><a href="#priority-skills" data-page="priority-skills">Priority skills</a></li>
         <li class="nav-item"><a href="#team-skills" data-page="team-skills">Team skills</a></li>
       </ul>
     </div>
@@ -1052,6 +1054,23 @@
         <h2>The voice of the product</h2>
         <p>Content design is not filler. It's a stance on the relationship we build with users.</p>
         <p>AI can generate 50 phrasings. Choosing which one is PayFit, which one respects a user who's struggling, which one doesn't ring false, that's a judgment built on accumulated knowledge of the product and the people.</p>
+      </section>
+
+      <section>
+        <h2>Signals we watch for</h2>
+        <p>Knowing the red lines isn't enough. Judgment erodes quietly, not suddenly. These are the patterns we try to catch early, in ourselves and in each other, without making it a performance review.</p>
+        <ul>
+          <li><strong>Outputs stop surprising anyone.</strong> Your work starts looking like everyone else's AI-assisted work. Same rhythms, same phrasing, same safe layouts. That's conformity bias leaking through.</li>
+          <li><strong>Critique gets harder to articulate.</strong> When asked <em>"why this choice over that one?"</em>, the answer is thinner than it used to be. Explanations become descriptions of what the AI produced, not justifications of a point of view.</li>
+          <li><strong>First drafts get accepted too easily.</strong> The iteration muscle atrophies. What was once a starting point becomes the final version because it's <em>good enough</em>.</li>
+          <li><strong>Edge cases vanish from the work.</strong> Empty states, error states, unhappy paths, accessibility, localization. If these quietly stop appearing in your specs, AI is driving and not getting challenged.</li>
+          <li><strong>You can't explain the work without the tool.</strong> If rebuilding the same piece without AI would feel impossibly hard, you've delegated more than a task.</li>
+        </ul>
+
+        <div class="callout warn">
+          <div class="callout-label">How we use this</div>
+          <p>Not as a checklist to judge. As prompts for design review. <em>"Has anything here stopped surprising us?"</em> is a healthier question than <em>"did you use AI?"</em>.</p>
+        </div>
       </section>
 
       <section>
@@ -1398,6 +1417,61 @@
           <div class="nav-link-kicker">← Previous</div>
           <div class="nav-link-title">Team self-assessment</div>
         </a>
+        <a class="nav-link next" href="#early-learnings" data-page="early-learnings">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Early learnings</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- EARLY LEARNINGS -->
+    <div class="page" id="page-early-learnings">
+      <div class="page-hero">
+        <span class="page-kicker">How we work</span>
+        <h1>Early <em>learnings.</em></h1>
+        <p class="lede">What the first designers to use AI tools in their daily work have discovered. Patterns, not prescriptions. The goal is for these to stop being rare knowledge and start being the team's common ground.</p>
+      </div>
+
+      <section>
+        <h2>On quality, from content design</h2>
+        <p>Content designers have been the first to hit AI's quality wall head-on. A few things they've noticed that the rest of the team hasn't, yet.</p>
+        <ul>
+          <li><strong>AI-generated copy passes the quick read, fails the second read.</strong> It sounds professional, flows cleanly, and uses the right-looking vocabulary. Two days later, when you re-read it with fresh eyes, the voice is generic and the choices are unjustifiable. The first instinct is always to ship it. The discipline is to re-read.</li>
+          <li><strong>Brand voice is invisible to the model.</strong> Unless you give Claude a tight skill with real examples and explicit tone rules, it defaults to <em>"SaaS corporate polite"</em>. That default is the enemy of any brand that wants to sound like itself.</li>
+          <li><strong>The biggest wins are editorial, not generative.</strong> Asking Claude to <em>write</em> copy yields mediocre results. Asking Claude to <em>rewrite</em>, <em>tighten</em>, <em>flag inconsistencies</em>, or <em>check tone against a reference</em> yields consistently useful output. The role shift is from author to editor-with-a-very-fast-first-draft.</li>
+          <li><strong>Feeding the DS manually works, but it's brittle.</strong> Exporting design system guidelines page by page into <code>.txt</code> files and feeding them into a custom skill is the current workaround while no proper machine-readable source exists. It produces acceptable results today. It will not scale past a few skills without proper infrastructure (see <strong>07 DS</strong>).</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>On research and discovery</h2>
+        <ul>
+          <li><strong>AI is a great rubber duck, a poor interviewer.</strong> Thinking out loud with Claude to sharpen a research question works. Letting Claude run a synthesis alone produces a smooth narrative that hides the uncomfortable quotes.</li>
+          <li><strong>Transcripts first, summaries never.</strong> Always keep the raw transcripts. Summaries generated early in the process quietly become "the source of truth" and weak signals disappear.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>On working across functions</h2>
+        <ul>
+          <li><strong>PMs and engineers producing interface work is not always a threat.</strong> Often it's a shortcut that lets everyone move faster. The question is whether design reviews happen, not whether design initiates. When design is absent from the loop entirely, that's the warning sign, not the fact that someone else prototyped first.</li>
+          <li><strong>Asking for AI-ready guidelines is asking for design leadership.</strong> When non-designers request <em>"the UX guidelines to feed into Claude"</em>, it's not an attack. It's a request for the design team to codify what used to live in reviewers' heads.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>How we grow this page</h2>
+        <div class="callout">
+          <div class="callout-label">Contribute</div>
+          <p>This page grows from what the team learns. If you've worked with AI enough to have an opinion others don't have yet, share it. Bring it to the monthly deep-dive (see <a href="#cadence" data-page="cadence">Sharing cadence</a>), or add it directly to the <a href="#use-cases" data-page="use-cases">Use cases library</a> with a tag. Learnings that keep coming up get promoted to this page in the quarterly review.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#use-cases" data-page="use-cases">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Use cases library</div>
+        </a>
         <a class="nav-link next" href="#license" data-page="license">
           <div class="nav-link-kicker">Next →</div>
           <div class="nav-link-title">License &amp; access</div>
@@ -1471,9 +1545,9 @@
       </section>
 
       <div class="page-nav-footer">
-        <a class="nav-link prev" href="#use-cases" data-page="use-cases">
+        <a class="nav-link prev" href="#early-learnings" data-page="early-learnings">
           <div class="nav-link-kicker">← Previous</div>
-          <div class="nav-link-title">Use cases library</div>
+          <div class="nav-link-title">Early learnings</div>
         </a>
         <a class="nav-link next" href="#prerequisites" data-page="prerequisites">
           <div class="nav-link-kicker">Next →</div>
@@ -1725,6 +1799,103 @@ DS reference: Unity, see /docs/unity-tokens.md
           <div class="nav-link-kicker">← Previous</div>
           <div class="nav-link-title">CLAUDE.md setup</div>
         </a>
+        <a class="nav-link next" href="#priority-skills" data-page="priority-skills">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Priority skills</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PRIORITY SKILLS -->
+    <div class="page" id="page-priority-skills">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1>Priority <em>skills.</em></h1>
+        <p class="lede">Three Claude Code skills we think the team should invest in first. These are hypotheses, not mandates. They'll be confirmed, pivoted, or expanded based on what the team self-assessment and the use cases library surface.</p>
+      </div>
+
+      <section>
+        <h2>How we picked three</h2>
+        <p>A Claude Code skill is a named, reusable capability: install it once, invoke it anywhere. Instead of re-explaining context every time, the skill carries it.</p>
+        <p>For this V1 we prioritize skills that:</p>
+        <ol>
+          <li>Automate a repetitive task most designers face weekly, not just one role.</li>
+          <li>Produce outputs that can be compared to a non-AI workflow (quality, time, satisfaction).</li>
+          <li>Don't require DS infrastructure we don't have yet.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>1. Content Design skill</h2>
+        <p><strong>Status:</strong> already started. Built manually by the content design team. Needs consolidation and sharing.</p>
+        <p><strong>What it does:</strong> carries PayFit's content conventions (tone of voice, inclusive language, Zeroheight content rules) and applies them when Claude produces or reviews any copy.</p>
+        <p><strong>Who it helps:</strong> every designer who writes UI copy. Not just content designers.</p>
+        <p><strong>Why now:</strong> content is the easiest place to spot AI quality drift (see <a href="#early-learnings" data-page="early-learnings">Early learnings</a>). A shared skill raises the floor.</p>
+      </section>
+
+      <section>
+        <h2>2. DS QA skill</h2>
+        <p><strong>Status:</strong> hypothesis to validate.</p>
+        <p><strong>What it does:</strong> takes a batch of screens and flags Unity DS drift. Primitive tokens where semantic ones should be, wrong typography scale, missing interactive states (especially <code>disabled</code>), accessibility gaps.</p>
+        <p><strong>Who it helps:</strong> product and service designers shipping fast, who today rely on peer review catching DS slips.</p>
+        <p><strong>Why now:</strong> QA is slow, tedious, and easy to delegate without losing judgment. High signal, low risk.</p>
+      </section>
+
+      <section>
+        <h2>3. Behaviour Spec skill</h2>
+        <p><strong>Status:</strong> hypothesis to validate.</p>
+        <p><strong>What it does:</strong> turns a mockup into a structured specification for engineering handoff, covering states, edge cases, empty states, error states, transitions. The stuff we always mean to document but rarely have time for.</p>
+        <p><strong>Who it helps:</strong> anyone doing handoff. Solves the <em>"I spent two hours writing a spec nobody reads"</em> problem.</p>
+      </section>
+
+      <section>
+        <h2>What a useful Behaviour Spec skill needs</h2>
+        <p>Because this is the trickiest of the three, here's the target contract. A skill that meets this bar is worth building. A skill that doesn't isn't worth shipping.</p>
+
+        <h3>Input the designer provides</h3>
+        <ul>
+          <li><strong>The artifact</strong>, a Figma frame URL or an image of the mockup.</li>
+          <li><strong>The scope</strong>, a one-line intention: <em>"this is the payroll confirmation screen, admin sees it once per month."</em></li>
+          <li><strong>Known constraints</strong>, anything non-obvious: user role, data dependencies, locked decisions.</li>
+        </ul>
+
+        <h3>Output the skill produces</h3>
+        <ol>
+          <li><strong>A structured list of states</strong>, default, loading, empty, error, success, partial, offline, disabled. Each state named, each state with a one-sentence description of when it appears.</li>
+          <li><strong>Interaction specs</strong>, what each interactive element does on click, hover, focus, long press, keyboard navigation. Flags elements that aren't reachable by keyboard.</li>
+          <li><strong>Edge cases and questions</strong>, a short list of things the designer hasn't decided yet, formatted as questions not assumptions. Example: <em>"If the user has no payroll history, should we show the empty state or a pre-created mock?"</em></li>
+          <li><strong>DS references</strong>, the Unity components used and the tokens they rely on, so engineering can plug in the right building blocks.</li>
+          <li><strong>What's explicitly out of scope</strong>, one line naming what this spec does not cover, to prevent scope drift in engineering review.</li>
+        </ol>
+
+        <h3>What it must never do</h3>
+        <ul>
+          <li>Invent business rules, compliance logic, or data schemas.</li>
+          <li>Decide the questions in section 3. It lists them, the designer answers them.</li>
+          <li>Assume a component exists in Unity without checking. If unsure, it flags.</li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-label">Quality bar</div>
+          <p>A spec is useful when an engineer can start implementation the same day without a meeting, and when the questions listed are the questions they would have asked anyway. If the spec generates follow-up questions that were already implicitly answered in the mockup, it's too shallow.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>How we confirm or pivot these three</h2>
+        <p>These three are proposals. The confirmation loop is simple:</p>
+        <ol>
+          <li>Two weeks of real use by at least two designers per skill.</li>
+          <li>A short review in the next biweekly sharing session: what it did well, what it got wrong, was it worth the setup cost.</li>
+          <li>If a proposed skill doesn't earn its keep, we pivot. If another pattern emerges from the <a href="#use-cases" data-page="use-cases">Use cases library</a>, we promote it.</li>
+        </ol>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#mcp" data-page="mcp">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">MCP &amp; Figma</div>
+        </a>
         <a class="nav-link next" href="#team-skills" data-page="team-skills">
           <div class="nav-link-kicker">Next →</div>
           <div class="nav-link-title">Team skills</div>
@@ -1788,9 +1959,9 @@ DS reference: Unity, see /docs/unity-tokens.md
       </section>
 
       <div class="page-nav-footer">
-        <a class="nav-link prev" href="#mcp" data-page="mcp">
+        <a class="nav-link prev" href="#priority-skills" data-page="priority-skills">
           <div class="nav-link-kicker">← Previous</div>
-          <div class="nav-link-title">MCP &amp; Figma</div>
+          <div class="nav-link-title">Priority skills</div>
         </a>
         <a class="nav-link next" href="#evaluating-tools" data-page="evaluating-tools">
           <div class="nav-link-kicker">Next →</div>
@@ -1824,6 +1995,49 @@ DS reference: Unity, see /docs/unity-tokens.md
           <li>It forces us to restructure our workflow around its terms, not ours.</li>
           <li>It makes AI do what <a href="#never-delegate" data-page="never-delegate">we decided</a> never to delegate.</li>
         </ul>
+      </section>
+
+      <section>
+        <h2>How we run an experiment</h2>
+        <p>The criteria above are the bar. Here's the process that takes a tool from <em>"someone saw it on Twitter"</em> to <em>"we use it or we don't"</em>, without disrupting anyone's current work.</p>
+
+        <h3>1. Propose</h3>
+        <p>Anyone on the team can propose a tool. The proposal fits in three lines, posted in the design AI channel:</p>
+        <ul>
+          <li>What the tool is and what it claims to do.</li>
+          <li>Which problem we already have that it might solve.</li>
+          <li>Which existing criterion from <em>"A tool earns integration when"</em> it could meet.</li>
+        </ul>
+        <p>No formal review yet. Proposals that no one signs up to test within two weeks are closed. That's a signal: if no one has the bandwidth or the need, it's not the right moment.</p>
+
+        <h3>2. Sign up</h3>
+        <p>A proposal needs <strong>at least two designers</strong> willing to run it for two weeks in their real work. Not a side project, not a dedicated sprint. Actual, in-flight design tasks.</p>
+        <p>Why two: one designer alone reports too subjectively. Two designers disagree, and the disagreement is where the signal lives.</p>
+
+        <h3>3. Run for two weeks</h3>
+        <p>During those two weeks, the experimenters keep a light log. A shared doc with three columns is enough:</p>
+        <ul>
+          <li><strong>Task</strong>: what they used the tool for.</li>
+          <li><strong>Result</strong>: did it help, hurt, or make no difference, in one sentence.</li>
+          <li><strong>Would recommend</strong>: a simple yes/no/it depends, with a one-line reason.</li>
+        </ul>
+        <p>No slide decks, no benchmarks, no KPIs. The log is evidence, not performance.</p>
+
+        <h3>4. Decide, in 15 minutes</h3>
+        <p>At the next biweekly sharing session (see <a href="#cadence" data-page="cadence">Sharing cadence</a>), the experimenters present their log. The decision has three possible outcomes:</p>
+        <ul>
+          <li><strong>Integrate</strong>: the tool becomes part of the team's stack. Someone owns writing the short guide for the rest of the team. Done within a week of the decision.</li>
+          <li><strong>Pass</strong>: the tool isn't worth our time right now. Logged with a one-line reason so we don't re-test the same thing in three months.</li>
+          <li><strong>Extend</strong>: needs another two weeks with different use cases or more designers. Max one extension. After that, pass by default.</li>
+        </ul>
+
+        <h3>5. Ring-fence the risk</h3>
+        <p>The process has one hard rule: <strong>no experiment goes on a critical path</strong>. If a designer is on a release-blocking task, they don't also run the experiment on that task. Experiments happen on work where a suboptimal output is a learning, not a blocker.</p>
+
+        <div class="callout success">
+          <div class="callout-label">Why this shape</div>
+          <p>Lightweight enough that the process doesn't eat the exploration. Structured enough that we don't keep re-testing the same hype. The log and the 15-minute decision are the minimum that turns individual opinion into team memory.</p>
+        </div>
       </section>
 
       <div class="page-nav-footer">
