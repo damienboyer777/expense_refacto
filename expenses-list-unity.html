@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes de frais — PayFit (migration Unity)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================
+   UNITY DS TOKENS
+   Source: /mnt/project/Unity_DS___Design_System_Reference.md
+   ========================================================= */
+:root {
+  --canvas: #f8f9fc;
+
+  --surface-primary-default: #0a73eb;
+  --surface-primary-hover:   #0d62c4;
+  --surface-primary-pressed: #0b56ac;
+  --surface-primary-lowest:  #e5f1ff;
+
+  --surface-neutral-default: #ffffff;
+  --surface-neutral-low:     #f5f6f9;
+  --surface-neutral-lowest:  #eceff4;
+
+  --surface-success-low:    #bff8d3;
+  --surface-warning-low:    #ffeda3;
+  --surface-danger-low:     #ffccd1;
+
+  --content-neutral-default: #030e1d;
+  --content-neutral-low:     #364251;
+  --content-neutral-lowest:  #626f7e;
+  --content-neutral-disabled:#8793a1;
+
+  --content-primary-default: #0a73eb;
+  --content-inverted:        #ffffff;
+
+  --border-neutral-default: #e0e5eb;
+  --border-neutral-high:    #a8b3c1;
+
+  --space-25:  2px;
+  --space-50:  4px;
+  --space-75:  6px;
+  --space-100: 8px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-250: 20px;
+  --space-300: 24px;
+  --space-400: 32px;
+  --space-500: 40px;
+  --space-600: 48px;
+
+  --radius-50:  4px;
+  --radius-75:  6px;
+  --radius-100: 8px;
+  --radius-150: 12px;
+  --radius-200: 16px;
+  --radius-pill: 9999px;
+
+  --shadow-card: 0 1px 2px rgba(3, 14, 29, 0.04), 0 1px 3px rgba(3, 14, 29, 0.06);
+  --shadow-elevated: 0 4px 12px rgba(3, 14, 29, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--content-neutral-default);
+  background: var(--canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+
+.app {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--canvas);
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-250) var(--space-150);
+  gap: var(--space-300);
+}
+.sidebar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-100);
+}
+.sidebar__logo { display: flex; align-items: center; gap: var(--space-100); font-weight: 600; font-size: 18px; }
+.sidebar__logo-mark {
+  width: 28px; height: 28px;
+  background: var(--surface-primary-default);
+  border-radius: var(--radius-100);
+  color: var(--content-inverted);
+  font-weight: 600; font-size: 14px;
+  display: grid; place-items: center;
+}
+.sidebar__bell {
+  width: 32px; height: 32px;
+  border-radius: var(--radius-100);
+  display: grid; place-items: center;
+  color: var(--content-neutral-low);
+  transition: background 120ms ease;
+}
+.sidebar__bell:hover { background: var(--surface-neutral-low); }
+.sidebar__search { position: relative; padding: 0 var(--space-100); }
+.sidebar__search input {
+  width: 100%; height: 36px;
+  padding: 0 var(--space-150) 0 36px;
+  background: var(--surface-neutral-default);
+  border: 1px solid var(--border-neutral-default);
+  border-radius: var(--radius-100);
+  font: inherit;
+  color: var(--content-neutral-default);
+}
+.sidebar__search input::placeholder { color: var(--content-neutral-lowest); }
+.sidebar__search input:focus {
+  outline: none;
+  border-color: var(--surface-primary-default);
+  box-shadow: 0 0 0 3px var(--surface-primary-lowest);
+}
+.sidebar__search svg {
+  position: absolute; left: 20px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--content-neutral-lowest);
+}
+.sidebar__group { display: flex; flex-direction: column; gap: var(--space-25); }
+.sidebar__group-label {
+  font-size: 12px; line-height: 20px; font-weight: 500;
+  color: var(--content-neutral-lowest);
+  padding: var(--space-50) var(--space-200);
+}
+.sidebar__item {
+  display: flex; align-items: center; gap: var(--space-150);
+  padding: var(--space-100) var(--space-150);
+  border-radius: var(--radius-100);
+  color: var(--content-neutral-low);
+  font-size: 14px; font-weight: 400;
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.sidebar__item:hover { background: var(--surface-neutral-low); }
+.sidebar__item--active {
+  background: var(--surface-neutral-default);
+  color: var(--content-neutral-default);
+  font-weight: 500;
+  box-shadow: var(--shadow-card);
+}
+.sidebar__item svg { color: currentColor; flex-shrink: 0; }
+.sidebar__user {
+  margin-top: auto;
+  display: flex; align-items: center; gap: var(--space-150);
+  padding: var(--space-150);
+  border-radius: var(--radius-100);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.sidebar__user:hover { background: var(--surface-neutral-low); }
+.sidebar__user-avatar {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-neutral-lowest);
+  position: relative; overflow: hidden; flex-shrink: 0;
+}
+.sidebar__user-avatar::after {
+  content: "P"; position: absolute; bottom: -2px; right: -2px;
+  width: 16px; height: 16px;
+  background: var(--surface-primary-default);
+  color: var(--content-inverted);
+  border: 2px solid var(--canvas);
+  border-radius: var(--radius-50);
+  font-size: 9px; font-weight: 600;
+  display: grid; place-items: center;
+}
+.sidebar__user-info { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.sidebar__user-name { font-size: 14px; font-weight: 500; }
+.sidebar__user-company { font-size: 12px; color: var(--content-neutral-lowest); }
+.sidebar__user-caret { color: var(--content-neutral-lowest); }
+
+/* MAIN */
+.main {
+  background: var(--surface-neutral-default);
+  border-top-left-radius: var(--radius-200);
+  border-left: 1px solid var(--border-neutral-default);
+  border-top: 1px solid var(--border-neutral-default);
+  padding: var(--space-400) var(--space-500);
+  overflow-x: auto;
+}
+.page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: var(--space-400);
+}
+.page-title {
+  font-size: 28px; line-height: 36px; font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* Button */
+.btn {
+  display: inline-flex; align-items: center; gap: var(--space-100);
+  padding: var(--space-100) var(--space-200);
+  height: 40px;
+  border-radius: var(--radius-100);
+  font-size: 14px; font-weight: 500; line-height: 22px;
+  transition: background 120ms ease, box-shadow 120ms ease;
+  white-space: nowrap;
+}
+.btn--primary { background: var(--surface-primary-default); color: var(--content-inverted); }
+.btn--primary:hover { background: var(--surface-primary-hover); }
+.btn--primary:active { background: var(--surface-primary-pressed); }
+.btn--primary:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--surface-primary-lowest); }
+
+/* Selectable button group */
+.selectable-group {
+  display: flex; align-items: center; gap: var(--space-100);
+  margin-bottom: var(--space-300);
+  flex-wrap: wrap;
+}
+.selectable-btn {
+  display: inline-flex; align-items: center; gap: var(--space-100);
+  padding: var(--space-100) var(--space-200);
+  height: 40px;
+  background: var(--surface-neutral-default);
+  color: var(--content-neutral-low);
+  border: 1px solid var(--border-neutral-default);
+  border-radius: var(--radius-pill);
+  font-size: 14px; font-weight: 500; line-height: 22px;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+.selectable-btn:hover {
+  background: var(--surface-neutral-low);
+  color: var(--content-neutral-default);
+}
+.selectable-btn--selected {
+  background: var(--surface-primary-lowest);
+  color: var(--content-primary-default);
+  border-color: var(--surface-primary-default);
+}
+.selectable-btn--selected:hover { background: var(--surface-primary-lowest); }
+.selectable-btn svg { color: currentColor; flex-shrink: 0; }
+.selectable-btn__count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 20px; height: 20px;
+  padding: 0 var(--space-75);
+  border-radius: var(--radius-pill);
+  font-size: 12px; font-weight: 500; line-height: 1;
+  background: var(--surface-neutral-lowest);
+  color: var(--content-neutral-low);
+}
+.selectable-btn--selected .selectable-btn__count {
+  background: var(--surface-neutral-default);
+  color: var(--content-primary-default);
+}
+
+/* Table */
+.table-wrap {
+  border: 1px solid var(--border-neutral-default);
+  border-radius: var(--radius-150);
+  overflow: hidden;
+  background: var(--surface-neutral-default);
+}
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th, .table td {
+  padding: var(--space-200) var(--space-300);
+  text-align: left; vertical-align: middle;
+}
+.table thead th {
+  background: var(--surface-neutral-default);
+  font-weight: 500;
+  color: var(--content-neutral-low);
+  font-size: 14px; line-height: 22px;
+  border-bottom: 1px solid var(--border-neutral-default);
+  white-space: nowrap;
+}
+.table thead th button {
+  display: inline-flex; align-items: center; gap: var(--space-75);
+  color: inherit; font: inherit;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.table thead th button:hover { color: var(--content-neutral-default); }
+.table thead th button svg { color: var(--content-neutral-lowest); transition: transform 120ms ease; }
+
+.table tbody tr {
+  border-bottom: 1px solid var(--border-neutral-default);
+  transition: background 120ms ease;
+  cursor: pointer;
+}
+.table tbody tr:last-child { border-bottom: none; }
+.table tbody tr:hover { background: var(--surface-neutral-low); }
+.table tbody tr:focus-visible {
+  outline: none;
+  background: var(--surface-neutral-low);
+  box-shadow: inset 0 0 0 2px var(--surface-primary-default);
+}
+.table tbody tr.is-hidden { display: none; }
+.table tbody td { color: var(--content-neutral-default); font-size: 14px; line-height: 22px; }
+
+.table__cell--type { display: flex; align-items: center; gap: var(--space-150); }
+.table__cell--type svg { color: var(--content-neutral-low); flex-shrink: 0; }
+.table__cell--name {
+  max-width: 280px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.table__cell--amount { font-variant-numeric: tabular-nums; }
+
+/* Empty state */
+.table__empty {
+  padding: var(--space-600) var(--space-300);
+  text-align: center;
+  color: var(--content-neutral-lowest);
+  display: none;
+}
+.table__empty.is-visible { display: block; }
+.table__empty-title {
+  font-size: 16px; font-weight: 500;
+  color: var(--content-neutral-default);
+  margin-bottom: var(--space-50);
+}
+
+/* Badge */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: var(--space-50) var(--space-150);
+  height: 24px;
+  border-radius: var(--radius-75);
+  font-size: 12px; font-weight: 500; line-height: 20px;
+  white-space: nowrap;
+}
+.badge--warning { background: var(--surface-warning-low); color: #7a5a00; }
+.badge--success { background: var(--surface-success-low); color: #075d24; }
+.badge--danger  { background: var(--surface-danger-low);  color: #8e1824; }
+.badge--neutral { background: var(--surface-neutral-lowest); color: var(--content-neutral-low); }
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--space-200) var(--space-300);
+  border-top: 1px solid var(--border-neutral-default);
+  background: var(--surface-neutral-default);
+}
+.pagination__summary { font-size: 14px; color: var(--content-neutral-low); }
+.pagination__pages { display: flex; align-items: center; gap: var(--space-50); }
+.page-btn {
+  min-width: 32px; height: 32px;
+  padding: 0 var(--space-100);
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-75);
+  font-size: 14px; font-weight: 500;
+  color: var(--content-neutral-low);
+  background: transparent;
+  transition: background 120ms ease, color 120ms ease;
+}
+.page-btn:hover:not(:disabled) { background: var(--surface-neutral-low); color: var(--content-neutral-default); }
+.page-btn--active {
+  background: var(--surface-primary-lowest);
+  color: var(--content-primary-default);
+}
+.page-btn:disabled { color: var(--content-neutral-disabled); cursor: not-allowed; }
+.page-btn--icon { padding: 0; width: 32px; }
+
+.pagination__size {
+  display: flex; align-items: center; gap: var(--space-150);
+  font-size: 14px; color: var(--content-neutral-low);
+}
+.select {
+  display: inline-flex; align-items: center; gap: var(--space-75);
+  height: 32px;
+  padding: 0 var(--space-100) 0 var(--space-150);
+  background: var(--surface-neutral-default);
+  border: 1px solid var(--border-neutral-default);
+  border-radius: var(--radius-75);
+  font-size: 14px; color: var(--content-neutral-default);
+  cursor: pointer;
+  transition: border-color 120ms ease;
+}
+.select:hover { border-color: var(--border-neutral-high); }
+.select svg { color: var(--content-neutral-lowest); }
+
+@media (max-width: 1100px) { .main { padding: var(--space-300); } }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar__top">
+      <div class="sidebar__logo">
+        <div class="sidebar__logo-mark">P</div>
+        <span>PayFit</span>
+      </div>
+      <button class="sidebar__bell" aria-label="Notifications">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+    </div>
+    <div class="sidebar__search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Rechercher">
+    </div>
+
+    <nav class="sidebar__group">
+      <div class="sidebar__group-label">The essentials</div>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+      </a>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Payslip
+      </a>
+    </nav>
+
+    <nav class="sidebar__group">
+      <div class="sidebar__group-label">Daily basis</div>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Leaves
+      </a>
+      <a class="sidebar__item sidebar__item--active">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1" fill="currentColor"/><rect x="3" y="14" width="7" height="7" rx="1" fill="currentColor"/><rect x="14" y="14" width="7" height="7" rx="1" fill="currentColor"/></svg>
+        Expenses
+      </a>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Performance &amp; Engagement
+      </a>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Salary advance
+      </a>
+    </nav>
+
+    <nav class="sidebar__group">
+      <div class="sidebar__group-label">My company</div>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Documents
+      </a>
+      <a class="sidebar__item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        My colleagues
+      </a>
+    </nav>
+
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar">
+        <svg width="36" height="36" viewBox="0 0 36 36"><rect width="36" height="36" fill="#cbd3dc"/><circle cx="18" cy="14" r="6" fill="#8793a1"/><path d="M6 34c0-6.6 5.4-12 12-12s12 5.4 12 12" fill="#8793a1"/></svg>
+      </div>
+      <div class="sidebar__user-info">
+        <span class="sidebar__user-name">User full name</span>
+        <span class="sidebar__user-company">User company name</span>
+      </div>
+      <svg class="sidebar__user-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <header class="page-header">
+      <h1 class="page-title">Notes de frais</h1>
+      <button class="btn btn--primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+        Ajouter une note de frais
+      </button>
+    </header>
+
+    <!-- Filtres -->
+    <div class="selectable-group" role="tablist" aria-label="Filtrer les notes de frais">
+      <button class="selectable-btn selectable-btn--selected" role="tab" aria-selected="true" data-filter="all">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Voir toutes
+        <span class="selectable-btn__count" data-count="all">6</span>
+      </button>
+      <button class="selectable-btn" role="tab" aria-selected="false" data-filter="validated">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+        Validées
+        <span class="selectable-btn__count" data-count="validated">2</span>
+      </button>
+      <button class="selectable-btn" role="tab" aria-selected="false" data-filter="pending">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v6c0 2 1 4 3 5-2 1-3 3-3 5v6"/><path d="M18 2v6c0 2-1 4-3 5 2 1 3 3 3 5v6"/><path d="M4 2h16"/><path d="M4 22h16"/></svg>
+        En cours de validation
+        <span class="selectable-btn__count" data-count="pending">2</span>
+      </button>
+      <button class="selectable-btn" role="tab" aria-selected="false" data-filter="rejected">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+        Refusées
+        <span class="selectable-btn__count" data-count="rejected">1</span>
+      </button>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col"><button>Nom<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button></th>
+            <th scope="col"><button>Catégorie<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button></th>
+            <th scope="col"><button>Date<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button></th>
+            <th scope="col"><button>Montant<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button></th>
+            <th scope="col"><button>Statut<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button></th>
+          </tr>
+        </thead>
+        <tbody id="expenseTableBody">
+          <tr tabindex="0" data-status="pending">
+            <td class="table__cell--name">thisisalongtextthisisalongtextthisisa…</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v17a1 1 0 0 0 1 1h11"/><path d="M14 9h4l4 4v8a1 1 0 0 1-1 1h-3"/><circle cx="7" cy="18" r="2"/><path d="M15 18H9"/><circle cx="17" cy="18" r="2"/></svg>
+                Indemnité kilomètrique
+              </div>
+            </td>
+            <td>13 septembre 2025</td>
+            <td class="table__cell--amount">275,64 €</td>
+            <td><span class="badge badge--warning">En attente de validation</span></td>
+          </tr>
+
+          <tr tabindex="0" data-status="validated">
+            <td class="table__cell--name">amazon.pdf</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Équipement
+              </div>
+            </td>
+            <td>26 juin 2025</td>
+            <td class="table__cell--amount">123 €</td>
+            <td><span class="badge badge--success">Validée</span></td>
+          </tr>
+
+          <tr tabindex="0" data-status="rejected">
+            <td class="table__cell--name">RCYE9X3EN5.pdf</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
+                Hôtel / Logement
+              </div>
+            </td>
+            <td>13 septembre 2025</td>
+            <td class="table__cell--amount">275,64 €</td>
+            <td><span class="badge badge--danger">Refusée</span></td>
+          </tr>
+
+          <tr tabindex="0" data-status="validated">
+            <td class="table__cell--name">invoice.pdf</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Équipement
+              </div>
+            </td>
+            <td>26 juin 2025</td>
+            <td class="table__cell--amount">123 €</td>
+            <td><span class="badge badge--success">Validée</span></td>
+          </tr>
+
+          <tr tabindex="0" data-status="pending">
+            <td class="table__cell--name">hotel_cervantes.pdf</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 9h1M9 13h1M9 17h1M14 9h1M14 13h1M14 17h1"/></svg>
+                Hôtel / Logement
+              </div>
+            </td>
+            <td>13 septembre 2025</td>
+            <td class="table__cell--amount">275,64 €</td>
+            <td><span class="badge badge--warning">En attente de validation</span></td>
+          </tr>
+
+          <tr tabindex="0" data-status="cancelled">
+            <td class="table__cell--name">invoice.pdf</td>
+            <td>
+              <div class="table__cell--type">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                Équipement
+              </div>
+            </td>
+            <td>26 juin 2025</td>
+            <td class="table__cell--amount">123 €</td>
+            <td><span class="badge badge--neutral">Annulée</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty state -->
+      <div class="table__empty" id="emptyState">
+        <div class="table__empty-title">Aucune note de frais</div>
+        <div>Aucune note ne correspond à ce filtre.</div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination">
+        <div class="pagination__summary" id="paginationSummary">1 à 6 sur 6 notes de frais</div>
+        <div class="pagination__pages">
+          <button class="page-btn page-btn--icon" disabled aria-label="Page précédente">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+          <button class="page-btn page-btn--active">1</button>
+          <button class="page-btn page-btn--icon" disabled aria-label="Page suivante">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div class="pagination__size">
+          Notes par page
+          <button class="select">
+            10
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const filterBtns = document.querySelectorAll('.selectable-btn');
+  const rows = document.querySelectorAll('#expenseTableBody tr');
+  const emptyState = document.getElementById('emptyState');
+  const summary = document.getElementById('paginationSummary');
+
+  // Map filter keys to status predicates.
+  const filterMap = {
+    all:       () => true,
+    validated: (s) => s === 'validated',
+    pending:   (s) => s === 'pending',
+    rejected:  (s) => s === 'rejected'
+  };
+
+  function applyFilter(filterKey) {
+    let visible = 0;
+    rows.forEach(row => {
+      const match = filterMap[filterKey](row.getAttribute('data-status'));
+      row.classList.toggle('is-hidden', !match);
+      if (match) visible++;
+    });
+
+    emptyState.classList.toggle('is-visible', visible === 0);
+
+    if (visible === 0) {
+      summary.textContent = '0 note de frais';
+    } else if (visible === 1) {
+      summary.textContent = '1 sur 1 note de frais';
+    } else {
+      summary.textContent = `1 à ${visible} sur ${visible} notes de frais`;
+    }
+  }
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => {
+        b.classList.remove('selectable-btn--selected');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('selectable-btn--selected');
+      btn.setAttribute('aria-selected', 'true');
+      applyFilter(btn.getAttribute('data-filter'));
+    });
+  });
+
+  // Sort indicator (cosmetic)
+  document.querySelectorAll('.table thead button').forEach(b => {
+    b.addEventListener('click', e => {
+      e.preventDefault();
+      const svg = b.querySelector('svg');
+      svg.style.transform = svg.style.transform === 'rotate(180deg)' ? '' : 'rotate(180deg)';
+    });
+  });
+
+  applyFilter('all');
+</script>
+
+</body>
+</html>
