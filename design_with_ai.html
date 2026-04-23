@@ -1,0 +1,2381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Design with AI · PayFit Design Framework</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #0b1220;
+    --canvas-raised: #111a2c;
+    --canvas-elevated: #16203a;
+    --surface-card: #0f1829;
+    --border-subtle: #1f2a42;
+    --border-default: #2a3756;
+    --border-strong: #3a4a6f;
+
+    --content-default: #e6ecf5;
+    --content-low: #a8b3c7;
+    --content-muted: #7684a0;
+    --content-faint: #4f5d7a;
+
+    --primary: #6b8bff;
+    --primary-hover: #829eff;
+    --primary-faint: rgba(107, 139, 255, 0.12);
+
+    --payfit-blue: #0A73EB;
+
+    --accent-warm: #f5b368;
+    --accent-danger: #ff7070;
+    --accent-success: #4ed394;
+
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --sidebar-width: 280px;
+    --content-max: 760px;
+    --radius-sm: 8px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--content-default);
+    background: var(--canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--canvas-raised);
+    border-right: 1px solid var(--border-subtle);
+    padding: 32px 24px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 3px; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .brand-logo {
+    height: 28px;
+    width: auto;
+  }
+  .brand-logo path { fill: var(--content-default); }
+  .brand-sub {
+    font-size: 11px;
+    color: var(--content-muted);
+    letter-spacing: 0.04em;
+    margin-top: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .nav-section { margin-bottom: 24px; }
+  .nav-section-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--content-muted);
+    margin: 0 0 10px 4px;
+  }
+  .nav-list { list-style: none; padding: 0; margin: 0; }
+  .nav-item a {
+    display: block;
+    padding: 7px 10px;
+    color: var(--content-low);
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+    border-left: 2px solid transparent;
+    margin-left: -2px;
+  }
+  .nav-item a:hover { color: var(--content-default); background: var(--primary-faint); }
+  .nav-item a.active {
+    color: var(--content-default);
+    background: var(--primary-faint);
+    border-left-color: var(--primary);
+    font-weight: 500;
+  }
+
+  /* Main */
+  .main {
+    padding: 80px 64px 120px;
+    max-width: calc(var(--content-max) + 128px);
+  }
+
+  .page-kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-faint);
+    padding: 4px 10px;
+    border-radius: 9999px;
+    margin-bottom: 20px;
+  }
+
+  .page-hero {
+    margin-bottom: 64px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .page-hero h1 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(40px, 5vw, 56px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    color: var(--content-default);
+  }
+  .page-hero h1 em {
+    font-style: italic;
+    color: var(--primary);
+    font-weight: 500;
+  }
+  .page-hero .lede {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--content-low);
+    max-width: 620px;
+    margin: 0;
+  }
+
+  section {
+    margin-bottom: 80px;
+    scroll-margin-top: 40px;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 20px;
+    color: var(--content-default);
+  }
+  h3 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 17px;
+    line-height: 1.4;
+    margin: 32px 0 12px;
+    color: var(--content-default);
+  }
+  h4 {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1.4;
+    margin: 24px 0 8px;
+    color: var(--content-default);
+    letter-spacing: 0.01em;
+  }
+
+  p { margin: 0 0 16px; color: var(--content-default); }
+  p.muted { color: var(--content-low); }
+
+  ul, ol { margin: 0 0 16px; padding-left: 22px; color: var(--content-default); }
+  li { margin-bottom: 8px; }
+  li::marker { color: var(--content-muted); }
+
+  strong { color: var(--content-default); font-weight: 600; }
+  em { color: var(--content-low); }
+
+  a { color: var(--primary); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.15s; }
+  a:hover { border-bottom-color: var(--primary); }
+
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    background: var(--canvas-elevated);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent-warm);
+    border: 1px solid var(--border-subtle);
+  }
+
+  pre {
+    background: var(--canvas-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--content-default);
+    margin: 16px 0 24px;
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; }
+
+  /* Cards */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+  }
+  @media (max-width: 720px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    transition: border-color 0.2s, transform 0.2s;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+  .card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+  .card-kicker {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--content-muted);
+    margin-bottom: 8px;
+  }
+  .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .card p { margin: 0; font-size: 13px; color: var(--content-low); }
+  .card-arrow { float: right; color: var(--content-muted); transition: transform 0.2s, color 0.2s; }
+  .card:hover .card-arrow { color: var(--primary); transform: translateX(2px); }
+
+  /* Callouts */
+  .callout {
+    border-left: 3px solid var(--primary);
+    background: var(--primary-faint);
+    padding: 16px 20px;
+    margin: 24px 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .callout.warn { border-left-color: var(--accent-warm); background: rgba(245, 179, 104, 0.08); }
+  .callout.danger { border-left-color: var(--accent-danger); background: rgba(255, 112, 112, 0.08); }
+  .callout.success { border-left-color: var(--accent-success); background: rgba(78, 211, 148, 0.08); }
+  .callout p:last-child { margin-bottom: 0; }
+  .callout-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  .callout.warn .callout-label { color: var(--accent-warm); }
+  .callout.danger .callout-label { color: var(--accent-danger); }
+  .callout.success .callout-label { color: var(--accent-success); }
+
+  /* Stats bar */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin: 32px 0;
+  }
+  @media (max-width: 620px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--surface-card); padding: 20px 24px; }
+  .stat-number {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 32px;
+    line-height: 1;
+    color: var(--content-default);
+    margin-bottom: 4px;
+    letter-spacing: -0.01em;
+  }
+  .stat-number em { color: var(--primary); font-style: normal; }
+  .stat-label { font-size: 12px; color: var(--content-muted); line-height: 1.4; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+  th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--content-muted);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-default);
+  }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+
+  .level-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    letter-spacing: 0.02em;
+  }
+  .level-1 { background: rgba(255, 112, 112, 0.12); color: var(--accent-danger); }
+  .level-2 { background: rgba(245, 179, 104, 0.12); color: var(--accent-warm); }
+  .level-3 { background: var(--primary-faint); color: var(--primary); }
+  .level-4 { background: rgba(78, 211, 148, 0.12); color: var(--accent-success); }
+
+  /* Rule rows */
+  .rule-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 720px) { .rule-row { grid-template-columns: 1fr; } }
+  .rule-cell {
+    padding: 18px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+  }
+  .rule-cell.pro { background: rgba(78, 211, 148, 0.05); border-color: rgba(78, 211, 148, 0.2); }
+  .rule-cell.con { background: rgba(255, 112, 112, 0.05); border-color: rgba(255, 112, 112, 0.2); }
+  .rule-label { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; }
+  .rule-cell.pro .rule-label { color: var(--accent-success); }
+  .rule-cell.con .rule-label { color: var(--accent-danger); }
+  .rule-cell ul { margin: 0; padding-left: 18px; }
+  .rule-cell li { font-size: 13px; color: var(--content-low); margin-bottom: 4px; }
+
+  /* Footer nav */
+  .page-nav-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 80px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-subtle);
+  }
+  .nav-link {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border-subtle);
+    transition: border-color 0.2s;
+  }
+  .nav-link:hover { border-color: var(--border-strong); border-bottom: 1px solid var(--border-strong); }
+  .nav-link.prev { text-align: left; }
+  .nav-link.next { text-align: right; }
+  .nav-link-kicker { font-size: 11px; color: var(--content-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+  .nav-link-title { font-size: 15px; font-weight: 500; color: var(--content-default); margin-top: 4px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1.4;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: var(--primary);
+    color: white;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--primary-hover); transform: translateY(-1px); border-bottom: 1px solid transparent; }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary {
+    background: transparent;
+    border-color: var(--border-default);
+    color: var(--content-default);
+  }
+  .btn.secondary:hover { border-color: var(--border-strong); background: var(--canvas-elevated); }
+  .btn.small { padding: 6px 12px; font-size: 13px; }
+  .btn.ghost { background: transparent; color: var(--content-low); border-color: transparent; padding: 6px 10px; }
+  .btn.ghost:hover { background: var(--canvas-elevated); color: var(--content-default); }
+
+  /* Form elements */
+  .field { margin-bottom: 20px; }
+  .field-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--content-default);
+    margin-bottom: 6px;
+  }
+  .field-hint { font-size: 12px; color: var(--content-muted); margin-top: 4px; }
+  .input, .textarea, .select {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--canvas-elevated);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    color: var(--content-default);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
+  .textarea { resize: vertical; min-height: 90px; font-family: inherit; }
+
+  /* Radio cards (self-assessment) */
+  .radio-cards { display: grid; gap: 10px; margin: 16px 0 24px; }
+  .radio-card {
+    display: block;
+    padding: 14px 18px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .radio-card:hover { border-color: var(--border-strong); }
+  .radio-card input { display: none; }
+  .radio-card-inner { display: flex; gap: 14px; align-items: flex-start; }
+  .radio-dot {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--border-default);
+    margin-top: 2px;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .radio-card input:checked + .radio-card-inner .radio-dot {
+    border-color: var(--primary);
+  }
+  .radio-card input:checked + .radio-card-inner .radio-dot::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--primary);
+  }
+  .radio-card input:checked ~ * { }
+  .radio-card:has(input:checked) { border-color: var(--primary); background: var(--primary-faint); }
+  .radio-card-content { flex: 1; }
+  .radio-card-title {
+    font-weight: 500;
+    color: var(--content-default);
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .radio-card-desc {
+    font-size: 13px;
+    color: var(--content-low);
+    line-height: 1.5;
+  }
+
+  /* Tag pills */
+  .tag-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+  .tag-pill {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--canvas-elevated);
+    color: var(--content-low);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    user-select: none;
+  }
+  .tag-pill:hover { border-color: var(--border-strong); color: var(--content-default); }
+  .tag-pill.active, .tag-pill:has(input:checked) {
+    background: var(--primary-faint);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+  .tag-pill input { display: none; }
+
+  .tag-chip {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--canvas-elevated);
+    color: var(--content-muted);
+    border: 1px solid var(--border-subtle);
+    margin-right: 6px;
+  }
+
+  /* Use case / skill item cards */
+  .item-list { display: flex; flex-direction: column; gap: 12px; margin: 24px 0; }
+  .item-card {
+    padding: 18px 20px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .item-title { font-weight: 600; font-size: 15px; color: var(--content-default); margin: 0; }
+  .item-meta { font-size: 12px; color: var(--content-muted); margin-top: 4px; }
+  .item-meta a { color: var(--content-low); }
+  .item-body { font-size: 14px; color: var(--content-default); line-height: 1.55; margin: 8px 0; white-space: pre-wrap; }
+  .item-footer { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; align-items: center; }
+
+  .like-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    background: var(--canvas-elevated);
+    color: var(--content-low);
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  .like-btn:hover { color: var(--content-default); border-color: var(--border-strong); }
+  .like-btn.liked { background: var(--primary-faint); color: var(--primary); border-color: var(--primary); }
+  .like-btn svg { width: 14px; height: 14px; }
+
+  .skill-code {
+    background: var(--canvas-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin: 12px 0;
+    font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--content-default);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+
+  .empty-state {
+    padding: 32px;
+    text-align: center;
+    border: 1px dashed var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--content-muted);
+    font-size: 14px;
+    margin: 24px 0;
+  }
+
+  /* Collapsible form (disclosure) */
+  .add-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 18px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--content-default);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: left;
+  }
+  .add-toggle:hover { border-color: var(--border-strong); background: var(--canvas-elevated); }
+  .add-toggle[aria-expanded="true"] {
+    border-color: var(--primary);
+    background: var(--primary-faint);
+    color: var(--primary);
+  }
+  .add-toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    font-size: 16px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+  }
+  .add-toggle[aria-expanded="true"] .add-toggle-icon { transform: rotate(45deg); }
+  .add-toggle-label { flex: 1; }
+  .add-toggle-hint {
+    color: var(--content-muted);
+    font-size: 12px;
+    font-weight: 400;
+    margin-left: auto;
+  }
+  .add-toggle[aria-expanded="true"] .add-toggle-hint { color: var(--primary); opacity: 0.8; }
+
+  .add-form-wrap {
+    display: none;
+    padding: 24px;
+    margin-top: 12px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+  }
+  .add-form-wrap.open { display: block; animation: slideDown 0.2s ease; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .add-form-wrap .field:last-of-type { margin-bottom: 24px; }
+  .add-form-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  /* Progress / monitor */
+  .monitor {
+    background: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .monitor-title { font-size: 14px; font-weight: 500; color: var(--content-default); }
+  .monitor-count {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 28px;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+  }
+  .monitor-bars { display: flex; flex-direction: column; gap: 10px; }
+  .monitor-bar { display: grid; grid-template-columns: 110px 1fr 40px; gap: 12px; align-items: center; font-size: 13px; }
+  .bar-track { height: 6px; background: var(--canvas-elevated); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+  .bar-fill.level-1-fill { background: var(--accent-danger); }
+  .bar-fill.level-2-fill { background: var(--accent-warm); }
+  .bar-fill.level-3-fill { background: var(--primary); }
+  .bar-fill.level-4-fill { background: var(--accent-success); }
+  .bar-count { text-align: right; color: var(--content-muted); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+  /* Menu toggle */
+  .menu-toggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--canvas-raised);
+    border: 1px solid var(--border-default);
+    color: var(--content-default);
+    cursor: pointer;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-toggle:hover { border-color: var(--border-strong); }
+  .menu-toggle svg { width: 20px; height: 20px; }
+  .menu-toggle .icon-close { display: none; }
+  body.menu-open .menu-toggle .icon-open { display: none; }
+  body.menu-open .menu-toggle .icon-close { display: block; }
+
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 80;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  body.menu-open .sidebar-backdrop { display: block; opacity: 1; }
+
+  /* Page switching */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* Local storage notice */
+  .local-notice {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--content-muted);
+    padding: 6px 12px;
+    background: var(--canvas-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: 9999px;
+    margin-bottom: 16px;
+  }
+  .local-notice svg { width: 12px; height: 12px; color: var(--accent-warm); }
+
+  /* Tablet */
+  @media (max-width: 960px) {
+    .app { grid-template-columns: 1fr; }
+    .main { padding: 72px 32px 80px; max-width: 100%; }
+    .menu-toggle { display: flex; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 300px;
+      max-width: 85vw;
+      z-index: 90;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      border-right: 1px solid var(--border-subtle);
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+    }
+    body.menu-open .sidebar { transform: translateX(0); }
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    body { font-size: 15px; }
+    .main { padding: 64px 20px 64px; }
+    .page-hero { margin-bottom: 40px; padding-bottom: 32px; }
+    .page-hero h1 { font-size: 34px; line-height: 1.1; }
+    .page-hero .lede { font-size: 16px; line-height: 1.5; }
+    .page-kicker { font-size: 10px; padding: 3px 9px; margin-bottom: 16px; }
+    section { margin-bottom: 56px; }
+    h2 { font-size: 24px; margin-bottom: 16px; }
+    h3 { font-size: 16px; margin: 24px 0 10px; }
+    h4 { font-size: 13px; }
+    .cards { gap: 12px; margin: 24px 0; }
+    .card { padding: 18px 18px; }
+    .stats { grid-template-columns: 1fr; margin: 24px 0; }
+    .stat { padding: 18px 20px; }
+    .stat-number { font-size: 28px; }
+    .rule-row { grid-template-columns: 1fr; gap: 12px; margin: 20px 0; }
+    .rule-cell { padding: 16px 18px; }
+    .rule-cell ul { padding-left: 18px; }
+    .table-wrap { margin: 20px -20px; padding: 0 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { font-size: 13px; min-width: 480px; margin: 0; }
+    th { padding: 8px 12px; font-size: 10px; }
+    td { padding: 10px 12px; }
+    .callout { padding: 14px 16px; margin: 20px 0; }
+    .callout-label { font-size: 10px; }
+    pre { padding: 14px 16px; font-size: 12px; margin: 14px -4px 20px; }
+    code { font-size: 12px; }
+    .page-nav-footer { flex-direction: column; gap: 12px; margin-top: 56px; padding-top: 24px; }
+    .nav-link { padding: 16px 18px; text-align: left !important; }
+    .nav-link-title { font-size: 14px; }
+    .sidebar { padding: 24px 20px; width: 280px; }
+    .brand { margin-bottom: 24px; padding-bottom: 20px; }
+    .nav-section { margin-bottom: 20px; }
+    .monitor-bar { grid-template-columns: 90px 1fr 36px; gap: 8px; font-size: 12px; }
+  }
+
+  @media (max-width: 380px) {
+    .main { padding: 60px 16px 48px; }
+    .page-hero h1 { font-size: 30px; }
+    .page-hero .lede { font-size: 15px; }
+    h2 { font-size: 22px; }
+    .stat-number { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" aria-label="Toggle navigation" type="button">
+  <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+</button>
+
+<div class="sidebar-backdrop" aria-hidden="true"></div>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div>
+        <svg class="brand-logo" viewBox="0 0 570 176" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PayFit">
+          <path d="M420.7 65.7H412.6C411.7 65.7 410.9 66.3 410.7 67.1C410.3 68.3 410 69.1 409.9 69.6C406.7 79.4 401.8 94.2 395.4 113.9C395.3 114.2 394.9 115.3 394.1 117.1C393.9 117.6 393.3 117.8 392.8 117.6C392.6 117.5 392.4 117.3 392.3 117.1C391.6 115.5 391.2 114.5 391 113.9C384.4 93.6 379.5 78.4 376.3 68.2C376.2 67.9 376.1 67.5 376 67.2C375.7 66.4 375 65.8 374.1 65.8H366.1C365 65.8 364.1 66.7 364.1 67.8C364.1 68 364.1 68.2 364.2 68.4C364.3 68.7 364.4 68.9 364.5 69.2C369.5 83.4 377 104.6 387 132.9C387 133 387 133 387.1 133.1C387.2 133.5 387.2 133.9 387.1 134.3C387.1 134.4 387.1 134.4 387 134.5C386.9 134.9 386.7 135.4 386.6 135.8C385.2 139.7 381.5 142.4 377.3 142.4H368.9C367.8 142.4 366.9 143.3 366.9 144.4V151.1C366.9 152.2 367.8 153.1 368.9 153.1H377.3C385.5 153.1 392.8 148.3 396.1 140.8C396.2 140.5 396.3 140.2 396.5 139.9C396.6 139.6 402.5 122.9 422.2 67.8C422.5 67.1 422.1 66.2 421.4 65.9C421.4 65.9 421.4 65.9 421.3 65.9C421 65.8 420.9 65.7 420.7 65.7ZM314.1 122.6C316 123.2 318 123.5 320 123.5C325.9 123.4 331.6 121.1 335.9 116.9C339 113.8 340.7 109.5 340.6 105.1V99.9C340.6 99.4 340.2 99 339.7 99C339.6 99 339.6 99 339.5 99C338.5 99.1 338 99.1 338 99.1L331.7 99.9L319.2 101.8C312.5 102.9 308.4 105.6 307.1 109.8C306.8 110.8 306.6 111.8 306.6 112.9C306.7 117.4 309.8 121.3 314.1 122.6ZM351.8 127V131C351.8 132.1 350.9 133 349.8 133H343.3C342.2 133 341.3 132.1 341.3 131L341.2 124.4C341.2 124.3 341.1 124.2 341.1 124.1C340.9 123.9 340.6 123.9 340.4 124.1C340 124.4 339.6 124.8 339.3 125.2C334.1 130.4 327 133 317.8 133C311.2 133 305.8 131.2 301.6 127.7C297.4 124.2 295.4 119.3 295.4 113.1C295.3 110.1 295.9 107.2 297.2 104.5C298.3 102.2 299.9 100.3 302 98.9C303.8 97.6 305.7 96.6 307.8 95.9C309.7 95.2 311.6 94.7 313.5 94.4C323.2 93 328.4 92.3 329.4 92.1C330.2 92 333.4 91.6 338.9 90.8C339.3 90.7 339.6 90.7 340 90.7C340.5 90.6 340.9 90.2 340.9 89.7V86.9C340.9 82.7 339.8 79.4 337.6 77.1C335.4 74.8 331.3 73.6 325.4 73.6C322.7 73.6 320 73.9 317.4 74.7C315.4 75.3 313.7 76.4 312.3 78C311.4 79.2 310.6 80.4 310.1 81.8C310 82.1 309.9 82.4 309.8 82.8C309.8 82.9 309.8 83 309.7 83.1C309.5 84 308.7 84.7 307.7 84.7H300.2C299.1 84.6 298.3 83.7 298.3 82.6V82.2C298.4 81.4 298.5 80.8 298.6 80.3C299.1 78.4 299.9 76.5 300.9 74.8C302.1 72.9 303.6 71.2 305.4 69.8C307.8 68.2 310.4 67 313.2 66.2C317 65.2 321 64.8 324.9 64.8C343 64.8 351.8 72 351.8 86.6V127ZM500.1 67.2V130.8C500.1 131.9 501 132.8 502.1 132.8H510.2C511.3 132.8 512.2 131.9 512.2 130.8V67.2C512.2 66.1 511.3 65.2 510.2 65.2H502.1C501 65.2 500.1 66.1 500.1 67.2ZM500.1 47V55.1C500.1 56.2 501 57.1 502.1 57.1H510.2C511.3 57.1 512.2 56.2 512.2 55.1V47C512.2 45.9 511.3 45 510.2 45H502.1C501 45 500.1 45.9 500.1 47ZM550 75.8H567.1C568.2 75.8 569.1 74.9 569.1 73.8V67.1C569.1 66 568.2 65.1 567.1 65.1H550C549.5 65.1 549 64.7 549 64.2V64.1V47C549 45.9 548.1 45 547 45H538.9C537.8 45 536.9 45.9 536.9 47V64.2C536.9 64.7 536.5 65.2 536 65.2H535.9H528.5C527.4 65.2 526.5 66.1 526.5 67.2V73.9C526.5 75 527.4 75.9 528.5 75.9H535.9C536.4 75.9 536.9 76.3 536.9 76.8V76.9V113C537.3 124 546.3 132.8 557.3 132.8H566.4C567.5 132.8 568.4 131.9 568.4 130.8V124.1C568.4 123 567.5 122.1 566.4 122.1H557.3C552.7 122.1 548.9 118.4 548.9 113.7V76.8C549 76.2 549.4 75.8 550 75.8ZM286.2 72.3C286.2 57.4 274.3 45.3 259.5 45H221C219.9 45 219 45.9 219 47V130.8C219 131.9 219.9 132.8 221 132.8H229.1C230.2 132.8 231.1 131.9 231.1 130.8V100.7C231.1 100.2 231.5 99.7 232 99.7H232.1H259.5C274.4 99.3 286.2 87.2 286.2 72.3ZM275.6 72.3C275.6 81.5 268.2 88.9 259 88.9H232.2C231.7 88.9 231.2 88.5 231.2 88V87.9V56.7C231.2 56.2 231.6 55.7 232.1 55.7H232.2H259C268.2 55.7 275.6 63.1 275.6 72.3ZM447.2 99.4H477.6C478.7 99.4 479.6 98.5 479.6 97.4V90.7C479.6 89.6 478.7 88.7 477.6 88.7H447.2C446.7 88.7 446.2 88.3 446.2 87.8V87.7V56.7C446.2 56.2 446.6 55.7 447.1 55.7H447.2H484.5C485.6 55.7 486.5 54.8 486.5 53.7V47C486.5 45.9 485.6 45 484.5 45H436.1C435 45 434.1 45.9 434.1 47V130.8C434.1 131.9 435 132.8 436.1 132.8H444.2C445.3 132.8 446.2 131.9 446.2 130.8V100.4C446.2 99.8 446.6 99.4 447.2 99.4Z"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M88 176C39.4 176 0 136.6 0 88C0 39.4 39.4 0 88 0C136.6 0 176 39.4 176 88C176 136.6 136.6 176 88 176ZM86.8 119.3V101.8C86.8 101.3 87.2 100.8 87.7 100.8H87.8H108.3C123.2 100.2 134.7 87.7 134.1 72.8C133.5 58.7 122.2 47.5 108.2 47H58C56.9 47 56 47.9 56 49V119.6C56 128.1 62.9 135 71.4 135C79.9 135 86.8 128.1 86.8 119.6C86.9 119.4 86.9 119.3 86.8 119.3ZM87.8 77.8H107.2C109.4 77.8 111.2 76 111.2 73.8C111.2 71.6 109.4 69.8 107.2 69.8H80.9C79.8 69.8 78.9 70.7 78.9 71.8V119.5C78.9 123.6 75.5 127 71.4 127C67.3 127 63.9 123.6 63.9 119.5V55.9C63.9 55.4 64.3 54.9 64.8 54.9H64.9H107.2C117.7 54.7 126.4 63.1 126.5 73.5C126.7 84 118.3 92.7 107.9 92.8H87.8C87.3 92.8 86.8 92.4 86.8 91.9V91.8V78.8C86.8 78.3 87.2 77.9 87.8 77.8Z"/>
+        </svg>
+        <div class="brand-sub">Design with AI</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Introduction</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#welcome" data-page="welcome">Welcome</a></li>
+        <li class="nav-item"><a href="#state-of-play" data-page="state-of-play">Where we are today</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">The framework</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#never-delegate" data-page="never-delegate">What we never delegate</a></li>
+        <li class="nav-item"><a href="#where-it-helps" data-page="where-it-helps">Where AI actually helps</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">How we work</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#self-assessment" data-page="self-assessment">Team self-assessment</a></li>
+        <li class="nav-item"><a href="#use-cases" data-page="use-cases">Use cases library</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Getting set up</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#license" data-page="license">License &amp; access</a></li>
+        <li class="nav-item"><a href="#prerequisites" data-page="prerequisites">Prerequisites</a></li>
+        <li class="nav-item"><a href="#install-claude-code" data-page="install-claude-code">Install Claude Code</a></li>
+        <li class="nav-item"><a href="#claude-md" data-page="claude-md">CLAUDE.md setup</a></li>
+        <li class="nav-item"><a href="#mcp" data-page="mcp">MCP &amp; Figma</a></li>
+        <li class="nav-item"><a href="#team-skills" data-page="team-skills">Team skills</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Experiments</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#evaluating-tools" data-page="evaluating-tools">Evaluating new tools</a></li>
+        <li class="nav-item"><a href="#cadence" data-page="cadence">Sharing cadence</a></li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">About</div>
+      <ul class="nav-list">
+        <li class="nav-item"><a href="#scope" data-page="scope">What this is not</a></li>
+        <li class="nav-item"><a href="#next" data-page="next">Next steps</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- WELCOME -->
+    <div class="page active" id="page-welcome">
+      <div class="page-hero">
+        <span class="page-kicker">V1 · Internal draft</span>
+        <h1>Design with <em>AI.</em></h1>
+        <p class="lede">A working framework for the PayFit design team. How we use AI without losing ourselves, without falling behind, and without leaving anyone behind. Built for product designers, service designers, content designers, and design researchers, no jargon.</p>
+      </div>
+
+      <section>
+        <h2>What you'll find here</h2>
+        <p class="muted">This is a living document, not a manifesto. It exists so the team has a shared reference instead of each of us figuring it out alone.</p>
+
+        <div class="cards">
+          <a class="card" href="#state-of-play" data-page="state-of-play">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">Introduction</div>
+            <h3>Where we are today</h3>
+            <p>An honest snapshot of where design stands in the current AI shift.</p>
+          </a>
+          <a class="card" href="#never-delegate" data-page="never-delegate">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">The framework</div>
+            <h3>What we never delegate</h3>
+            <p>The red lines. Not out of fear of AI, out of clarity about our craft.</p>
+          </a>
+          <a class="card" href="#self-assessment" data-page="self-assessment">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">How we work</div>
+            <h3>Team self-assessment</h3>
+            <p>Rate yourself, anonymously, and see where the team stands.</p>
+          </a>
+          <a class="card" href="#use-cases" data-page="use-cases">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">How we work</div>
+            <h3>Use cases library</h3>
+            <p>Real AI use cases from the team, tagged and attributed so you can ping the author.</p>
+          </a>
+          <a class="card" href="#install-claude-code" data-page="install-claude-code">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">Getting set up</div>
+            <h3>Install Claude Code</h3>
+            <p>From zero to Claude running in your terminal. Step by step, no assumed knowledge.</p>
+          </a>
+          <a class="card" href="#team-skills" data-page="team-skills">
+            <span class="card-arrow">→</span>
+            <div class="card-kicker">Getting set up</div>
+            <h3>Team skills</h3>
+            <p>Skills built by the team. Copy, download, and show some love.</p>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h2>Who this is for</h2>
+        <p>Every designer at PayFit, regardless of current level. Whether you've never opened a terminal or you're already shipping Claude Code skills, there's a page here that matches where you are.</p>
+        <p class="muted">If you're not a designer and you ended up here anyway, welcome. The positions in <a href="#never-delegate" data-page="never-delegate">What we never delegate</a> and <a href="#where-it-helps" data-page="where-it-helps">Where AI actually helps</a> describe how the design team sees its role in the AI era.</p>
+      </section>
+    </div>
+
+    <!-- STATE OF PLAY -->
+    <div class="page" id="page-state-of-play">
+      <div class="page-hero">
+        <span class="page-kicker">Introduction</span>
+        <h1>Where we are <em>today.</em></h1>
+        <p class="lede">This document doesn't exist to prescribe a method. It exists because a shift is happening around us, and design needs a shared response.</p>
+      </div>
+
+      <section>
+        <h2>The numbers</h2>
+        <p>A partial snapshot of AI tool adoption at PayFit. It does not include Codex, Cursor, or other platforms the company subscribes to. But it's enough to notice the gap.</p>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-number"><em>5</em> / 47</div>
+            <div class="stat-label">designers among Claude Code users at PayFit</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number"><em>9</em> / 222</div>
+            <div class="stat-label">designers among PayFiters with a GitHub account</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number">30</div>
+            <div class="stat-label">engineers using Claude Code, the baseline we're measured against</div>
+          </div>
+        </div>
+
+        <p>Engineers have show-and-tells, peering sessions, and trial subscriptions. Designers mostly explore alone. The AI guild is open and transverse, and it isn't a substitute for a design-specific learning system.</p>
+      </section>
+
+      <section>
+        <h2>What we're noticing</h2>
+        <p>Not hypotheticals. Patterns that are becoming common across teams.</p>
+        <ul>
+          <li><strong>Non-designers are producing interface work.</strong> PMs show up with wireframes done in Claude Design. Engineers prototype flows directly in code. Sometimes it's great collaboration, sometimes we find out after the fact.</li>
+          <li><strong>The demand for design guidelines is shifting.</strong> People ask where to find the UX and content guidelines they can feed into Claude or Cursor. The Design System is not yet structured for AI consumption.</li>
+          <li><strong>Individual effort isn't scaling.</strong> Each designer configures access, learns the tool, finds their use cases on their own. What one learns doesn't reliably reach the rest of the team.</li>
+        </ul>
+
+        <div class="callout warn">
+          <div class="callout-label">The real problem</div>
+          <p>It isn't <em>"the design team doesn't use AI enough."</em> It's that <strong>a new way of building is forming around us</strong>, while we explore individually, without a shared framework, without a visible collective position.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>What this document proposes</h2>
+        <ol>
+          <li><strong>Name what we never delegate</strong>, so our craft stays legible to the company.</li>
+          <li><strong>Map where AI actually helps</strong>, and where it promises more than it delivers.</li>
+          <li><strong>Organize how we level up together</strong>, not each on our own.</li>
+          <li><strong>Open a structured experimentation space</strong>, instead of waiting for the right method to appear.</li>
+        </ol>
+        <p>This is a V1. It is written to be criticized, reshaped, and iterated on as a team.</p>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#welcome" data-page="welcome">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Welcome</div>
+        </a>
+        <a class="nav-link next" href="#never-delegate" data-page="never-delegate">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">What we never delegate</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- NEVER DELEGATE -->
+    <div class="page" id="page-never-delegate">
+      <div class="page-hero">
+        <span class="page-kicker">The framework</span>
+        <h1>What we <em>never delegate.</em></h1>
+        <p class="lede">Before talking about what AI does well, we draw the red lines. Not out of fear of the tool, out of clarity about our craft.</p>
+      </div>
+
+      <section>
+        <h2>Defining the problem</h2>
+        <p>AI executes an intention. It does not formulate one.</p>
+        <p>Understanding what a user is actually trying to accomplish, why they're struggling, which moment of their professional life we're touching, that's design thinking. Not interface generation. A designer who lets AI define the problem has delegated the job, not a task.</p>
+      </section>
+
+      <section>
+        <h2>Decisions that affect vulnerable users</h2>
+        <p>In an HR product, every interface decision has real consequences on real people. A misread payslip, a miscalibrated compliance alert, an onboarding flow that forgets an edge case, those are not bugs. They're impacts.</p>
+        <p>AI can propose, compare, accelerate. It cannot carry the responsibility of a choice that affects a vulnerable user: a new employee, an HR lead under end-of-month pressure, a director discovering a new legal obligation.</p>
+      </section>
+
+      <section>
+        <h2>What we choose <em>not</em> to build</h2>
+        <p>Design craft is as much about what we leave out as what we put in.</p>
+        <p>AI has an addition bias. It adds options, fields, features. The judgment that removes, simplifies, says <em>"this doesn't deserve a screen"</em>, refuses a product request, that stays with us.</p>
+      </section>
+
+      <section>
+        <h2>The voice of the product</h2>
+        <p>Content design is not filler. It's a stance on the relationship we build with users.</p>
+        <p>AI can generate 50 phrasings. Choosing which one is PayFit, which one respects a user who's struggling, which one doesn't ring false, that's a judgment built on accumulated knowledge of the product and the people.</p>
+      </section>
+
+      <section>
+        <h2>The test we use</h2>
+        <div class="callout">
+          <div class="callout-label">Heuristic</div>
+          <p><strong>Can a designer who delegates <em>this</em> to AI still defend their job against a sensitized PM and an engineer who knows how to prompt?</strong></p>
+          <p class="muted">If the answer is no, it's a red line. We don't cross it, even under pressure for speed.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#state-of-play" data-page="state-of-play">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Where we are today</div>
+        </a>
+        <a class="nav-link next" href="#where-it-helps" data-page="where-it-helps">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Where AI actually helps</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- WHERE IT HELPS -->
+    <div class="page" id="page-where-it-helps">
+      <div class="page-hero">
+        <span class="page-kicker">The framework</span>
+        <h1>Where AI <em>actually helps.</em></h1>
+        <p class="lede">The structure follows moments of the design workflow, not roles. A PD, a service designer, and a content designer often face the same moments, just on different artifacts.</p>
+      </div>
+
+      <section>
+        <h2>Research &amp; framing</h2>
+        <div class="rule-row">
+          <div class="rule-cell pro">
+            <div class="rule-label">Where it helps</div>
+            <ul>
+              <li>Synthesizing a corpus of interviews, extracting recurring themes.</li>
+              <li>Reformulating an ambiguous brief, surfacing what's unsaid.</li>
+              <li>Exhaustive competitor scans, where we'd otherwise stop at two captures.</li>
+            </ul>
+          </div>
+          <div class="rule-cell con">
+            <div class="rule-label">Where it overpromises</div>
+            <ul>
+              <li>It smooths out weak signals. The three uncomfortable quotes that matter most get buried.</li>
+              <li>It invents patterns that <em>sound right</em> but don't hold up when verified.</li>
+              <li>It doesn't replace being in the room with a user.</li>
+            </ul>
+          </div>
+        </div>
+        <p class="muted">PayFit note: the research team is already testing AI-augmented approaches (see 06 Research). The rule that's emerging: AI prepares, the researcher decides.</p>
+      </section>
+
+      <section>
+        <h2>Concept &amp; exploration</h2>
+        <div class="rule-row">
+          <div class="rule-cell pro">
+            <div class="rule-label">Where it helps</div>
+            <ul>
+              <li>Generating 10 variants of a flow to get past the first reflex.</li>
+              <li>Prototyping a happy path in minutes to test a stance before investing.</li>
+              <li>Thinking out loud with a model to sharpen an intuition.</li>
+            </ul>
+          </div>
+          <div class="rule-cell con">
+            <div class="rule-label">Where it overpromises</div>
+            <ul>
+              <li>The 10 variants look more alike than we realize. AI's conformity bias is strong.</li>
+              <li>It produces interfaces that <em>look right</em> but fail the first user test.</li>
+              <li>It doesn't replace the productive difficulty of finding your own idea.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Craft &amp; production</h2>
+        <div class="rule-row">
+          <div class="rule-cell pro">
+            <div class="rule-label">Where it helps</div>
+            <ul>
+              <li>Mobile adaptation of an existing desktop component.</li>
+              <li>Consistency QA across a batch of screens, DS drift, typography mistakes.</li>
+              <li>Structured spec writing from a mockup.</li>
+            </ul>
+          </div>
+          <div class="rule-cell con">
+            <div class="rule-label">Where it overpromises</div>
+            <ul>
+              <li>It applies the DS mechanically. Cases where the rule doesn't apply, it forces.</li>
+              <li>Output quality depends entirely on DS input quality. Ours isn't AI-ready yet (see 07 DS).</li>
+              <li>It makes "correct" faster, not "right".</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout warn">
+          <div class="callout-label">Reality check</div>
+          <p>AI doesn't compensate for missing infrastructure. Until the Design System is machine-readable, we're patching, and any skill we build will be bound by what we can manually feed into it.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>Handoff &amp; communication</h2>
+        <div class="rule-row">
+          <div class="rule-cell pro">
+            <div class="rule-label">Where it helps</div>
+            <ul>
+              <li>Changelogs, release notes, review notes for stakeholders.</li>
+              <li>Translating a design stance into an argument for a PM or engineer.</li>
+              <li>Presentation prep from specs.</li>
+            </ul>
+          </div>
+          <div class="rule-cell con">
+            <div class="rule-label">Where it overpromises</div>
+            <ul>
+              <li>It generates text that <em>sounds</em> professional but lacks conviction.</li>
+              <li>It erases the nuances that make a stance valuable.</li>
+              <li>It doesn't replace a face-to-face when there's actual disagreement.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#never-delegate" data-page="never-delegate">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">What we never delegate</div>
+        </a>
+        <a class="nav-link next" href="#self-assessment" data-page="self-assessment">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Team self-assessment</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SELF-ASSESSMENT -->
+    <div class="page" id="page-self-assessment">
+      <div class="page-hero">
+        <span class="page-kicker">How we work</span>
+        <h1>Team <em>self-assessment.</em></h1>
+        <p class="lede">Rate yourself on where you stand with AI tools today. Fully anonymous. Takes 30 seconds. See how the team is distributed once you submit.</p>
+      </div>
+
+      <section>
+        <div class="local-notice">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 6l7 13H5l7-13zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z"/></svg>
+          Prototype: responses are stored locally in your browser. In a production version, this would sync with a shared backend.
+        </div>
+
+        <h2>I rate myself</h2>
+        <p>Pick the level that best reflects your current usage of Claude, Cursor, or similar AI tools in your design work.</p>
+
+        <form id="self-assessment-form" class="radio-cards">
+          <label class="radio-card">
+            <input type="radio" name="level" value="1" />
+            <div class="radio-card-inner">
+              <div class="radio-dot"></div>
+              <div class="radio-card-content">
+                <div class="radio-card-title"><span class="level-tag level-1">Not yet</span></div>
+                <div class="radio-card-desc">Access not configured, or tried once without follow-up. This is a starting point, not a failure.</div>
+              </div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="level" value="2" />
+            <div class="radio-card-inner">
+              <div class="radio-dot"></div>
+              <div class="radio-card-content">
+                <div class="radio-card-title"><span class="level-tag level-2">Exploring</span></div>
+                <div class="radio-card-desc">Access configured, a few attempts, no regular use case yet. Needs pairing.</div>
+              </div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="level" value="3" />
+            <div class="radio-card-inner">
+              <div class="radio-dot"></div>
+              <div class="radio-card-content">
+                <div class="radio-card-title"><span class="level-tag level-3">Regular use</span></div>
+                <div class="radio-card-desc">One or two stable use cases per week. Starting to see where it helps and where it breaks.</div>
+              </div>
+            </div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="level" value="4" />
+            <div class="radio-card-inner">
+              <div class="radio-dot"></div>
+              <div class="radio-card-content">
+                <div class="radio-card-title"><span class="level-tag level-4">Contributor</span></div>
+                <div class="radio-card-desc">Produces skills, shares methods, teaches others.</div>
+              </div>
+            </div>
+          </label>
+        </form>
+
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <button class="btn" id="submit-assessment" type="button">Submit my answer</button>
+          <button class="btn ghost" id="reset-assessment" type="button" style="display:none;">Change my answer</button>
+        </div>
+
+        <div id="assessment-confirmation" style="display:none; margin-top: 16px;">
+          <div class="callout success">
+            <div class="callout-label">Thanks</div>
+            <p>Your answer was recorded. Anonymously.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>How the team is distributed</h2>
+        <p class="muted">Live count. Updates as people submit.</p>
+
+        <div class="monitor">
+          <div class="monitor-header">
+            <div class="monitor-title">Total responses</div>
+            <div class="monitor-count" id="total-count">0</div>
+          </div>
+          <div class="monitor-bars">
+            <div class="monitor-bar">
+              <div><span class="level-tag level-1">Not yet</span></div>
+              <div class="bar-track"><div class="bar-fill level-1-fill" id="bar-1" style="width: 0%;"></div></div>
+              <div class="bar-count" id="count-1">0</div>
+            </div>
+            <div class="monitor-bar">
+              <div><span class="level-tag level-2">Exploring</span></div>
+              <div class="bar-track"><div class="bar-fill level-2-fill" id="bar-2" style="width: 0%;"></div></div>
+              <div class="bar-count" id="count-2">0</div>
+            </div>
+            <div class="monitor-bar">
+              <div><span class="level-tag level-3">Regular</span></div>
+              <div class="bar-track"><div class="bar-fill level-3-fill" id="bar-3" style="width: 0%;"></div></div>
+              <div class="bar-count" id="count-3">0</div>
+            </div>
+            <div class="monitor-bar">
+              <div><span class="level-tag level-4">Contributor</span></div>
+              <div class="bar-track"><div class="bar-fill level-4-fill" id="bar-4" style="width: 0%;"></div></div>
+              <div class="bar-count" id="count-4">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-label">How we read this</div>
+          <p>If half the team is <em>Not yet</em> or <em>Exploring</em>, the priority is infrastructure and onboarding, not advanced workshops. If someone sits in <em>Not yet</em> for a quarter, it's not a person problem, it's a setup problem we haven't solved.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#where-it-helps" data-page="where-it-helps">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Where AI actually helps</div>
+        </a>
+        <a class="nav-link next" href="#use-cases" data-page="use-cases">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Use cases library</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- USE CASES -->
+    <div class="page" id="page-use-cases">
+      <div class="page-hero">
+        <span class="page-kicker">How we work</span>
+        <h1>Use cases <em>library.</em></h1>
+        <p class="lede">Real AI use cases from the team. When you want to try something, someone here has probably already done it. Filter by topic, ping the author, skip the guessing.</p>
+      </div>
+
+      <section>
+        <div class="local-notice">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 6l7 13H5l7-13zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z"/></svg>
+          Prototype: contributions are stored locally in your browser. In a production version, this would be a shared team library.
+        </div>
+
+        <h2>Browse the library</h2>
+        <div class="tag-pills" id="uc-filters" style="margin-bottom: 20px;">
+          <span class="tag-pill active" data-filter="all">All</span>
+          <span class="tag-pill" data-filter="UX research">UX research</span>
+          <span class="tag-pill" data-filter="Discovery">Discovery</span>
+          <span class="tag-pill" data-filter="Delivery">Delivery</span>
+          <span class="tag-pill" data-filter="Design review">Design review</span>
+          <span class="tag-pill" data-filter="Content design">Content design</span>
+          <span class="tag-pill" data-filter="Design system">Design system</span>
+          <span class="tag-pill" data-filter="Prototyping">Prototyping</span>
+          <span class="tag-pill" data-filter="Handoff">Handoff</span>
+          <span class="tag-pill" data-filter="Service design">Service design</span>
+        </div>
+        <div id="uc-list" class="item-list"></div>
+      </section>
+
+      <section>
+        <h2>Add a use case</h2>
+        <p>Share something you've done, so others don't have to reinvent it.</p>
+
+        <button class="add-toggle" id="uc-toggle" aria-expanded="false" aria-controls="uc-form-wrap" type="button">
+          <span class="add-toggle-icon">+</span>
+          <span class="add-toggle-label">New use case</span>
+          <span class="add-toggle-hint">Click to open the form</span>
+        </button>
+
+        <div class="add-form-wrap" id="uc-form-wrap">
+          <form id="use-case-form">
+            <div class="field">
+              <label class="field-label" for="uc-title">Title</label>
+              <input class="input" id="uc-title" type="text" placeholder="Claude Code helped me turn interview notes into a synthesis" required />
+            </div>
+            <div class="field">
+              <label class="field-label" for="uc-desc">What did you do, and what worked</label>
+              <textarea class="textarea" id="uc-desc" placeholder="Short description. What was the task, what tool did you use, what was surprisingly easy or hard."></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label">Tags (pick all that apply)</label>
+              <div class="tag-pills" id="uc-tags">
+                <label class="tag-pill"><input type="checkbox" value="UX research" />UX research</label>
+                <label class="tag-pill"><input type="checkbox" value="Discovery" />Discovery</label>
+                <label class="tag-pill"><input type="checkbox" value="Delivery" />Delivery</label>
+                <label class="tag-pill"><input type="checkbox" value="Design review" />Design review</label>
+                <label class="tag-pill"><input type="checkbox" value="Content design" />Content design</label>
+                <label class="tag-pill"><input type="checkbox" value="Design system" />Design system</label>
+                <label class="tag-pill"><input type="checkbox" value="Prototyping" />Prototyping</label>
+                <label class="tag-pill"><input type="checkbox" value="Handoff" />Handoff</label>
+                <label class="tag-pill"><input type="checkbox" value="Service design" />Service design</label>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="uc-author">Your name</label>
+              <input class="input" id="uc-author" type="text" placeholder="Jane Doe" required />
+              <div class="field-hint">So others can reach out to you for more context.</div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="uc-contact">How to contact you (Slack handle or email)</label>
+              <input class="input" id="uc-contact" type="text" placeholder="@jane.doe" required />
+            </div>
+            <div class="add-form-actions">
+              <button class="btn" id="submit-use-case" type="button">Share this use case</button>
+              <button class="btn ghost" id="uc-cancel" type="button">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#self-assessment" data-page="self-assessment">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Team self-assessment</div>
+        </a>
+        <a class="nav-link next" href="#license" data-page="license">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">License &amp; access</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- LICENSE -->
+    <div class="page" id="page-license">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1>License <em>&amp; access.</em></h1>
+        <p class="lede">How to get a license for Claude Code or any whitelisted AI tool at PayFit, through the Spendesk card system.</p>
+      </div>
+
+      <section>
+        <h2>How it works</h2>
+        <p>You can use <strong>one tool at a time</strong>. To request a Spendesk card, you'll need to discontinue your current Cursor Enterprise, Junie, or GitHub Copilot Enterprise license.</p>
+
+        <p>The card can be used for any of these whitelisted tools (the list can evolve over time):</p>
+        <ul>
+          <li><strong>Cursor</strong> individual plan with higher rates (if your current plan doesn't meet your needs)</li>
+          <li><strong>Claude Code</strong></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Creating your Spendesk card</h2>
+        <p>A short explanation is available internally with more detail, but in short:</p>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 180px;">Field</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cost center</td>
+              <td><code>Tools</code></td>
+            </tr>
+            <tr>
+              <td>Billing email</td>
+              <td>The Spendesk billing email, so Spendesk can automatically retrieve monthly invoices. It's your responsibility to make sure the monthly bill is uploaded to Spendesk each month.</td>
+            </tr>
+            <tr>
+              <td>Billing name</td>
+              <td><code>PayFit SAS</code></td>
+            </tr>
+            <tr>
+              <td>Billing address</td>
+              <td><code>37/39 avenue Trudaine 75009 PARIS</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Additional notes</h2>
+        <ul>
+          <li>Your current <strong>Cursor Enterprise</strong> or <strong>Junie</strong> license remains a valid option if it meets your needs.</li>
+          <li><strong>GitHub Copilot</strong> remains on the Enterprise version, as PayFit has an existing contract.</li>
+          <li>You can use <strong>OpenCode</strong> by linking it to your GitHub Copilot or Claude Code subscription.</li>
+        </ul>
+
+        <div class="callout">
+          <div class="callout-label">One tool at a time</div>
+          <p>The "one tool at a time" rule is what makes the Spendesk system sustainable. Pick the tool that fits your current workflow. You can always switch later.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#use-cases" data-page="use-cases">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Use cases library</div>
+        </a>
+        <a class="nav-link next" href="#prerequisites" data-page="prerequisites">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Prerequisites</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- PREREQUISITES -->
+    <div class="page" id="page-prerequisites">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1><em>Prerequisites.</em></h1>
+        <p class="lede">Before installing anything, make sure these three things are in place. If any of them is missing, pair with a teammate before going further.</p>
+      </div>
+
+      <section>
+        <h2>1. A working terminal</h2>
+        <p>On macOS, the default <strong>Terminal</strong> app or <strong>iTerm2</strong> both work. You don't need to become a terminal expert, you just need to be comfortable typing a command and reading the output.</p>
+        <p>Quick check: open your terminal and run:</p>
+        <pre><code>echo "hello"</code></pre>
+        <p>If you see <code>hello</code> printed back, you're good.</p>
+      </section>
+
+      <section>
+        <h2>2. Node.js installed</h2>
+        <p>Claude Code runs on Node. Check if it's already installed:</p>
+        <pre><code>node --version</code></pre>
+        <p>If you get a version number (v18 or higher), skip to the next section. If you get <code>command not found</code>, install Node via <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a>, the LTS version is fine.</p>
+        <div class="callout warn">
+          <div class="callout-label">If this step blocks</div>
+          <p>Don't spend more than 15 minutes here alone. Ping a teammate. This is exactly what peer support is for.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2>3. A GitHub account tied to PayFit</h2>
+        <p>You need a GitHub account linked to your PayFit email. If you don't have one yet, request access through IT.</p>
+        <p>Why: many designer use cases eventually touch repos, reading code, opening a PR with a small change, pulling the latest DS tokens. You don't need to know git deeply, but you need the account.</p>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#license" data-page="license">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">License &amp; access</div>
+        </a>
+        <a class="nav-link next" href="#install-claude-code" data-page="install-claude-code">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Install Claude Code</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- INSTALL -->
+    <div class="page" id="page-install-claude-code">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1>Install <em>Claude Code.</em></h1>
+        <p class="lede">From zero to Claude running in your terminal. If you're blocked at any step longer than 15 minutes, pair. Don't spiral alone.</p>
+      </div>
+
+      <section>
+        <h2>Step 1, install the CLI</h2>
+        <p>In your terminal, run:</p>
+        <pre><code>npm install -g @anthropic-ai/claude-code</code></pre>
+        <p>If you get a permission error about <code>EACCES</code>, don't use <code>sudo</code>. Instead, fix your npm permissions by following the <a href="https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally" target="_blank" rel="noopener">official npm guide</a>, or ask a teammate.</p>
+      </section>
+
+      <section>
+        <h2>Step 2, authenticate</h2>
+        <p>Run:</p>
+        <pre><code>claude</code></pre>
+        <p>The first time, it will open a browser to sign in with your PayFit-linked Anthropic account. If PayFit hasn't provisioned your account yet, see the <a href="#license" data-page="license">License &amp; access</a> page.</p>
+      </section>
+
+      <section>
+        <h2>Step 3, first run</h2>
+        <p>Still in the terminal, navigate to a folder where you want to work. Could be a scratch folder, could be a repo.</p>
+        <pre><code>cd ~/Documents/design-sandbox
+claude</code></pre>
+        <p>Claude starts an interactive session. Try:</p>
+        <pre><code>&gt; Create a markdown file with a short brief for a new onboarding screen</code></pre>
+        <p>If you see a file appear in the folder, it works. You're in.</p>
+      </section>
+
+      <section>
+        <h2>Common errors</h2>
+        <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40%;">Symptom</th>
+              <th>What to try</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>command not found: claude</code></td>
+              <td>The install didn't finish. Re-run the install command, check for errors in the output.</td>
+            </tr>
+            <tr>
+              <td><code>EACCES</code> permission denied</td>
+              <td>Don't use <code>sudo</code>. Fix npm permissions or ask a teammate.</td>
+            </tr>
+            <tr>
+              <td>Authentication loop in browser</td>
+              <td>Your PayFit Anthropic account likely isn't provisioned yet. See License &amp; access.</td>
+            </tr>
+            <tr>
+              <td>Works in terminal, not in VS Code</td>
+              <td>VS Code has a different shell. Restart VS Code after install. If it persists, check VS Code's integrated terminal settings.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#prerequisites" data-page="prerequisites">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Prerequisites</div>
+        </a>
+        <a class="nav-link next" href="#claude-md" data-page="claude-md">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">CLAUDE.md setup</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- CLAUDE.MD -->
+    <div class="page" id="page-claude-md">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1><em>CLAUDE.md</em>, global and project.</h1>
+        <p class="lede">CLAUDE.md is the file Claude reads every time it starts. It's how you teach Claude who you are, how you work, and what rules apply. Two scopes: global (all your work) and project (this repo only).</p>
+      </div>
+
+      <section>
+        <h2>Why it matters</h2>
+        <p>Without a CLAUDE.md, Claude starts every session as a generalist. With one, it arrives already knowing the DS tokens, the tone of voice, the conventions of your project. Every prompt gets shorter. Every output gets closer to right on the first try.</p>
+      </section>
+
+      <section>
+        <h2>Global CLAUDE.md</h2>
+        <p>Lives at <code>~/.claude/CLAUDE.md</code>. Applies to every Claude session on your machine. Keep it short, this is about <em>you</em>, not about any specific project.</p>
+        <p>Template to start from:</p>
+        <pre><code># About me
+
+I'm a product designer at PayFit.
+I work in Figma and Notion daily. I'm not a full-stack engineer.
+
+## How to respond
+- Be concrete, skip preambles.
+- If the task is visual, show me markup I can preview, not theory.
+- Flag anything that touches the DS, don't assume, ask.
+- If you write copy, write it in English unless I say otherwise.
+
+## What I care about
+- Unity DS compliance (Inter, semantic tokens, no primitives).
+- Content clarity over cleverness.
+- Small, reviewable outputs, not 500-line monoliths.</code></pre>
+      </section>
+
+      <section>
+        <h2>Project CLAUDE.md</h2>
+        <p>Lives at the root of a project folder. Applies only when Claude runs in that folder. This is where project-specific context goes, design system references, tone of voice for this product, folder structure.</p>
+        <pre><code># Project: Onboarding redesign
+
+## Context
+This is the onboarding flow for new PayFit customers (admins, not employees).
+Figma source: [link]
+DS reference: Unity, see /docs/unity-tokens.md
+
+## Conventions
+- All copy in English first, French second.
+- Mobile and desktop specs are separate files.
+- Every screen needs an empty state.
+
+## Don't
+- Don't invent new components. Propose a variant of an existing Unity one.
+- Don't use warning yellow for destructive actions. Danger is red.</code></pre>
+
+        <div class="callout">
+          <div class="callout-label">Rule of thumb</div>
+          <p>Global = who you are. Project = what this work is. When in doubt, put it in the project file, you can always promote it to global later.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#install-claude-code" data-page="install-claude-code">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Install Claude Code</div>
+        </a>
+        <a class="nav-link next" href="#mcp" data-page="mcp">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">MCP &amp; Figma</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- MCP -->
+    <div class="page" id="page-mcp">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1><em>MCP</em> &amp; Figma.</h1>
+        <p class="lede">MCP is the power outlet between Claude and the tools you already use. Once wired up, Claude can read your Figma file, pull DS tokens, open tasks, and respond with context instead of guesses.</p>
+      </div>
+
+      <section>
+        <h2>What is an MCP?</h2>
+        <p>MCP stands for Model Context Protocol. It's a standard way for Claude to talk to external tools, Figma, GitHub, Notion, your company's DS, through a server that exposes a specific set of actions.</p>
+        <p>You don't need to understand the protocol. You need to know: if a tool has an MCP server, Claude can use it directly, no manual copy-paste.</p>
+      </section>
+
+      <section>
+        <h2>The Figma Console MCP</h2>
+        <p>This is the one that changes the most for designers. With the Figma MCP connected, Claude can:</p>
+        <ul>
+          <li>Read the structure of a Figma file you're working on.</li>
+          <li>Export component specs automatically.</li>
+          <li>Cross-check a screen against Unity DS tokens.</li>
+          <li>Generate a handoff doc from a frame, without you having to screenshot.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Setup</h2>
+        <h3>1. Enable Dev Mode in Figma</h3>
+        <p>The MCP runs through Figma's Dev Mode. Make sure your PayFit Figma seat has Dev Mode enabled. If not, ask the DS team.</p>
+
+        <h3>2. Add the MCP to Claude Code</h3>
+        <p>In your terminal:</p>
+        <pre><code>claude mcp add figma</code></pre>
+        <p>Claude will walk you through the authentication.</p>
+
+        <h3>3. Test</h3>
+        <p>Open a Claude Code session in a project folder. Try:</p>
+        <pre><code>&gt; List the frames in the Figma file [paste URL]
+&gt; Check if frame "Onboarding step 2" uses only Unity semantic tokens</code></pre>
+
+        <div class="callout warn">
+          <div class="callout-label">The Zeroheight question</div>
+          <p>A Zeroheight MCP doesn't exist today. Until it does, DS guidelines need to be exported manually and fed to Claude via custom skills. It's not elegant, but it works. See <a href="#team-skills" data-page="team-skills">Team skills</a> for examples.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#claude-md" data-page="claude-md">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">CLAUDE.md setup</div>
+        </a>
+        <a class="nav-link next" href="#team-skills" data-page="team-skills">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Team skills</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- TEAM SKILLS -->
+    <div class="page" id="page-team-skills">
+      <div class="page-hero">
+        <span class="page-kicker">Getting set up</span>
+        <h1>Team <em>skills.</em></h1>
+        <p class="lede">Skills the team has built, tested, and found useful. Copy them, download them, give love to the ones you use.</p>
+      </div>
+
+      <section>
+        <div class="local-notice">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 22h20L12 2zm0 6l7 13H5l7-13zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z"/></svg>
+          Prototype: contributions and likes are stored locally in your browser. In a production version, this would be a shared team library.
+        </div>
+
+        <h2>Skills shared by the team</h2>
+        <div id="sk-list" class="item-list"></div>
+      </section>
+
+      <section>
+        <h2>Share a skill</h2>
+        <p>Something you built, tested, and found useful. Others will benefit.</p>
+
+        <button class="add-toggle" id="sk-toggle" aria-expanded="false" aria-controls="sk-form-wrap" type="button">
+          <span class="add-toggle-icon">+</span>
+          <span class="add-toggle-label">New skill</span>
+          <span class="add-toggle-hint">Click to open the form</span>
+        </button>
+
+        <div class="add-form-wrap" id="sk-form-wrap">
+          <form id="skill-form">
+            <div class="field">
+              <label class="field-label" for="sk-name">Skill name</label>
+              <input class="input" id="sk-name" type="text" placeholder="DS QA for Unity" required />
+            </div>
+            <div class="field">
+              <label class="field-label" for="sk-desc">Short description</label>
+              <textarea class="textarea" id="sk-desc" placeholder="What does this skill do? When do you use it?" required></textarea>
+            </div>
+            <div class="field">
+              <label class="field-label" for="sk-code">Skill content (SKILL.md or prompt)</label>
+              <textarea class="textarea" id="sk-code" style="min-height: 180px; font-family: 'JetBrains Mono', monospace; font-size: 12px;" placeholder="Paste the full SKILL.md or prompt content here" required></textarea>
+              <div class="field-hint">This is what other designers will copy or download.</div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="sk-author">Your name (contributor)</label>
+              <input class="input" id="sk-author" type="text" placeholder="Jane Doe" required />
+            </div>
+            <div class="add-form-actions">
+              <button class="btn" id="submit-skill" type="button">Share this skill</button>
+              <button class="btn ghost" id="sk-cancel" type="button">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#mcp" data-page="mcp">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">MCP &amp; Figma</div>
+        </a>
+        <a class="nav-link next" href="#evaluating-tools" data-page="evaluating-tools">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Evaluating new tools</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- EVALUATING TOOLS -->
+    <div class="page" id="page-evaluating-tools">
+      <div class="page-hero">
+        <span class="page-kicker">Experiments</span>
+        <h1>Evaluating <em>new tools.</em></h1>
+        <p class="lede">New AI design tools appear every week. We can't test all of them, and we shouldn't. A lightweight grid to decide what's worth our time.</p>
+      </div>
+
+      <section>
+        <h2>A tool earns integration when</h2>
+        <ol>
+          <li>It solves a problem we've already identified, not the other way around.</li>
+          <li>It survives two weeks of real use by at least two designers.</li>
+          <li>Its outputs can be compared to the non-AI workflow on quality, time, and satisfaction.</li>
+          <li>It doesn't create a dependency we can't back out of.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>We don't integrate when</h2>
+        <ul>
+          <li>It's impressive in the demo and silent in the test.</li>
+          <li>It forces us to restructure our workflow around its terms, not ours.</li>
+          <li>It makes AI do what <a href="#never-delegate" data-page="never-delegate">we decided</a> never to delegate.</li>
+        </ul>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#team-skills" data-page="team-skills">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Team skills</div>
+        </a>
+        <a class="nav-link next" href="#cadence" data-page="cadence">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Sharing cadence</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- CADENCE -->
+    <div class="page" id="page-cadence">
+      <div class="page-hero">
+        <span class="page-kicker">Experiments</span>
+        <h1>Sharing <em>cadence.</em></h1>
+        <p class="lede">A framework that doesn't evolve is a framework we don't use. Three rhythms keep this alive.</p>
+      </div>
+
+      <section>
+        <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 180px;">Every</th>
+              <th>What happens</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>2 weeks</strong></td>
+              <td>30 minutes, team-wide. 2 or 3 use cases from the library discussed. What worked, what broke.</td>
+            </tr>
+            <tr>
+              <td><strong>1 month</strong></td>
+              <td>A deep-dive use case presented by one designer. 15 minutes plus 15 minutes of questions.</td>
+            </tr>
+            <tr>
+              <td><strong>1 quarter</strong></td>
+              <td>Framework review. What evolved? What do we remove? What do we add? Self-assessment refresh.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <section>
+        <p class="muted">If any of these rhythms stops happening, that's the signal the framework has become theoretical. At that point, we either revive it or admit it's not working and rebuild.</p>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#evaluating-tools" data-page="evaluating-tools">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Evaluating new tools</div>
+        </a>
+        <a class="nav-link next" href="#scope" data-page="scope">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">What this is not</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- SCOPE -->
+    <div class="page" id="page-scope">
+      <div class="page-hero">
+        <span class="page-kicker">About</span>
+        <h1>What this <em>is not.</em></h1>
+        <p class="lede">Explicit scope. What lives here, what lives elsewhere, what comes later.</p>
+      </div>
+
+      <section>
+        <h2>Not in this V1</h2>
+        <ul>
+          <li><strong>Detailed skills by role</strong> (PD, SD, researcher, content designer). Each role will own its own doc. This V1 sets the frame, not the detail.</li>
+          <li><strong>The public, company-facing document</strong>. Extracted once this V1 has been tested and stabilized. Sections <em>What we never delegate</em> and <em>Where AI actually helps</em> are the most extractable.</li>
+          <li><strong>The design stance on AI in HR</strong> (what AI should and shouldn't do for our users). Covered in <strong>00 Manifesto</strong>. This framework builds on it without redoing it.</li>
+          <li><strong>The visual identity of AI</strong> (visible presence or invisible?). Covered in <strong>02 Principles</strong>.</li>
+          <li><strong>The AI-ready DS</strong> (machine-readability, Zeroheight MCP). Covered in <strong>07 DS</strong>. This framework states the need, not the solution.</li>
+        </ul>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#cadence" data-page="cadence">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">Sharing cadence</div>
+        </a>
+        <a class="nav-link next" href="#next" data-page="next">
+          <div class="nav-link-kicker">Next →</div>
+          <div class="nav-link-title">Next steps</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- NEXT -->
+    <div class="page" id="page-next">
+      <div class="page-hero">
+        <span class="page-kicker">About</span>
+        <h1><em>Next steps.</em></h1>
+        <p class="lede">How this V1 gets from a draft to a live practice over the next month.</p>
+      </div>
+
+      <section>
+        <ol>
+          <li><strong>Review with Thomas and Jules</strong> to tune the V1.</li>
+          <li><strong>Share with the design team</strong> for open review.</li>
+          <li><strong>One-hour team workshop</strong>. Run the self-assessment, seed the use cases library, react to the V1.</li>
+          <li><strong>V2 integrating feedback</strong>, published within three weeks after the workshop.</li>
+          <li><strong>First quarterly review</strong> three months later.</li>
+        </ol>
+
+        <div class="callout success">
+          <div class="callout-label">One last thing</div>
+          <p>This document is a proposal. Disagreements, counter-proposals, and rewrites are contributions, not obstacles.</p>
+        </div>
+      </section>
+
+      <div class="page-nav-footer">
+        <a class="nav-link prev" href="#scope" data-page="scope">
+          <div class="nav-link-kicker">← Previous</div>
+          <div class="nav-link-title">What this is not</div>
+        </a>
+        <a class="nav-link next" href="#welcome" data-page="welcome">
+          <div class="nav-link-kicker">Back to →</div>
+          <div class="nav-link-title">Welcome</div>
+        </a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // =========================
+  //   Navigation
+  // =========================
+  const menuToggle = document.querySelector('.menu-toggle');
+  const backdrop = document.querySelector('.sidebar-backdrop');
+  const body = document.body;
+
+  function closeMenu() { body.classList.remove('menu-open'); }
+  function toggleMenu() { body.classList.toggle('menu-open'); }
+
+  menuToggle.addEventListener('click', toggleMenu);
+  backdrop.addEventListener('click', closeMenu);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) closeMenu();
+  });
+
+  const pages = document.querySelectorAll('.page');
+
+  function showPage(pageId) {
+    pages.forEach(p => p.classList.remove('active'));
+    const target = document.getElementById('page-' + pageId);
+    if (target) {
+      target.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    document.querySelectorAll('.nav-item a').forEach(a => a.classList.remove('active'));
+    const activeNav = document.querySelector('.nav-item a[data-page="' + pageId + '"]');
+    if (activeNav) activeNav.classList.add('active');
+    history.replaceState(null, '', '#' + pageId);
+    closeMenu();
+  }
+
+  document.querySelectorAll('[data-page]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const pageId = link.getAttribute('data-page');
+      showPage(pageId);
+    });
+  });
+
+  const initialHash = window.location.hash.replace('#', '');
+  if (initialHash && document.getElementById('page-' + initialHash)) {
+    showPage(initialHash);
+  } else {
+    showPage('welcome');
+  }
+
+  // =========================
+  //   Collapsible forms (disclosure pattern)
+  // =========================
+  function setupDisclosure(toggleId, wrapId, cancelId) {
+    const toggle = document.getElementById(toggleId);
+    const wrap = document.getElementById(wrapId);
+    const cancel = cancelId ? document.getElementById(cancelId) : null;
+    if (!toggle || !wrap) return;
+
+    function open() {
+      wrap.classList.add('open');
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.querySelector('.add-toggle-hint').textContent = 'Click to close';
+      // Scroll form into view on mobile
+      setTimeout(() => {
+        wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 50);
+    }
+    function close() {
+      wrap.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.querySelector('.add-toggle-hint').textContent = 'Click to open the form';
+    }
+
+    toggle.addEventListener('click', () => {
+      if (wrap.classList.contains('open')) close();
+      else open();
+    });
+    if (cancel) cancel.addEventListener('click', close);
+
+    return { open, close };
+  }
+  const ucDisclosure = setupDisclosure('uc-toggle', 'uc-form-wrap', 'uc-cancel');
+  const skDisclosure = setupDisclosure('sk-toggle', 'sk-form-wrap', 'sk-cancel');
+
+  // =========================
+  //   Self-assessment
+  // =========================
+  const STORAGE_KEY_COUNTS = 'pf_assessment_counts';
+  const STORAGE_KEY_MINE = 'pf_assessment_mine';
+
+  function loadCounts() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_COUNTS);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return { 1: 0, 2: 0, 3: 0, 4: 0 };
+  }
+  function saveCounts(c) {
+    try { localStorage.setItem(STORAGE_KEY_COUNTS, JSON.stringify(c)); } catch(e) {}
+  }
+
+  function renderCounts() {
+    const counts = loadCounts();
+    const total = counts[1] + counts[2] + counts[3] + counts[4];
+    document.getElementById('total-count').textContent = total;
+    for (let i = 1; i <= 4; i++) {
+      const pct = total ? (counts[i] / total * 100) : 0;
+      document.getElementById('bar-' + i).style.width = pct + '%';
+      document.getElementById('count-' + i).textContent = counts[i];
+    }
+  }
+  renderCounts();
+
+  function checkAssessmentState() {
+    const mine = localStorage.getItem(STORAGE_KEY_MINE);
+    if (mine) {
+      document.getElementById('submit-assessment').style.display = 'none';
+      document.getElementById('reset-assessment').style.display = 'inline-flex';
+      document.getElementById('assessment-confirmation').style.display = 'block';
+      const radios = document.querySelectorAll('#self-assessment-form input[name="level"]');
+      radios.forEach(r => {
+        if (r.value === mine) r.checked = true;
+        r.disabled = true;
+      });
+    } else {
+      document.getElementById('submit-assessment').style.display = 'inline-flex';
+      document.getElementById('reset-assessment').style.display = 'none';
+      document.getElementById('assessment-confirmation').style.display = 'none';
+      const radios = document.querySelectorAll('#self-assessment-form input[name="level"]');
+      radios.forEach(r => { r.disabled = false; });
+    }
+  }
+  checkAssessmentState();
+
+  document.getElementById('submit-assessment').addEventListener('click', () => {
+    const selected = document.querySelector('#self-assessment-form input[name="level"]:checked');
+    if (!selected) {
+      alert('Pick a level first.');
+      return;
+    }
+    const value = selected.value;
+    const counts = loadCounts();
+    counts[value] = (counts[value] || 0) + 1;
+    saveCounts(counts);
+    localStorage.setItem(STORAGE_KEY_MINE, value);
+    renderCounts();
+    checkAssessmentState();
+  });
+
+  document.getElementById('reset-assessment').addEventListener('click', () => {
+    const mine = localStorage.getItem(STORAGE_KEY_MINE);
+    if (mine) {
+      const counts = loadCounts();
+      counts[mine] = Math.max(0, (counts[mine] || 0) - 1);
+      saveCounts(counts);
+      localStorage.removeItem(STORAGE_KEY_MINE);
+      renderCounts();
+      checkAssessmentState();
+    }
+  });
+
+  // Visual feedback on radio cards
+  document.querySelectorAll('#self-assessment-form .radio-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('#self-assessment-form .radio-card').forEach(c => {
+        c.style.borderColor = '';
+        c.style.background = '';
+      });
+      const input = card.querySelector('input');
+      if (input && !input.disabled) input.checked = true;
+    });
+  });
+
+  // =========================
+  //   Use cases
+  // =========================
+  const STORAGE_KEY_UC = 'pf_use_cases';
+
+  function loadUseCases() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_UC);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+  }
+  function saveUseCases(list) {
+    try { localStorage.setItem(STORAGE_KEY_UC, JSON.stringify(list)); } catch(e) {}
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  let currentFilter = 'all';
+
+  function renderUseCases() {
+    const list = loadUseCases();
+    const container = document.getElementById('uc-list');
+    const filtered = currentFilter === 'all'
+      ? list
+      : list.filter(uc => (uc.tags || []).includes(currentFilter));
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty-state">No use cases yet for this filter. Be the first to share one.</div>';
+      return;
+    }
+    container.innerHTML = filtered.map((uc, i) => `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <h3 class="item-title">${escapeHtml(uc.title)}</h3>
+            <div class="item-meta">by <strong>${escapeHtml(uc.author)}</strong> · reach out: <a href="${uc.contact.startsWith('@') || uc.contact.includes('@') ? (uc.contact.includes('@') && !uc.contact.startsWith('@') ? 'mailto:' + uc.contact : '#') : '#'}">${escapeHtml(uc.contact)}</a></div>
+          </div>
+          <button class="btn ghost small" data-delete-uc="${i}" title="Remove">✕</button>
+        </div>
+        ${uc.description ? `<div class="item-body">${escapeHtml(uc.description)}</div>` : ''}
+        <div class="item-footer">
+          ${(uc.tags || []).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('[data-delete-uc]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.getAttribute('data-delete-uc'));
+        if (confirm('Remove this use case?')) {
+          const list = loadUseCases();
+          list.splice(idx, 1);
+          saveUseCases(list);
+          renderUseCases();
+        }
+      });
+    });
+  }
+
+  // Tag filter pills
+  document.querySelectorAll('#uc-filters .tag-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('#uc-filters .tag-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentFilter = pill.getAttribute('data-filter');
+      renderUseCases();
+    });
+  });
+
+  document.getElementById('submit-use-case').addEventListener('click', () => {
+    const title = document.getElementById('uc-title').value.trim();
+    const desc = document.getElementById('uc-desc').value.trim();
+    const author = document.getElementById('uc-author').value.trim();
+    const contact = document.getElementById('uc-contact').value.trim();
+    const tags = Array.from(document.querySelectorAll('#uc-tags input:checked')).map(i => i.value);
+
+    if (!title || !author || !contact) {
+      alert('Please fill in title, your name, and contact.');
+      return;
+    }
+
+    const list = loadUseCases();
+    list.unshift({ title, description: desc, author, contact, tags, created: Date.now() });
+    saveUseCases(list);
+
+    document.getElementById('uc-title').value = '';
+    document.getElementById('uc-desc').value = '';
+    document.getElementById('uc-author').value = '';
+    document.getElementById('uc-contact').value = '';
+    document.querySelectorAll('#uc-tags input').forEach(i => i.checked = false);
+    renderUseCases();
+    if (ucDisclosure) ucDisclosure.close();
+    // Scroll to the newly added item
+    const firstItem = document.querySelector('#uc-list .item-card');
+    if (firstItem) firstItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  renderUseCases();
+
+  // =========================
+  //   Team skills
+  // =========================
+  const STORAGE_KEY_SK = 'pf_team_skills';
+  const STORAGE_KEY_SK_LIKES = 'pf_team_skills_likes';
+
+  function loadSkills() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_SK);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return [];
+  }
+  function saveSkills(list) {
+    try { localStorage.setItem(STORAGE_KEY_SK, JSON.stringify(list)); } catch(e) {}
+  }
+  function loadMyLikes() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_SK_LIKES);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return {};
+  }
+  function saveMyLikes(obj) {
+    try { localStorage.setItem(STORAGE_KEY_SK_LIKES, JSON.stringify(obj)); } catch(e) {}
+  }
+
+  function renderSkills() {
+    const list = loadSkills();
+    const likes = loadMyLikes();
+    const container = document.getElementById('sk-list');
+    if (list.length === 0) {
+      container.innerHTML = '<div class="empty-state">No skills shared yet. Be the first to share one.</div>';
+      return;
+    }
+    container.innerHTML = list.map((sk, i) => `
+      <div class="item-card">
+        <div class="item-header">
+          <div>
+            <h3 class="item-title">${escapeHtml(sk.name)}</h3>
+            <div class="item-meta">shared by <strong>${escapeHtml(sk.author)}</strong></div>
+          </div>
+          <button class="btn ghost small" data-delete-sk="${i}" title="Remove">✕</button>
+        </div>
+        <div class="item-body">${escapeHtml(sk.description)}</div>
+        <div class="skill-code">${escapeHtml(sk.code)}</div>
+        <div class="item-footer">
+          <button class="btn secondary small" data-copy-sk="${i}">Copy</button>
+          <button class="btn secondary small" data-download-sk="${i}">Download</button>
+          <button class="like-btn ${likes[i] ? 'liked' : ''}" data-like-sk="${i}">
+            <svg viewBox="0 0 24 24" fill="${likes[i] ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <span>${sk.likes || 0}</span>
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('[data-delete-sk]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.target.getAttribute('data-delete-sk'));
+        if (confirm('Remove this skill?')) {
+          const list = loadSkills();
+          list.splice(idx, 1);
+          saveSkills(list);
+          renderSkills();
+        }
+      });
+    });
+    container.querySelectorAll('[data-copy-sk]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute('data-copy-sk'));
+        const list = loadSkills();
+        if (list[idx]) {
+          navigator.clipboard.writeText(list[idx].code).then(() => {
+            const orig = e.currentTarget.textContent;
+            e.currentTarget.textContent = 'Copied!';
+            setTimeout(() => { e.currentTarget.textContent = orig; }, 1500);
+          });
+        }
+      });
+    });
+    container.querySelectorAll('[data-download-sk]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute('data-download-sk'));
+        const list = loadSkills();
+        if (list[idx]) {
+          const sk = list[idx];
+          const blob = new Blob([sk.code], { type: 'text/markdown' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = sk.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.md';
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+      });
+    });
+    container.querySelectorAll('[data-like-sk]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.getAttribute('data-like-sk'));
+        const list = loadSkills();
+        const likes = loadMyLikes();
+        if (likes[idx]) {
+          list[idx].likes = Math.max(0, (list[idx].likes || 0) - 1);
+          delete likes[idx];
+        } else {
+          list[idx].likes = (list[idx].likes || 0) + 1;
+          likes[idx] = true;
+        }
+        saveSkills(list);
+        saveMyLikes(likes);
+        renderSkills();
+      });
+    });
+  }
+
+  document.getElementById('submit-skill').addEventListener('click', () => {
+    const name = document.getElementById('sk-name').value.trim();
+    const desc = document.getElementById('sk-desc').value.trim();
+    const code = document.getElementById('sk-code').value.trim();
+    const author = document.getElementById('sk-author').value.trim();
+
+    if (!name || !desc || !code || !author) {
+      alert('Please fill in every field.');
+      return;
+    }
+
+    const list = loadSkills();
+    list.unshift({ name, description: desc, code, author, likes: 0, created: Date.now() });
+    saveSkills(list);
+
+    document.getElementById('sk-name').value = '';
+    document.getElementById('sk-desc').value = '';
+    document.getElementById('sk-code').value = '';
+    document.getElementById('sk-author').value = '';
+    renderSkills();
+    if (skDisclosure) skDisclosure.close();
+    const firstSkItem = document.querySelector('#sk-list .item-card');
+    if (firstSkItem) firstSkItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  renderSkills();
+</script>
+
+</body>
+</html>
