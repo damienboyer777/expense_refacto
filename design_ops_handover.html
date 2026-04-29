@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Ops handover — status</title>
+<style>
+  :root {
+    --pf-primary: #0F6FDE;
+    --pf-primary-high: #0157B2;
+    --pf-primary-highest: #082F63;
+    --pf-primary-low: #D9E9FF;
+    --pf-primary-lowest: #EBF4FF;
+    --pf-bg: #FAFAFA;
+    --pf-surface: #FFFFFF;
+    --pf-border: rgba(8, 47, 99, 0.12);
+    --pf-border-strong: rgba(8, 47, 99, 0.24);
+    --pf-text: #082F63;
+    --pf-text-muted: #5C7493;
+    --pf-text-subtle: #8BA1BB;
+    --pf-warning-bg: #FFF4E5;
+    --pf-warning-text: #8A5A00;
+    --pf-warning-border: #F5B96B;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--pf-bg);
+    color: var(--pf-text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .deck-frame {
+    flex: 1;
+    background: var(--pf-surface);
+    border: 1px solid var(--pf-border);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .brand-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--pf-border);
+    background: var(--pf-surface);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pf-primary-highest);
+    letter-spacing: -0.01em;
+  }
+
+  .brand-dot {
+    width: 24px;
+    height: 24px;
+    background: var(--pf-primary);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .meta {
+    font-size: 12px;
+    color: var(--pf-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .slide-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 48px 56px;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    display: flex;
+    animation: fadeIn 0.25s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .kicker {
+    font-size: 12px;
+    color: var(--pf-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    margin: 0 0 12px;
+  }
+
+  h1 {
+    font-size: 36px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    line-height: 1.15;
+    color: var(--pf-primary-highest);
+    letter-spacing: -0.02em;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    line-height: 1.2;
+    color: var(--pf-primary-highest);
+    letter-spacing: -0.015em;
+  }
+
+  p { margin: 0 0 12px; line-height: 1.6; color: var(--pf-text); }
+
+  .lead { font-size: 18px; color: var(--pf-text-muted); max-width: 720px; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 28px 0 0;
+    max-width: 640px;
+  }
+
+  .stat {
+    background: var(--pf-primary-lowest);
+    border-radius: 12px;
+    padding: 20px 24px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--pf-primary-high);
+    margin: 0 0 6px;
+    font-weight: 500;
+  }
+
+  .stat-value {
+    font-size: 40px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--pf-primary-highest);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat.warning {
+    background: var(--pf-warning-bg);
+  }
+  .stat.warning .stat-label { color: var(--pf-warning-text); }
+  .stat.warning .stat-value { color: var(--pf-warning-text); }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .topic-card {
+    background: var(--pf-surface);
+    border: 1px solid var(--pf-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    transition: border-color 0.15s;
+  }
+
+  .topic-card:hover { border-color: var(--pf-border-strong); }
+
+  .topic-card .name {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    color: var(--pf-primary-highest);
+  }
+
+  .topic-card .owner {
+    font-size: 13px;
+    color: var(--pf-text-muted);
+    margin: 0;
+  }
+
+  .warn-card {
+    background: var(--pf-warning-bg);
+    border: 1px solid var(--pf-warning-border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+  }
+
+  .warn-card .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pf-warning-text);
+    margin: 0 0 4px;
+  }
+
+  .warn-card .detail {
+    font-size: 13px;
+    color: var(--pf-warning-text);
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .bullet-list {
+    list-style: none;
+    padding: 0;
+    margin: 16px 0 0;
+    max-width: 720px;
+  }
+
+  .bullet-list li {
+    font-size: 16px;
+    line-height: 1.7;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 8px;
+    color: var(--pf-text);
+  }
+
+  .bullet-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 11px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--pf-primary);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-top: 1px solid var(--pf-border);
+    background: var(--pf-surface);
+  }
+
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--pf-border-strong);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--pf-primary-highest);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background: var(--pf-primary-lowest);
+    border-color: var(--pf-primary);
+  }
+
+  .nav-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .counter {
+    font-size: 13px;
+    color: var(--pf-text-muted);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+
+  .progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--pf-primary-lowest);
+    z-index: 2;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--pf-primary);
+    transition: width 0.3s ease;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pf-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 20px 0 10px;
+  }
+
+  .kbd-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--pf-text-subtle);
+    margin-top: 12px;
+  }
+
+  .author {
+    font-size: 14px;
+    color: var(--pf-text-muted);
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--pf-border);
+    max-width: 720px;
+  }
+
+  @media (max-width: 768px) {
+    .topic-grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr; }
+    .slide { padding: 32px 24px; }
+    h1 { font-size: 28px; }
+    h2 { font-size: 22px; }
+  }
+
+  @media print {
+    .nav, .progress, .kbd-hint { display: none; }
+    .slide { display: flex !important; page-break-after: always; position: relative; }
+    .deck-frame { border: none; }
+    .slide-area { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="deck-frame">
+    <div class="progress"><div class="progress-bar" id="progress-bar" style="width: 12.5%"></div></div>
+
+    <div class="brand-bar">
+      <div class="brand">
+        <span class="brand-dot">P</span>
+        <span>PayFit · Design Chapter</span>
+      </div>
+      <div class="meta">Show &amp; Tell · Internal</div>
+    </div>
+
+    <div class="slide-area">
+
+      <div class="slide active" data-slide="1">
+        <p class="kicker">Show &amp; Tell</p>
+        <h1>Design Ops handover: status</h1>
+        <p class="lead">15 topics identified. 14 transferred. 1 canceled. This walkthrough covers the ownership map and what it means day-to-day.</p>
+       
+      </div>
+
+      <div class="slide" data-slide="2">
+        <p class="kicker">Scope</p>
+        <h2>What was handed over</h2>
+        <p class="lead">Amine documented the full handover in a dedicated Notion. Topics are grouped into four families: tools, rituals, AI agents, cross-functional. Status was reviewed with Damien & design leadership.</p>
+        <div class="stats">
+          <div class="stat">
+            <p class="stat-label">Topics identified</p>
+            <p class="stat-value">15</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Transferred</p>
+            <p class="stat-value">14</p>
+          </div>
+          <div class="stat warning">
+            <p class="stat-label">Canceled</p>
+            <p class="stat-value">1</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" data-slide="3">
+        <p class="kicker">Family 1 of 4</p>
+        <h2>Tools &amp; process</h2>
+        <div class="topic-grid">
+          <div class="topic-card">
+            <p class="name">Jira — admin, flows, reporting</p>
+            <p class="owner">Owner: Andy</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Looker Brand &amp; DS dashboards</p>
+            <p class="owner">Owner: Data team / ProductOps</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Figma — budget renewal</p>
+            <p class="owner">Owner: Damien (with Aurore)</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Figma — folders &amp; Helper plugin</p>
+            <p class="owner">Owner: Maeva (supported by Damien)</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Design debt (Jira)</p>
+            <p class="owner">Owner: Thomas M</p>
+          </div>
+           <div class="topic-card">
+            <p class="name">For any question about tools</p>
+            <p class="owner">#ask-design-ops or your manager</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" data-slide="4">
+        <p class="kicker">Family 2 of 4</p>
+        <h2>Rituals</h2>
+        <div class="topic-grid">
+          <div class="topic-card">
+            <p class="name">Show &amp; Tell / Design Critics events</p>
+            <p class="owner">Owner: None — Events has been recreated</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Show &amp; Tell MC reminder</p>
+            <p class="owner">Owner: None — migrated to Zapier, live</p>
+          </div>
+        </div>
+        <p class="section-label">Note</p>
+        <p>Recordings continue. No interruption.</p>
+      </div>
+
+      <div class="slide" data-slide="5">
+        <p class="kicker">Family 3 of 4</p>
+        <h2>AI agents &amp; reporting</h2>
+        <div class="topic-grid">
+          <div class="topic-card">
+            <p class="name">AI design report (Dust)</p>
+            <p class="owner">Owner: Nicola Carli — running autonomously</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Brand design agent recap</p>
+            <p class="owner">Owner: Jules</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Unity metric report</p>
+            <p class="owner">Owner: Jules</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">AI research qualification agent</p>
+            <p class="owner">Owner: Margaux &amp; Nicola</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">AI Playbook</p>
+            <p class="owner">Owner: AI Guild</p>
+          </div>
+        </div>
+        <div class="warn-card">
+          <p class="name">AI Competition analyser — Canceled</p>
+          <p class="detail">No rush. This topic has been canceled for now.</p>
+        </div>
+      </div>
+
+      <div class="slide" data-slide="6">
+        <p class="kicker">Family 4 of 4</p>
+        <h2>Cross-functional</h2>
+        <div class="topic-grid">
+          <div class="topic-card">
+            <p class="name">Sana — Learning platform</p>
+            <p class="owner">Owner: Design leadership — next step: design content scope</p>
+          </div>
+          <div class="topic-card">
+            <p class="name">Design Framework (Figma)</p>
+            <p class="owner">Owner: Design Leadership — On hold for now</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" data-slide="7">
+        <p class="kicker">Impact</p>
+        <h2>What this means day-to-day</h2>
+        <ul class="bullet-list">
+          <li>Rituals run on the same cadence.</li>
+          <li>Dashboards remain maintained.</li>
+          <li>AI agents remain active.</li>
+          <li>Single point of contact for any doubt: Damien.</li>
+          <li>The #ask-design-ops Slack channel is open for any questions you may have</li>
+        </ul>
+      </div>
+
+      <div class="slide" data-slide="8">
+        <p class="kicker">Closing</p>
+        <h2>Next checkpoints</h2>
+        <ul class="bullet-list">
+          <li>Figma renewal with Aurore — scheduled.</li>
+          <li>Sana design content scoping — to be kicked off.</li>
+        </ul>
+        <p class="section-label">Feedback</p>
+        <p>Flag anything that feels like it's drifting. Direct message works.</p>
+      </div>
+
+    </div>
+
+    <div class="nav">
+      <button class="nav-btn" id="prev-btn">← Previous</button>
+      <span class="counter" id="counter">1 / 8</span>
+      <button class="nav-btn" id="next-btn">Next →</button>
+    </div>
+  </div>
+  <p class="kbd-hint">Use ← → arrow keys to navigate · Press F for fullscreen · P to print</p>
+</div>
+
+<script>
+(function() {
+  const slides = document.querySelectorAll('.slide');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const counter = document.getElementById('counter');
+  const progressBar = document.getElementById('progress-bar');
+  let current = 0;
+  const total = slides.length;
+
+  function show(i) {
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    counter.textContent = (i + 1) + ' / ' + total;
+    prevBtn.disabled = i === 0;
+    nextBtn.disabled = i === total - 1;
+    progressBar.style.width = ((i + 1) / total * 100) + '%';
+    current = i;
+  }
+
+  prevBtn.addEventListener('click', () => { if (current > 0) show(current - 1); });
+  nextBtn.addEventListener('click', () => { if (current < total - 1) show(current + 1); });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft' && current > 0) show(current - 1);
+    else if (e.key === 'ArrowRight' && current < total - 1) show(current + 1);
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(total - 1);
+    else if (e.key === 'f' || e.key === 'F') {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+
+  show(0);
+})();
+</script>
+
+</body>
+</html>
