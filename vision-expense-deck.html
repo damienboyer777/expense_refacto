@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vision Expense — Opportunities & Bets</title>
+<title>Vision Expense — Opportunities & the Strategic Choice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,45 +22,32 @@
   }
   *{box-sizing:border-box; margin:0; padding:0}
   html,body{height:100%}
-  body{
-    font-family:var(--body); background:#06101f; color:var(--ink);
-    overflow:hidden; -webkit-font-smoothing:antialiased;
-  }
+  body{font-family:var(--body); background:#06101f; color:var(--ink); overflow:hidden; -webkit-font-smoothing:antialiased}
   .deck{position:fixed; inset:0}
-  .slide{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    opacity:0; visibility:hidden; transition:opacity .45s ease, visibility .45s ease;
-    padding:clamp(28px,5vw,76px);
-  }
+  .slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:opacity .45s ease, visibility .45s ease; padding:clamp(26px,4.5vw,72px)}
   .slide.active{opacity:1; visibility:visible}
-  .inner{width:100%; max-width:1120px}
+  .inner{width:100%; max-width:1140px}
 
-  /* themes */
   .light{background:var(--white)}
   .dark{background:radial-gradient(120% 120% at 88% -15%, rgba(10,115,235,.20) 0%, transparent 55%), var(--ink)}
   .dark, .dark .muted{color:var(--white)}
 
-  /* typography */
   .eyebrow{font-family:var(--disp); font-weight:700; font-size:clamp(11px,1vw,13px); letter-spacing:.18em; text-transform:uppercase}
   .eyebrow.blue{color:var(--blue)} .eyebrow.pink{color:var(--pink)}
   h1{font-family:var(--disp); font-weight:800; font-size:clamp(44px,7vw,86px); line-height:.98; letter-spacing:-.02em}
-  h2{font-family:var(--disp); font-weight:700; font-size:clamp(30px,4.4vw,52px); line-height:1.02; letter-spacing:-.015em; color:var(--ink)}
+  h2{font-family:var(--disp); font-weight:700; font-size:clamp(28px,4.2vw,50px); line-height:1.02; letter-spacing:-.015em; color:var(--ink)}
   .dark h2{color:var(--white)}
-  .lead{font-size:clamp(16px,1.5vw,20px); color:var(--muted); line-height:1.5}
+  .lead{font-size:clamp(15px,1.45vw,19px); color:var(--muted); line-height:1.5}
   .dark .lead{color:var(--ice)}
   p{line-height:1.5}
 
-  /* reveal animation */
   .slide.active .r{animation:rise .55s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--d,0)*70ms)}
   @keyframes rise{from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:none}}
 
-  /* layout helpers */
-  .head{margin-bottom:clamp(20px,3vw,38px)}
+  .head{margin-bottom:clamp(16px,2.6vw,32px)}
   .head .eyebrow{margin-bottom:10px; display:block}
   .grid{display:grid; gap:16px}
-  .g3{grid-template-columns:repeat(3,1fr)}
-  .g4{grid-template-columns:repeat(4,1fr)}
-  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
 
   .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px}
   .card h3{font-family:var(--disp); font-weight:700; font-size:clamp(17px,1.6vw,20px); margin-bottom:8px; color:var(--ink)}
@@ -68,94 +55,107 @@
   .ic{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:16px}
   .ic svg{width:24px; height:24px}
 
-  .banner{margin-top:22px; background:var(--ink); color:#fff; border-radius:16px; padding:20px 26px; font-family:var(--disp); font-weight:600; font-size:clamp(14px,1.4vw,17px)}
+  .banner{margin-top:20px; background:var(--ink); color:#fff; border-radius:16px; padding:18px 24px; font-family:var(--disp); font-weight:600; font-size:clamp(14px,1.35vw,17px)}
   .banner b{color:#fff} .banner span{color:var(--ice)}
 
-  /* stats */
-  .stat{background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:22px 18px; text-align:center}
-  .stat .v{font-family:var(--disp); font-weight:800; font-size:clamp(30px,3.6vw,46px); line-height:1; letter-spacing:-.02em}
-  .stat .l{font-size:13px; color:var(--muted); margin-top:12px; line-height:1.25}
+  .stat{background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:22px 16px; text-align:center}
+  .stat .v{font-family:var(--disp); font-weight:800; font-size:clamp(26px,3.2vw,42px); line-height:1; letter-spacing:-.02em}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:12px; line-height:1.25}
 
-  /* requests hero */
-  .req{background:linear-gradient(180deg,#fff,#f8f9fc); border:1.5px solid var(--blue); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:8px; transition:transform .2s ease, box-shadow .2s ease}
+  .req{background:linear-gradient(180deg,#fff,#f8f9fc); border:1.5px solid var(--blue); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:7px; transition:transform .2s ease, box-shadow .2s ease}
   .req:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(10,115,235,.12)}
   .req .num{font-family:var(--disp); font-weight:800; color:var(--blue); font-size:13px; letter-spacing:.1em}
   .req .t{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:var(--ink)}
   .req .d{font-size:13px; color:var(--muted)}
 
-  .strengths{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+  .strengths{display:flex; flex-wrap:wrap; gap:10px}
   .chip{display:inline-flex; align-items:center; gap:8px; background:var(--green-bg); color:#155f2c; border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600}
   .chip svg{width:15px; height:15px; color:var(--green)}
 
-  /* flow */
-  .flow{display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin:14px 0 30px}
-  .node{flex:1; min-width:180px; background:var(--ink2); border:1.5px solid var(--blue); border-radius:16px; padding:20px 22px; display:flex; align-items:center; gap:14px}
-  .node .nic{width:42px;height:42px;border-radius:10px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .node .nic svg{width:22px;height:22px;color:#fff}
-  .node b{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,19px); color:#fff}
-  .arrow{color:var(--blue); flex-shrink:0}
-  .arrow svg{width:28px;height:28px}
+  /* defensible — two blocks */
+  .blk{border-radius:16px; padding:24px}
+  .blk .tag{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:10px}
+  .blk h3{font-family:var(--disp); font-weight:700; font-size:clamp(18px,2vw,24px); margin-bottom:10px; line-height:1.05}
+  .blk p{font-size:clamp(13px,1.3vw,15px); line-height:1.45}
+  .blk.bad{background:rgba(255,255,255,.04); border:1px solid #1e3656}
+  .blk.bad .tag{color:var(--muted2)} .blk.bad h3{color:#cfd8e6} .blk.bad p{color:#9fb0c6}
+  .blk.good{background:var(--ink2); border:1.5px solid var(--blue)}
+  .blk.good .tag{color:var(--blue)} .blk.good h3{color:#fff} .blk.good p{color:var(--ice)}
+  .blk.good ul{list-style:none; margin-top:6px; display:flex; flex-direction:column; gap:9px}
+  .blk.good li{display:flex; gap:10px; font-size:clamp(13px,1.3vw,15px); color:var(--ice); line-height:1.35}
+  .blk.good li b{color:#fff}
+  .dot-b{width:7px;height:7px;border-radius:50%;background:var(--blue);margin-top:7px;flex-shrink:0}
 
-  /* opportunity cards */
-  .opp{background:#fff; border:1px solid var(--border); border-radius:16px; padding:22px; box-shadow:0 6px 18px rgba(3,14,29,.05); display:flex; flex-direction:column; gap:10px}
-  .opp .top{display:flex; align-items:center; gap:14px}
-  .opp h3{font-family:var(--disp); font-weight:700; font-size:clamp(16px,1.6vw,19px); color:var(--ink)}
-  .opp p{font-size:13.5px; color:var(--muted); flex:1}
-  .tag{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.06em; text-transform:uppercase}
+  /* fork */
+  .fork{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .pole{border-radius:18px; padding:22px 24px; display:flex; flex-direction:column}
+  .pole .ph{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+  .pole .pic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .pole .pic svg{width:21px;height:21px;color:#fff}
+  .pole .lbl{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.12em; text-transform:uppercase}
+  .pole h3{font-family:var(--disp); font-weight:700; font-size:clamp(18px,1.9vw,23px); color:var(--ink); line-height:1.05; margin-bottom:12px}
+  .pole ul{list-style:none; display:flex; flex-direction:column; gap:8px; flex:1}
+  .pole li{display:flex; gap:9px; font-size:13.5px; color:#33414f; line-height:1.35}
+  .pole li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
+  .pole .to{margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); font-size:12.5px; color:var(--muted)}
+  .pole .to b{color:var(--ink)}
+  .pole.out{background:var(--pink-bg); border:1px solid #f3c6e2} .pole.out .pic{background:var(--pink)} .pole.out .lbl{color:var(--pink)} .pole.out li svg{color:var(--pink)}
+  .pole.inn{background:var(--green-bg); border:1px solid #bfe9cd} .pole.inn .pic{background:var(--green)} .pole.inn .lbl{color:var(--green)} .pole.inn li svg{color:var(--green)}
+  .forknote{margin-top:16px; text-align:center; font-family:var(--disp); font-weight:600; font-size:clamp(13px,1.3vw,16px); color:var(--ink)}
+  .forknote b{color:var(--blue)}
+
+  /* AI */
+  .commodity{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--muted2); border-radius:12px; padding:14px 18px; margin-bottom:18px; font-size:13.5px; color:var(--muted)}
+  .commodity b{color:var(--ink)} .commodity svg{width:18px;height:18px;color:var(--muted2);flex-shrink:0}
+  .mini{background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:0 4px 14px rgba(3,14,29,.04)}
+  .mini .mic{width:34px;height:34px;border-radius:9px;background:#E6F0FF;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+  .mini .mic svg{width:18px;height:18px;color:var(--blue)}
+  .mini h4{font-family:var(--disp); font-weight:700; font-size:14.5px; color:var(--ink); margin-bottom:4px}
+  .mini p{font-size:12.5px; color:var(--muted); line-height:1.35}
 
   /* references + table */
-  .refs{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px}
-  .ref{display:inline-flex; align-items:center; gap:10px; text-decoration:none; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px 16px; transition:border-color .2s, transform .2s}
+  .refs{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px}
+  .ref{display:inline-flex; align-items:center; gap:10px; text-decoration:none; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 15px; transition:border-color .2s, transform .2s}
   .ref:hover{border-color:var(--pink); transform:translateY(-2px)}
   .ref b{font-family:var(--disp); color:var(--pink); font-size:15px}
   .ref span{color:var(--muted); font-size:12.5px}
   .ref svg{width:14px;height:14px;color:var(--muted2)}
-
-  table{width:100%; border-collapse:separate; border-spacing:0; font-size:clamp(12.5px,1.25vw,15px)}
-  thead th{font-family:var(--disp); font-weight:700; text-align:left; padding:14px 16px; color:var(--ink); border-bottom:2px solid var(--ink)}
+  table{width:100%; border-collapse:separate; border-spacing:0; font-size:clamp(12px,1.15vw,14.5px)}
+  thead th{font-family:var(--disp); font-weight:700; text-align:left; padding:12px 14px; color:var(--ink); border-bottom:2px solid var(--ink)}
   thead th:first-child{color:var(--muted); font-weight:600}
-  tbody td{padding:13px 16px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top}
+  tbody td{padding:11px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top}
   tbody tr td:first-child{font-weight:600; color:var(--muted)}
   tbody tr:last-child td{border-bottom:none}
-  .moat-row td{background:var(--surface2)}
-  .no{color:var(--muted2); font-weight:600}
-  .yes{color:var(--green); font-weight:700}
-  .note{margin-top:14px; font-size:13px; color:var(--muted)}
-  .note b{color:var(--blue)}
+  .moat-row td{background:var(--surface2)} .no{color:var(--muted2); font-weight:600}
+  .note{margin-top:12px; font-size:13px; color:var(--muted)} .note b{color:var(--pink)}
 
   /* questions */
-  .q{background:var(--ink2); border:1px solid #1e3656; border-radius:16px; padding:22px; display:flex; gap:16px; align-items:flex-start}
-  .q .qic{width:44px;height:44px;border-radius:11px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .q .qic svg{width:22px;height:22px;color:#fff}
-  .q h3{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:#fff; margin-bottom:6px}
-  .q p{font-size:13.5px; color:var(--ice)}
+  .q{background:var(--ink2); border:1px solid #1e3656; border-radius:16px; padding:20px; display:flex; gap:15px; align-items:flex-start}
+  .q .qic{width:42px;height:42px;border-radius:11px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .q .qic svg{width:21px;height:21px;color:#fff}
+  .q h3{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:#fff; margin-bottom:5px}
+  .q p{font-size:13px; color:var(--ice)}
 
-  /* deco card motif on title */
-  .motif{position:absolute; top:-60px; right:-40px; width:420px; height:260px; transform:rotate(16deg); border-radius:24px; background:linear-gradient(135deg, rgba(10,115,235,.35), rgba(233,73,166,.18)); filter:blur(.5px)}
-  .motif.b{top:60px; right:-120px; width:380px; height:240px; transform:rotate(16deg); background:linear-gradient(135deg, rgba(233,73,166,.16), rgba(10,115,235,.05))}
+  .motif{position:absolute; top:-60px; right:-40px; width:420px; height:260px; transform:rotate(16deg); border-radius:24px; background:linear-gradient(135deg, rgba(10,115,235,.35), rgba(233,73,166,.18))}
+  .motif.b{top:60px; right:-120px; width:380px; height:240px; background:linear-gradient(135deg, rgba(233,73,166,.16), rgba(10,115,235,.05))}
 
-  /* controls */
   .bar{position:fixed; top:0; left:0; height:3px; background:var(--blue); width:0; z-index:50; transition:width .35s ease}
   .nav{position:fixed; bottom:22px; right:26px; display:flex; gap:10px; z-index:50}
   .nav button{width:44px;height:44px;border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.9); backdrop-filter:blur(6px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s, transform .2s}
   .nav button:hover{background:#fff; transform:translateY(-2px)}
-  .nav button:active{transform:translateY(0)}
   .nav svg{width:20px;height:20px;color:var(--ink)}
   .nav button:disabled{opacity:.35; cursor:default; transform:none}
   .dots{position:fixed; bottom:30px; left:50%; transform:translateX(-50%); display:flex; gap:9px; z-index:50}
   .dot{width:8px;height:8px;border-radius:50%; background:var(--muted2); opacity:.4; cursor:pointer; transition:opacity .2s, transform .2s, background .2s}
   .dot.on{opacity:1; background:var(--blue); transform:scale(1.3)}
   .counter{position:fixed; bottom:30px; left:26px; z-index:50; font-family:var(--disp); font-weight:700; font-size:13px; color:var(--muted); letter-spacing:.08em}
-  .brand{position:fixed; top:20px; left:26px; z-index:40; font-family:var(--disp); font-weight:800; font-size:14px; letter-spacing:.02em; color:var(--blue)}
-  /* contextual control colors over dark slides handled via mix */
-  .slide.dark ~ .counter{color:var(--ice)}
-  .hint{position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(34px); font-size:11px; color:var(--muted2); z-index:40; opacity:.0; transition:opacity .4s}
+  .brand{position:fixed; top:20px; left:26px; z-index:40; font-family:var(--disp); font-weight:800; font-size:14px; color:var(--blue)}
+  .hint{position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(34px); font-size:11px; color:var(--muted2); z-index:40; opacity:0; transition:opacity .4s}
   body.show-hint .hint{opacity:1}
 
-  @media (max-width:820px){
-    .g4,.g3,.g2{grid-template-columns:1fr}
-    .flow{flex-direction:column} .arrow{transform:rotate(90deg)}
-    table{font-size:12px} thead th,tbody td{padding:9px 8px}
+  @media (max-width:880px){
+    .g4,.g3,.g2,.fork{grid-template-columns:1fr}
+    table{font-size:11.5px} thead th,tbody td{padding:8px}
     .motif{width:240px;height:150px;right:-30px}
   }
 </style>
@@ -173,7 +173,7 @@
     <div class="inner">
       <span class="eyebrow blue r" style="--d:0">PayFit · Discovery S1 2026 · Design × Product × Strategy</span>
       <h1 class="r" style="--d:1; color:#fff; margin:18px 0 18px">Vision Expense</h1>
-      <p class="lead r" style="--d:2; font-size:clamp(18px,2vw,26px); color:var(--ice); max-width:760px">Opportunities &amp; bets — where we are, what's on the table, and the directions worth exploring together.</p>
+      <p class="lead r" style="--d:2; font-size:clamp(18px,2vw,26px); color:var(--ice); max-width:820px">Opportunities &amp; bets — and the strategic questions to explore together.</p>
     </div>
   </section>
 
@@ -195,7 +195,7 @@
           <h3>Market &amp; regulation move</h3><p>Competitors gone card-first (Spendesk, Mooncard, Pleo) and the 2026 e-invoicing mandate.</p>
         </div>
       </div>
-      <div class="banner r" style="--d:5"><span>The lens for the whole topic:</span> <b>our payroll loop</b> <span>— the only one linking the expense straight to the payslip.</span></div>
+      <div class="banner r" style="--d:5"><span>Competitors are removing the very friction our model rests on —</span> <b>which opens a real strategic question about where we play next.</b></div>
     </div>
   </section>
 
@@ -206,26 +206,25 @@
       <div class="grid g4">
         <div class="stat r" style="--d:2"><div class="v" style="color:var(--blue)">~€100k</div><div class="l">MRR</div></div>
         <div class="stat r" style="--d:3"><div class="v" style="color:var(--ink)">80k</div><div class="l">employees rolled out (~35% of base)</div></div>
-        <div class="stat r" style="--d:4"><div class="v" style="color:var(--ink)">€3</div><div class="l">per employee / month</div></div>
+        <div class="stat r" style="--d:4"><div class="v" style="color:var(--ink)">€1–3</div><div class="l">per employee / mo · list price, often discounted (≈€1 in UK/ES)</div></div>
         <div class="stat r" style="--d:5"><div class="v" style="color:var(--amber)">−6%</div><div class="l">usage YoY</div></div>
       </div>
-      <div class="banner r" style="--d:6" >
-        <b>Popular and widely used — but its value is eroding.</b>
-        <span style="display:block; font-family:var(--body); font-weight:400; font-size:14px; margin-top:8px; color:var(--ice)">Positioned as an HRIS cornerstone for SMBs. The goal isn't to revive a dead feature, but to turn it into a strategic asset before it slips.</span>
+      <div class="banner r" style="--d:6">
+        <b>Popular and widely used — but low-ARPU and eroding.</b>
+        <span style="display:block; font-family:var(--body); font-weight:400; font-size:14px; margin-top:8px; color:var(--ice)">An HRIS add-on priced as a commodity. That low ARPU is exactly why the business-model question — interchange, premium tiers — is worth opening now.</span>
       </div>
     </div>
   </section>
 
-  <!-- 4 — STRENGTHS + REQUESTS -->
+  <!-- 4 — REQUESTS -->
   <section class="slide light">
     <div class="inner">
       <div class="head"><span class="eyebrow blue r" style="--d:0">What we know · usage</span><h2 class="r" style="--d:1">What customers are asking for</h2></div>
       <div class="strengths r" style="--d:2">
         <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Smooth, appreciated mobile submission</span>
         <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> HRIS cornerstone for SMBs</span>
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Full chain through to the payslip</span>
       </div>
-      <div class="grid g4" style="margin-top:22px">
+      <div class="grid g4" style="margin-top:20px">
         <div class="req r" style="--d:3"><span class="num">01</span><span class="t">Bulk submission</span><span class="d">Submit many expenses at once, in a single confirmation.</span></div>
         <div class="req r" style="--d:4"><span class="num">02</span><span class="t">Custom categories</span><span class="d">Company-specific tags and category management.</span></div>
         <div class="req r" style="--d:5"><span class="num">03</span><span class="t">Double validation</span><span class="d">Manager + accountant approval flow.</span></div>
@@ -235,51 +234,75 @@
     </div>
   </section>
 
-  <!-- 5 — MOAT -->
+  <!-- 5 — WHAT'S ACTUALLY DEFENSIBLE -->
   <section class="slide dark">
     <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">Our differentiator</span><h2 class="r" style="--d:1">The structural moat: the payroll loop</h2></div>
-      <div class="flow r" style="--d:2">
-        <div class="node"><div class="nic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/></svg></div><b>Expense</b></div>
-        <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-        <div class="node"><div class="nic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><b>Processing</b></div>
-        <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
-        <div class="node"><div class="nic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg></div><b>Payslip · net</b></div>
+      <div class="head"><span class="eyebrow blue r" style="--d:0">Let's be honest about the moat</span><h2 class="r" style="--d:1; color:#fff">What's actually defensible</h2></div>
+      <div class="grid g2">
+        <div class="blk bad r" style="--d:2">
+          <span class="tag">Not the moat</span>
+          <h3>Being "linked to payroll", on its own</h3>
+          <p>For ordinary out-of-pocket spend, the payslip line only exists because the employee fronts the cash. It's a by-product of a friction — and the market is busy removing that friction. We shouldn't sell it as an asset.</p>
+        </div>
+        <div class="blk good r" style="--d:3">
+          <span class="tag">The real moat</span>
+          <h3>Two things no spend tool can copy</h3>
+          <ul>
+            <li><span class="dot-b"></span><span><b>The payroll engine + SMB base + distribution.</b> Expense rides on top of it.</span></li>
+            <li><span class="dot-b"></span><span><b>The payroll-native items:</b> mileage (IK), meal allowances, benefits in kind — anything under social contributions. They must be processed in payroll; URSSAF treatment is non-trivial; a card doesn't remove that.</span></li>
+          </ul>
+        </div>
       </div>
-      <p class="lead r" style="--d:3"><b style="color:#fff; font-weight:700">The only player linking the expense directly to payroll.</b><br>No card pure-player (Spendesk, Pleo, Mooncard) touches this layer. It's our lens: every opportunity is judged by what it adds to the payroll loop.</p>
+      <p class="lead r" style="--d:4; margin-top:16px">Our edge isn't "we connect to payroll" — it's <b style="color:#fff">owning the payroll-native slice no spend tool can touch.</b></p>
     </div>
   </section>
 
-  <!-- 6 — OPPORTUNITY MAP -->
+  <!-- 6 — THE STRATEGIC FORK -->
   <section class="slide light">
     <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">The opportunities on the table</span><h2 class="r" style="--d:1">Four axes to explore</h2></div>
-      <div class="grid g2">
-        <div class="opp r" style="--d:2">
-          <div class="top"><div class="ic" style="background:#E6F0FF; margin:0"><svg viewBox="0 0 24 24" fill="none" stroke="#0A73EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8V5m0 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/><circle cx="8.5" cy="14" r="1"/><circle cx="15.5" cy="14" r="1"/></svg></div><h3>AI in processing</h3></div>
-          <p>OCR and field pre-fill. Drive manual entry toward zero.</p>
-          <span class="tag" style="color:var(--blue)">Exploration</span>
+      <div class="head"><span class="eyebrow blue r" style="--d:0">A direction to explore together</span><h2 class="r" style="--d:1">A strategic fork to explore</h2></div>
+      <div class="fork">
+        <div class="pole out r" style="--d:2">
+          <div class="ph"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><span class="lbl">Lean out → spend</span></div>
+          <h3>Go card-first</h3>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Remove the advance, capture spend in real time, monetize via interchange.</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Build via BaaS (Treezor, Swan, Stripe Issuing) <i>or</i> partner with an existing player (Qonto).</span></li>
+          </ul>
+          <div class="to"><b>Trade-off:</b> decouples general spend from payroll; adds regulatory &amp; ops load.</div>
         </div>
-        <div class="opp r" style="--d:3">
-          <div class="top"><div class="ic" style="background:var(--pink-bg); margin:0"><svg viewBox="0 0 24 24" fill="none" stroke="#E949A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><h3>E-cards / card-first</h3></div>
-          <p>Remove the cash advance, capture spend in real time.</p>
-          <span class="tag" style="color:var(--pink)">New territory · today's bet</span>
+        <div class="pole inn r" style="--d:3">
+          <div class="ph"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg></div><span class="lbl">Lean in → payroll-native depth</span></div>
+          <h3>Deepen where we're unique</h3>
+          <ul>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>IK / mileage, allowances, benefits, real-time cumulation, compliance (e-invoicing).</span></li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Cards stay out of scope, or partner-only.</span></li>
+          </ul>
+          <div class="to"><b>Trade-off:</b> smaller surface; doesn't answer the "spend platform" market move.</div>
         </div>
-        <div class="opp r" style="--d:4">
-          <div class="top"><div class="ic" style="background:var(--green-bg); margin:0"><svg viewBox="0 0 24 24" fill="none" stroke="#0B993C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg></div><h3>Payroll-loop extension</h3></div>
-          <p>Real-time mileage cumulation, payslip-aware tracking, net impact.</p>
-          <span class="tag" style="color:var(--green)">In design · S1</span>
-        </div>
-        <div class="opp r" style="--d:5">
-          <div class="top"><div class="ic" style="background:#E6EEF7; margin:0"><svg viewBox="0 0 24 24" fill="none" stroke="#084385" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><h3>Multi-market compliance</h3></div>
-          <p>2026 e-invoicing, rollout FR → UK → ES.</p>
-          <span class="tag" style="color:var(--muted)">Scoping · S1</span>
-        </div>
+      </div>
+      <p class="forknote r" style="--d:4">Both pull on the same resource — the payroll link. <b>Worth exploring as directions, not a verdict — and AI is the cross-cutting lever on either path.</b></p>
+    </div>
+  </section>
+
+  <!-- 7 — AI BEYOND PROCESSING -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head"><span class="eyebrow blue r" style="--d:0">The cross-cutting lever</span><h2 class="r" style="--d:1">AI: beyond processing</h2></div>
+      <div class="commodity r" style="--d:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>OCR &amp; pre-fill = table stakes</b> — already handled well by our partner Mindee. Not where the differentiation lies.</span></div>
+      <p class="lead r" style="--d:3; margin-bottom:16px">Where AI changes the job-to-be-done for the company — an open exploration:</p>
+      <div class="grid g3" style="margin-top:16px">
+        <div class="mini r" style="--d:4"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 3v6h-6"/></svg></div><h4>Policy &amp; compliance automation</h4><p>Auto-validate against rules, CCN and URSSAF logic.</p></div>
+        <div class="mini r" style="--d:5"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.3a2 2 0 0 1 3.4 0l8 14A2 2 0 0 1 20 20H4a2 2 0 0 1-1.7-2.7z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg></div><h4>Anomaly &amp; fraud detection</h4><p>Flag duplicates, out-of-policy and suspicious spend.</p></div>
+        <div class="mini r" style="--d:6"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>Conversational / agentic capture</h4><p>"Forward the receipt" — the rest is done for you.</p></div>
+        <div class="mini r" style="--d:7"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 14 11 9 15 12 20 6"/></svg></div><h4>Predictive budgets</h4><p>Real-time spend guidance and forecasting for finance.</p></div>
+        <div class="mini r" style="--d:8"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div><h4>Automated month-end close</h4><p>From expense to accounting entry, end to end.</p></div>
+        <div class="mini r" style="--d:9"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h4>Spend intelligence</h4><p>Insights for finance &amp; HR across the whole base.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 7 — E-CARDS FOCUS -->
+  <!-- 8 — E-CARDS FOCUS -->
   <section class="slide light">
     <div class="inner">
       <div class="head"><span class="eyebrow pink r" style="--d:0">In focus · e-cards</span><h2 class="r" style="--d:1">How the market plays it</h2></div>
@@ -293,33 +316,32 @@
         <tbody>
           <tr><td>Origin</td><td>France</td><td>France</td><td>Denmark / EU</td></tr>
           <tr><td>Model</td><td>Card-first + spend mgmt</td><td>Corporate card + expense</td><td>Card-first spend mgmt</td></tr>
-          <tr><td>Card issuing</td><td>Own EMI licence</td><td>Via Treezor (BaaS)</td><td>Mastercard issuing</td></tr>
-          <tr><td>Strongest at</td><td>Reconciliation logic</td><td>FR accounting ecosystem</td><td>Instant virtual cards &amp; UX</td></tr>
+          <tr><td>Card issuing</td><td>Own EMI licence</td><td>Via Treezor (BaaS)</td><td>Own EMI (Mastercard)</td></tr>
+          <tr><td>Pricing*</td><td>Quote · sub + per-transaction</td><td>Quote · ~€5–6/user/mo + €10/card</td><td>Public · from ~£9.50/user/mo + cashback</td></tr>
           <tr class="moat-row"><td>Linked to payroll</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
         </tbody>
       </table>
-      <p class="note r" style="--d:4"><b>Our angle:</b> not "card vs payroll" — the only one able to do both. Spend capture <i>and</i> payroll processing <i>and</i> compliance, in one chain.</p>
+      <p class="note r" style="--d:4"><b>Our angle:</b> cards <i>decouple</i> general spend from payroll — that's the point of the model, not a flaw. The real questions: which segments justify a card, and build (BaaS) vs partner (Qonto)? <span style="color:var(--muted2)">*Most are quote-based; figures to reconfirm. All monetize per-seat <i>and</i> interchange — a richer model than our €1–3 add-on.</span></p>
     </div>
   </section>
 
-  <!-- 8 — OPEN QUESTIONS -->
+  <!-- 9 — OPEN QUESTIONS -->
   <section class="slide dark">
     <div class="inner">
       <div class="head"><span class="eyebrow blue r" style="--d:0">Where we go together</span><h2 class="r" style="--d:1; color:#fff">Open questions for the collaboration</h2></div>
       <p class="lead r" style="--d:2">Questions Design, Product and Strategy need to answer together before we commit design effort.</p>
-      <div class="grid g2" style="margin-top:22px">
-        <div class="q r" style="--d:3"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><h3>Existing benchmarks &amp; studies</h3><p>What's already been explored on expense &amp; cards — even partial sizing or research.</p></div></div>
-        <div class="q r" style="--d:4"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-2 5a3 3 0 0 0 6 0z"/><path d="M19 7l-2 5a3 3 0 0 0 6 0z"/></svg></div><div><h3>Build vs partner</h3><p>On the regulated layer: own it one day, or lean on a BaaS (Treezor, Swan, Stripe Issuing)?</p></div></div>
+      <div class="grid g2" style="margin-top:20px">
+        <div class="q r" style="--d:3"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><h3>The fork: lean-out vs lean-in</h3><p>Which direction is worth exploring first — spend platform, payroll-native depth, or a deliberate hybrid?</p></div></div>
+        <div class="q r" style="--d:4"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-2 5a3 3 0 0 0 6 0z"/><path d="M19 7l-2 5a3 3 0 0 0 6 0z"/></svg></div><div><h3>Build vs partner</h3><p>On cards: build via a BaaS (Treezor, Swan) or resell/integrate an existing player (Qonto)?</p></div></div>
         <div class="q r" style="--d:5"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div><h3>Client &amp; CCN fit</h3><p>Which segments justify a card economically across our SMB base?</p></div></div>
-        <div class="q r" style="--d:6"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6m-5 3h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1h6c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z"/></svg></div><div><h3>Signals we may be missing</h3><p>Market angles and opportunities beyond the product radar.</p></div></div>
+        <div class="q r" style="--d:6"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div><div><h3>Existing material &amp; pricing intel</h3><p>Any benchmarks, studies or sizing already on the Strategy side — even partial.</p></div></div>
       </div>
     </div>
   </section>
 
 </div>
 
-<!-- controls -->
-<div class="counter" id="counter">01 / 08</div>
+<div class="counter" id="counter">01 / 09</div>
 <div class="dots" id="dots"></div>
 <div class="nav">
   <button id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -336,7 +358,6 @@
   const prev = document.getElementById('prev');
   const next = document.getElementById('next');
   const dotsWrap = document.getElementById('dots');
-
   slides.forEach((_, idx) => {
     const d = document.createElement('div');
     d.className = 'dot' + (idx===0?' on':'');
@@ -344,34 +365,27 @@
     dotsWrap.appendChild(d);
   });
   const dots = Array.from(document.querySelectorAll('.dot'));
-
-  function pad(n){return String(n).padStart(2,'0')}
-
+  const pad = n => String(n).padStart(2,'0');
   function go(n){
     n = Math.max(0, Math.min(total-1, n));
     slides[i].classList.remove('active');
     i = n;
     slides[i].classList.add('active');
-    bar.style.width = ((i)/(total-1))*100 + '%';
+    bar.style.width = (i/(total-1))*100 + '%';
     counter.textContent = pad(i+1) + ' / ' + pad(total);
     dots.forEach((d,idx)=>d.classList.toggle('on', idx===i));
-    prev.disabled = i===0;
-    next.disabled = i===total-1;
-    // tint controls on dark slides
+    prev.disabled = i===0; next.disabled = i===total-1;
     const dark = slides[i].classList.contains('dark');
     counter.style.color = dark ? 'var(--ice)' : 'var(--muted)';
     document.querySelector('.brand').style.color = dark ? '#fff' : 'var(--blue)';
   }
-
   next.addEventListener('click', ()=>go(i+1));
   prev.addEventListener('click', ()=>go(i-1));
   document.addEventListener('keydown', e=>{
-    if(e.key==='ArrowRight' || e.key===' '){e.preventDefault(); go(i+1)}
+    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault(); go(i+1)}
     else if(e.key==='ArrowLeft'){go(i-1)}
-    else if(e.key==='Home'){go(0)}
-    else if(e.key==='End'){go(total-1)}
+    else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(total-1)}
   });
-  // hide hint after a moment
   setTimeout(()=>document.body.classList.remove('show-hint'), 4200);
   go(0);
 </script>
