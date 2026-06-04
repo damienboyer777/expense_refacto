@@ -120,14 +120,15 @@
   .ref b{font-family:var(--disp); color:var(--pink); font-size:15px}
   .ref span{color:var(--muted); font-size:12.5px}
   .ref svg{width:14px;height:14px;color:var(--muted2)}
-  table{width:100%; border-collapse:separate; border-spacing:0; font-size:clamp(12px,1.15vw,14.5px)}
-  thead th{font-family:var(--disp); font-weight:700; text-align:left; padding:12px 14px; color:var(--ink); border-bottom:2px solid var(--ink)}
+  table{width:100%; border-collapse:separate; border-spacing:0; font-size:clamp(10.5px,1vw,13px)}
+  thead th{font-family:var(--disp); font-weight:700; text-align:left; padding:10px 10px; color:var(--ink); border-bottom:2px solid var(--ink)}
   thead th:first-child{color:var(--muted); font-weight:600}
-  tbody td{padding:11px 14px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top}
+  tbody td{padding:9px 10px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top}
   tbody tr td:first-child{font-weight:600; color:var(--muted)}
   tbody tr:last-child td{border-bottom:none}
   .moat-row td{background:var(--surface2)} .no{color:var(--muted2); font-weight:600}
   .note{margin-top:12px; font-size:13px; color:var(--muted)} .note b{color:var(--pink)}
+  #activation-chart{width:100%; margin-top:2px} #activation-chart svg{display:block; width:100%; height:auto}
 
   /* questions */
   .q{background:var(--ink2); border:1px solid #1e3656; border-radius:16px; padding:20px; display:flex; gap:15px; align-items:flex-start}
@@ -135,6 +136,25 @@
   .q .qic svg{width:21px;height:21px;color:#fff}
   .q h3{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:#fff; margin-bottom:5px}
   .q p{font-size:13px; color:var(--ice)}
+
+  /* annex recap */
+  .rhead{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .rhead h2{font-size:clamp(26px,3.4vw,40px)}
+  .rhead .pos{font-size:clamp(13px,1.3vw,15px); color:var(--muted)}
+  .reflink{display:inline-flex; align-items:center; gap:6px; color:var(--blue); text-decoration:none; font-size:12.5px; font-weight:600; margin-top:8px}
+  .reflink svg{width:12px;height:12px}
+  .recap{display:grid; grid-template-columns:1.05fr 1fr; gap:24px; margin-top:6px}
+  .facts{display:flex; flex-direction:column}
+  .facts .row{display:grid; grid-template-columns:120px 1fr; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); font-size:13.5px; line-height:1.35}
+  .facts .row:last-child{border-bottom:none}
+  .facts .k{color:var(--muted); font-weight:600}
+  .facts .v{color:var(--ink)}
+  .rcol{display:flex; flex-direction:column; gap:14px}
+  .rbox{border-radius:14px; padding:18px 20px}
+  .rbox h4{font-family:var(--disp); font-weight:700; font-size:12px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px}
+  .rbox p{font-size:13.5px; line-height:1.45}
+  .rbox.learn{background:var(--surface); border:1px solid var(--border)} .rbox.learn h4{color:var(--muted)} .rbox.learn p{color:var(--ink)}
+  .rbox.rel{background:#E6F0FF; border:1px solid #cfe0fb} .rbox.rel h4{color:var(--blue)} .rbox.rel p{color:var(--ink)}
 
   .motif{position:absolute; top:-60px; right:-40px; width:420px; height:260px; transform:rotate(16deg); border-radius:24px; background:linear-gradient(135deg, rgba(10,115,235,.35), rgba(233,73,166,.18))}
   .motif.b{top:60px; right:-120px; width:380px; height:240px; background:linear-gradient(135deg, rgba(233,73,166,.16), rgba(10,115,235,.05))}
@@ -184,7 +204,7 @@
       <div class="grid g3">
         <div class="card r" style="--d:2">
           <div class="ic" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="#C98A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
-          <h3>Usage is eroding</h3><p>A widely-used feature, yet −6% usage YoY. The signal isn't disinterest — it's slow erosion.</p>
+          <h3>Usage is declining</h3><p>A widely-used feature, yet −14% submissions YoY (May 25 → May 26). The signal isn't disinterest — it's a real, accelerating decline.</p>
         </div>
         <div class="card r" style="--d:3">
           <div class="ic" style="background:#E6F0FF"><svg viewBox="0 0 24 24" fill="none" stroke="#0A73EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div>
@@ -207,12 +227,21 @@
         <div class="stat r" style="--d:2"><div class="v" style="color:var(--blue)">~€100k</div><div class="l">MRR</div></div>
         <div class="stat r" style="--d:3"><div class="v" style="color:var(--ink)">80k</div><div class="l">employees rolled out (~35% of base)</div></div>
         <div class="stat r" style="--d:4"><div class="v" style="color:var(--ink)">€1–3</div><div class="l">per employee / mo · list price, often discounted (≈€1 in UK/ES)</div></div>
-        <div class="stat r" style="--d:5"><div class="v" style="color:var(--amber)">−6%</div><div class="l">usage YoY</div></div>
+        <div class="stat r" style="--d:5"><div class="v" style="color:var(--amber)">−14%</div><div class="l">submissions YoY · 50.3k → 43.4k (May 25→26)</div></div>
       </div>
       <div class="banner r" style="--d:6">
         <b>Popular and widely used — but low-ARPU and eroding.</b>
         <span style="display:block; font-family:var(--body); font-weight:400; font-size:14px; margin-top:8px; color:var(--ice)">An HRIS add-on priced as a commodity. That low ARPU is exactly why the business-model question — interchange, premium tiers — is worth opening now.</span>
       </div>
+    </div>
+  </section>
+
+  <!-- 3b — THE DECLINE IN DATA -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head"><span class="eyebrow blue r" style="--d:0">What we know · the trend</span><h2 class="r" style="--d:1">The decline, in data</h2></div>
+      <div class="r" id="activation-chart" style="--d:2"></div>
+      <p class="note r" style="--d:3"><b style="color:var(--amber)">−21% activations, −11 pts activation rate since Jan 2025.</b> Companies activating Expenses and the activation rate both fall every quarter — the −14% in submissions is the symptom of a top-to-bottom decline, not a blip.</p>
     </div>
   </section>
 
@@ -307,18 +336,19 @@
     <div class="inner">
       <div class="head"><span class="eyebrow pink r" style="--d:0">In focus · e-cards</span><h2 class="r" style="--d:1">How the market plays it</h2></div>
       <div class="refs r" style="--d:2">
+        <a class="ref" href="https://www.expensya.com/en/solutions/payment-cards/" target="_blank" rel="noopener"><b>Expensya</b><span>Payment cards &amp; budgets</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         <a class="ref" href="https://www.spendesk.com/platform/smart-company-cards/" target="_blank" rel="noopener"><b>Spendesk</b><span>Smart company cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         <a class="ref" href="https://www.mooncard.co/fr/vos-besoins/cartes-de-paiement" target="_blank" rel="noopener"><b>Mooncard</b><span>Corporate payment cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         <a class="ref" href="https://www.pleo.io/en/business-expense-cards" target="_blank" rel="noopener"><b>Pleo</b><span>Business expense cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
       </div>
       <table class="r" style="--d:3">
-        <thead><tr><th></th><th>Spendesk</th><th>Mooncard</th><th>Pleo</th></tr></thead>
+        <thead><tr><th></th><th>Spendesk</th><th>Mooncard</th><th>Pleo</th><th>Expensya</th></tr></thead>
         <tbody>
-          <tr><td>Origin</td><td>France</td><td>France</td><td>Denmark / EU</td></tr>
-          <tr><td>Model</td><td>Card-first + spend mgmt</td><td>Corporate card + expense</td><td>Card-first spend mgmt</td></tr>
-          <tr><td>Card issuing</td><td>Own EMI licence</td><td>Via Treezor (BaaS)</td><td>Own EMI (Mastercard)</td></tr>
-          <tr><td>Pricing*</td><td>Quote · sub + per-transaction</td><td>Quote · ~€5–6/user/mo + €10/card</td><td>Public · from ~£9.50/user/mo + cashback</td></tr>
-          <tr class="moat-row"><td>Linked to payroll</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+          <tr><td>Origin</td><td>France</td><td>France</td><td>Denmark / EU</td><td>France (Medius)</td></tr>
+          <tr><td>Model</td><td>Card-first + spend mgmt</td><td>Corporate card + expense</td><td>Card-first spend mgmt</td><td>Expense mgmt + cards &amp; travel</td></tr>
+          <tr><td>Card issuing</td><td>Own EMI licence</td><td>Via Treezor (BaaS)</td><td>Own EMI (Mastercard)</td><td>Via Adyen (BaaS)</td></tr>
+          <tr><td>Pricing*</td><td>Quote · sub + per-transaction</td><td>Quote · ~€5–6/user/mo + €10/card</td><td>Public · from ~£9.50/user/mo + cashback</td><td>~€5–8/user/mo (Silver/Gold)</td></tr>
+          <tr class="moat-row"><td>Linked to payroll</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
         </tbody>
       </table>
       <p class="note r" style="--d:4"><b>Our angle:</b> cards <i>decouple</i> general spend from payroll — that's the point of the model, not a flaw. The real questions: which segments justify a card, and build (BaaS) vs partner (Qonto)? <span style="color:var(--muted2)">*Most are quote-based; figures to reconfirm. All monetize per-seat <i>and</i> interchange — a richer model than our €1–3 add-on.</span></p>
@@ -339,9 +369,121 @@
     </div>
   </section>
 
+  <!-- ANNEX — DIVIDER -->
+  <section class="slide dark">
+    <div class="motif" style="opacity:.55"></div>
+    <div class="inner">
+      <span class="eyebrow blue r" style="--d:0">Annex</span>
+      <h1 class="r" style="--d:1; color:#fff; font-size:clamp(40px,6vw,72px); margin:14px 0 16px">Competitor recaps</h1>
+      <p class="lead r" style="--d:2; max-width:780px">One page each — Spendesk, Mooncard, Pleo, Expensya. Reference detail behind the main narrative. <span style="color:var(--muted2)">Pricing figures are mostly quote-based and to reconfirm.</span></p>
+    </div>
+  </section>
+
+  <!-- ANNEX — SPENDESK -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head" style="margin-bottom:16px">
+        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
+        <div class="rhead r" style="--d:1"><h2>Spendesk</h2><span class="pos">Card-first spend management, built for finance teams</span></div>
+        <a class="reflink r" style="--d:1" href="https://www.spendesk.com/platform/smart-company-cards/" target="_blank" rel="noopener">spendesk.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+      </div>
+      <div class="recap">
+        <div class="facts r" style="--d:2">
+          <div class="row"><span class="k">Origin</span><span class="v">France (Paris), founded 2016</span></div>
+          <div class="row"><span class="k">Model</span><span class="v">Card-first platform: cards, invoices, expense, approvals</span></div>
+          <div class="row"><span class="k">Buyer</span><span class="v">Finance teams, mid-market</span></div>
+          <div class="row"><span class="k">Card issuing</span><span class="v">Own EMI licence (regulated)</span></div>
+          <div class="row"><span class="k">Pricing</span><span class="v">Quote-based · subscription + per-transaction (100/mo incl., ~€50 per extra 100)</span></div>
+          <div class="row"><span class="k">Mileage</span><span class="v">Yes (incl. electric vehicle)</span></div>
+          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+        </div>
+        <div class="rcol r" style="--d:3">
+          <div class="rbox learn"><h4>Strongest at</h4><p>Reconciliation logic and approval workflows, with a polished finance-team experience.</p></div>
+          <div class="rbox rel"><h4>Relevance to us</h4><p>The reconciliation pattern is the one to study (multi-step confirmation). But it sells to Finance, not our HR / office-manager buyer — and never touches payroll.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANNEX — MOONCARD -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head" style="margin-bottom:16px">
+        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
+        <div class="rhead r" style="--d:1"><h2>Mooncard</h2><span class="pos">Corporate card + expense automation, FR-accounting native</span></div>
+        <a class="reflink r" style="--d:1" href="https://www.mooncard.co/fr/vos-besoins/cartes-de-paiement" target="_blank" rel="noopener">mooncard.co <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+      </div>
+      <div class="recap">
+        <div class="facts r" style="--d:2">
+          <div class="row"><span class="k">Origin</span><span class="v">France (Paris), founded 2016</span></div>
+          <div class="row"><span class="k">Model</span><span class="v">Corporate card + automated expense &amp; accounting</span></div>
+          <div class="row"><span class="k">Card issuing</span><span class="v">Via Treezor (BaaS)</span></div>
+          <div class="row"><span class="k">Pricing</span><span class="v">Quote-based · from ~€5–6/user/mo + €10 per physical card</span></div>
+          <div class="row"><span class="k">Extras</span><span class="v">IK / mileage option · Flying Blue miles · certified archiving</span></div>
+          <div class="row"><span class="k">Payroll link</span><span class="v">No (accounting, not payroll)</span></div>
+        </div>
+        <div class="rcol r" style="--d:3">
+          <div class="rbox learn"><h4>Strongest at</h4><p>French accounting ecosystem — automated entries, IK handling, legal archiving.</p></div>
+          <div class="rbox rel"><h4>Relevance to us</h4><p>The closest "build-via-BaaS" template (Treezor). Handles mileage, but as accounting, not payroll. Good reference if we lean-out via a BaaS.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANNEX — PLEO -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head" style="margin-bottom:16px">
+        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
+        <div class="rhead r" style="--d:1"><h2>Pleo</h2><span class="pos">Card-first spend management with consumer-grade UX</span></div>
+        <a class="reflink r" style="--d:1" href="https://www.pleo.io/en/business-expense-cards" target="_blank" rel="noopener">pleo.io <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+      </div>
+      <div class="recap">
+        <div class="facts r" style="--d:2">
+          <div class="row"><span class="k">Origin</span><span class="v">Denmark / EU, founded 2015</span></div>
+          <div class="row"><span class="k">Model</span><span class="v">Card-first; also reimbursements &amp; mileage without cards</span></div>
+          <div class="row"><span class="k">Card issuing</span><span class="v">Own EMI, FCA-authorised (Mastercard)</span></div>
+          <div class="row"><span class="k">Pricing</span><span class="v">Public · from ~£9.50/user/mo · free up to 3 users · cashback 0.5–0.75%</span></div>
+          <div class="row"><span class="k">Focus</span><span class="v">SMB, self-serve onboarding, strong employee UX</span></div>
+          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+        </div>
+        <div class="rcol r" style="--d:3">
+          <div class="rbox learn"><h4>Strongest at</h4><p>Instant virtual cards and a consumer-grade employee experience; transparent self-serve pricing.</p></div>
+          <div class="rbox rel"><h4>Relevance to us</h4><p>Best UX and pricing transparency to benchmark. Note it still reimburses out-of-pocket &amp; mileage — proof a card player can't drop the reimbursement flow entirely.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANNEX — EXPENSYA -->
+  <section class="slide light">
+    <div class="inner">
+      <div class="head" style="margin-bottom:16px">
+        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
+        <div class="rhead r" style="--d:1"><h2>Expensya</h2><span class="pos">Expense management that added cards — the closest analog to us</span></div>
+        <a class="reflink r" style="--d:1" href="https://www.expensya.com/en/solutions/payment-cards/" target="_blank" rel="noopener">expensya.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+      </div>
+      <div class="recap">
+        <div class="facts r" style="--d:2">
+          <div class="row"><span class="k">Origin</span><span class="v">France · Expensya by Medius (acquired 2023)</span></div>
+          <div class="row"><span class="k">Model</span><span class="v">Expense mgmt + cards, budgets &amp; travel — one platform</span></div>
+          <div class="row"><span class="k">Card issuing</span><span class="v">Via Adyen issuing (BaaS)</span></div>
+          <div class="row"><span class="k">Pricing</span><span class="v">~€5–8/user/mo (Silver €5 / Gold €8) + enterprise quote</span></div>
+          <div class="row"><span class="k">Markets</span><span class="v">EUR, GBP, SEK, DKK, NOK, PLN · cashback up to 0.5%</span></div>
+          <div class="row"><span class="k">AI</span><span class="v">Anomaly &amp; fraud detection (Medius Copilot)</span></div>
+          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+        </div>
+        <div class="rcol r" style="--d:3">
+          <div class="rbox learn"><h4>Strongest at</h4><p>Expense-management depth plus integrated cards/travel and AI anomaly detection — the closest to an HRIS-adjacent positioning.</p></div>
+          <div class="rbox rel"><h4>Relevance to us</h4><p>The most analogous path: expense-led, adds cards via a BaaS (Adyen) — a lean-in + partner hybrid. Still no payroll link, which remains our opening.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div>
 
-<div class="counter" id="counter">01 / 09</div>
+<div class="counter" id="counter">01 / 15</div>
 <div class="dots" id="dots"></div>
 <div class="nav">
   <button id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
@@ -388,6 +530,33 @@
   });
   setTimeout(()=>document.body.classList.remove('show-hint'), 4200);
   go(0);
+
+  // --- Activation trend chart (bars = total, line = rate) ---
+  (function(){
+    const months=['Jan 25','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan 26','Feb','Mar','Apr','May','Jun'];
+    const totals=[5755,5736,5663,5575,5512,5410,5367,5318,5259,5112,4969,4913,4760,4700,4588,4565,4554,4520];
+    const rates=[31.96,32.10,31.58,30.84,30.51,29.76,29.16,27.97,26.01,24.89,24.19,24.03,22.06,22.01,21.36,21.07,20.88,20.71];
+    const W=1160,H=420,mL=58,mR=56,mT=30,mB=46;
+    const pw=W-mL-mR, ph=H-mT-mB, n=totals.length, slot=pw/n, bw=slot*0.58;
+    const maxT=6000,maxR=40;
+    const yT=v=>mT+ph-(v/maxT)*ph, yR=v=>mT+ph-(v/maxR)*ph, xC=i=>mL+slot*i+slot/2;
+    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Manrope, sans-serif">`;
+    for(let g=0; g<=6000; g+=2000){ const y=yT(g); s+=`<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="#E0E5EB" stroke-width="1"/>`; s+=`<text x="${mL-10}" y="${y+4}" text-anchor="end" font-size="12" fill="#8793A1">${g?g/1000+'k':'0'}</text>`; }
+    for(let i=0;i<n;i++){ const x=xC(i)-bw/2, y=yT(totals[i]), h=mT+ph-y; s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="#0A73EB" opacity="${i===0||i===n-1?'1':'0.88'}"/>`; }
+    let d=''; for(let i=0;i<n;i++){ d+=(i?'L':'M')+xC(i).toFixed(1)+' '+yR(rates[i]).toFixed(1)+' '; }
+    s+=`<path d="${d}" fill="none" stroke="#C98A00" stroke-width="3" stroke-linejoin="round"/>`;
+    for(let i=0;i<n;i++){ s+=`<circle cx="${xC(i).toFixed(1)}" cy="${yR(rates[i]).toFixed(1)}" r="3" fill="#C98A00"/>`; }
+    s+=`<text x="${xC(0)}" y="${(yT(totals[0])-8).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#0A73EB">5,755</text>`;
+    s+=`<text x="${xC(n-1)}" y="${(yT(totals[n-1])-8).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#0A73EB">4,520</text>`;
+    s+=`<text x="${xC(0)}" y="${(yR(rates[0])-10).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#C98A00" stroke="#FFFFFF" stroke-width="3.5" paint-order="stroke">32.0%</text>`;
+    s+=`<text x="${xC(n-1)}" y="${(yR(rates[n-1])-10).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#C98A00" stroke="#FFFFFF" stroke-width="3.5" paint-order="stroke">20.7%</text>`;
+    [0,3,6,9,12,15,17].forEach(i=>{ s+=`<text x="${xC(i).toFixed(1)}" y="${H-mB+22}" text-anchor="middle" font-size="11.5" fill="#626F7E">${months[i]}</text>`; });
+    s+=`<line x1="${mL}" y1="${mT+ph}" x2="${W-mR}" y2="${mT+ph}" stroke="#030E1D" stroke-width="1.5"/>`;
+    s+=`<rect x="${mL}" y="4" width="12" height="12" rx="2" fill="#0A73EB"/><text x="${mL+18}" y="14" font-size="12.5" fill="#626F7E">Activations — total</text>`;
+    s+=`<line x1="${mL+165}" y1="10" x2="${mL+189}" y2="10" stroke="#C98A00" stroke-width="3"/><text x="${mL+195}" y="14" font-size="12.5" fill="#626F7E">Activation rate</text>`;
+    s+=`</svg>`;
+    const el=document.getElementById('activation-chart'); if(el) el.innerHTML=s;
+  })();
 </script>
 </body>
 </html>
