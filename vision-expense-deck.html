@@ -1,562 +1,735 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vision Expense — Opportunities & the Strategic Choice</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vision Expense — Exploration</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#030E1D; --ink2:#0B1C33; --ink3:#13294a;
-    --blue:#0A73EB; --blue-dk:#084385; --ice:#CADCFC;
-    --white:#FFFFFF; --surface:#F5F6F9; --surface2:#F8F9FC; --border:#E0E5EB;
-    --muted:#626F7E; --muted2:#8793A1;
-    --green:#0B993C; --green-bg:#E5FFED;
-    --amber:#C98A00; --amber-bg:#FFF7DB;
-    --pink:#E949A6; --pink-bg:#FCE6F3;
-    --red:#CF1125; --red-bg:#FFEBED;
-    --disp:'Bricolage Grotesque', sans-serif;
-    --body:'Manrope', sans-serif;
+    --canvas:#f8f9fc; --white:#ffffff; --s-low:#f5f6f9; --s-lowest:#eceff4;
+    --ink:#030e1d; --ink-low:#364251; --ink-muted:#626f7e; --ink-disabled:#8793a1;
+    --border:#e0e5eb; --border-strong:#a8b3c1;
+    --primary:#0a73eb; --primary-hover:#0d62c4; --primary-deep:#084385;
+    --primary-deepest:#052d5b; --primary-night:#03162c; --primary-low:#78b6fc; --primary-lowest:#e5f1ff;
+    --danger:#cf1125; --danger-low:#ffccd1; --danger-lowest:#ffebed;
+    --success:#0b993c; --success-low:#bff8d3; --success-lowest:#e5ffed;
+    --warning:#f0ac00; --warning-surface:#ffc800; --warning-lowest:#fff7db;
+    --info:#5fd2ff; --info-lowest:#e6f8ff; --promo:#e949a6; --promo-low:#f9cde6;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   }
-  *{box-sizing:border-box; margin:0; padding:0}
-  html,body{height:100%}
-  body{font-family:var(--body); background:#06101f; color:var(--ink); overflow:hidden; -webkit-font-smoothing:antialiased}
-  .deck{position:fixed; inset:0}
-  .slide{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; visibility:hidden; transition:opacity .45s ease, visibility .45s ease; padding:clamp(26px,4.5vw,72px)}
-  .slide.active{opacity:1; visibility:visible}
-  .inner{width:100%; max-width:1140px}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--primary-night);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden}
+  #viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 120% at 50% 0%,#0a1f3d 0%,#03162c 60%,#020a16 100%)}
+  #scaler{width:1280px;height:720px;position:relative;transform-origin:center center}
+  .stage{position:absolute;inset:0;background:var(--canvas);overflow:hidden;border-radius:4px;box-shadow:0 40px 120px -30px rgba(0,0,0,.6)}
 
-  .light{background:var(--white)}
-  .dark{background:radial-gradient(120% 120% at 88% -15%, rgba(10,115,235,.20) 0%, transparent 55%), var(--ink)}
-  .dark, .dark .muted{color:var(--white)}
+  /* progress bar */
+  #progress{position:absolute;top:0;left:0;height:4px;background:var(--primary);width:0;z-index:60;transition:width .45s cubic-bezier(.16,1,.3,1)}
 
-  .eyebrow{font-family:var(--disp); font-weight:700; font-size:clamp(11px,1vw,13px); letter-spacing:.18em; text-transform:uppercase}
-  .eyebrow.blue{color:var(--blue)} .eyebrow.pink{color:var(--pink)}
-  h1{font-family:var(--disp); font-weight:800; font-size:clamp(44px,7vw,86px); line-height:.98; letter-spacing:-.02em}
-  h2{font-family:var(--disp); font-weight:700; font-size:clamp(28px,4.2vw,50px); line-height:1.02; letter-spacing:-.015em; color:var(--ink)}
-  .dark h2{color:var(--white)}
-  .lead{font-size:clamp(15px,1.45vw,19px); color:var(--muted); line-height:1.5}
-  .dark .lead{color:var(--ice)}
-  p{line-height:1.5}
+  /* slides */
+  .slide{position:absolute;inset:0;padding:56px 72px 60px;display:none;flex-direction:column;opacity:0;transition:opacity .5s ease}
+  .slide.active{display:flex;opacity:1}
+  .slide.dark{background:var(--primary-night)}
+  .slide.deep{background:linear-gradient(135deg,#084385 0%,#052d5b 55%,#03162c 100%)}
 
-  .slide.active .r{animation:rise .55s cubic-bezier(.2,.7,.2,1) both; animation-delay:calc(var(--d,0)*70ms)}
-  @keyframes rise{from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:none}}
+  /* reveal animation */
+  [data-reveal]{opacity:0;transform:translateY(14px);transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1)}
+  .slide.active [data-reveal]{opacity:1;transform:none}
 
-  .head{margin-bottom:clamp(16px,2.6vw,32px)}
-  .head .eyebrow{margin-bottom:10px; display:block}
-  .grid{display:grid; gap:16px}
-  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  /* kicker + title */
+  .kicker{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);margin-bottom:18px}
+  .kicker.on-dark{color:var(--primary-low)}
+  h1.title{font-size:40px;line-height:46px;font-weight:600;color:var(--ink);letter-spacing:-.02em;max-width:980px}
+  h1.title .accent{color:var(--primary)}
+  .lead{font-size:18px;line-height:27px;color:var(--ink-low);max-width:880px;margin-top:18px;font-weight:400}
 
-  .card{background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px}
-  .card h3{font-family:var(--disp); font-weight:700; font-size:clamp(17px,1.6vw,20px); margin-bottom:8px; color:var(--ink)}
-  .card p{font-size:14px; color:var(--muted)}
-  .ic{width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; margin-bottom:16px}
-  .ic svg{width:24px; height:24px}
+  /* footer */
+  .foot{position:absolute;left:72px;right:72px;bottom:24px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--ink-disabled);letter-spacing:.04em}
+  .foot.on-dark{color:rgba(255,255,255,.5)}
+  .foot .internal{font-weight:600;letter-spacing:.16em}
 
-  .banner{margin-top:20px; background:var(--ink); color:#fff; border-radius:16px; padding:18px 24px; font-family:var(--disp); font-weight:600; font-size:clamp(14px,1.35vw,17px)}
-  .banner b{color:#fff} .banner span{color:var(--ice)}
+  /* blobs */
+  .blob{position:absolute;pointer-events:none;opacity:.9}
 
-  .stat{background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:22px 16px; text-align:center}
-  .stat .v{font-family:var(--disp); font-weight:800; font-size:clamp(26px,3.2vw,42px); line-height:1; letter-spacing:-.02em}
-  .stat .l{font-size:12.5px; color:var(--muted); margin-top:12px; line-height:1.25}
+  /* ---- TITLE ---- */
+  .cover-tag{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid rgba(120,182,252,.4);border-radius:9999px;color:var(--primary-low);font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .cover-tag .dot{width:7px;height:7px;border-radius:50%;background:var(--info);box-shadow:0 0 12px var(--info)}
+  .cover-h{font-size:72px;line-height:74px;font-weight:600;color:#fff;letter-spacing:-.03em;margin-top:30px}
+  .cover-h .x{color:var(--primary-low);font-weight:400;margin:0 6px}
+  .cover-sub{font-size:20px;color:rgba(255,255,255,.72);margin-top:22px;max-width:620px;line-height:30px;font-weight:400}
+  .cover-meta{margin-top:auto;display:flex;gap:48px;align-items:flex-end}
+  .cover-meta .col .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:6px}
+  .cover-meta .col .val{font-size:15px;color:rgba(255,255,255,.9);font-weight:500;line-height:22px}
+  .navhint{position:absolute;right:72px;bottom:54px;display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.5);font-size:13px}
+  .navhint kbd{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;padding:0 6px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:rgba(255,255,255,.06);font-family:var(--font);font-size:13px;color:rgba(255,255,255,.8)}
 
-  .req{background:linear-gradient(180deg,#fff,#f8f9fc); border:1.5px solid var(--blue); border-radius:18px; padding:18px; display:flex; flex-direction:column; gap:7px; transition:transform .2s ease, box-shadow .2s ease}
-  .req:hover{transform:translateY(-3px); box-shadow:0 14px 30px rgba(10,115,235,.12)}
-  .req .num{font-family:var(--disp); font-weight:800; color:var(--blue); font-size:13px; letter-spacing:.1em}
-  .req .t{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:var(--ink)}
-  .req .d{font-size:13px; color:var(--muted)}
+  /* ---- generic layout helpers ---- */
+  .body{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .grid{display:grid;gap:18px}
+  .card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .card .ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .card h3{font-size:17px;font-weight:600;color:var(--ink);line-height:23px}
+  .card p{font-size:14px;line-height:21px;color:var(--ink-low);margin-top:8px}
+  .num{font-variant-numeric:tabular-nums}
 
-  .strengths{display:flex; flex-wrap:wrap; gap:10px}
-  .chip{display:inline-flex; align-items:center; gap:8px; background:var(--green-bg); color:#155f2c; border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600}
-  .chip svg{width:15px; height:15px; color:var(--green)}
+  /* stat blocks */
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:8px}
+  .stat{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:22px 22px 20px}
+  .stat .v{font-size:42px;font-weight:600;color:var(--ink);letter-spacing:-.02em;line-height:1}
+  .stat .v.down{color:var(--danger)}
+  .stat .v small{font-size:20px;font-weight:600}
+  .stat .k{font-size:13px;color:var(--ink-muted);margin-top:10px;line-height:18px}
+  .stat .sub{font-size:12px;color:var(--ink-disabled);margin-top:6px}
 
-  /* defensible — two blocks */
-  .blk{border-radius:16px; padding:24px}
-  .blk .tag{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.14em; text-transform:uppercase; display:block; margin-bottom:10px}
-  .blk h3{font-family:var(--disp); font-weight:700; font-size:clamp(18px,2vw,24px); margin-bottom:10px; line-height:1.05}
-  .blk p{font-size:clamp(13px,1.3vw,15px); line-height:1.45}
-  .blk.bad{background:rgba(255,255,255,.04); border:1px solid #1e3656}
-  .blk.bad .tag{color:var(--muted2)} .blk.bad h3{color:#cfd8e6} .blk.bad p{color:#9fb0c6}
-  .blk.good{background:var(--ink2); border:1.5px solid var(--blue)}
-  .blk.good .tag{color:var(--blue)} .blk.good h3{color:#fff} .blk.good p{color:var(--ice)}
-  .blk.good ul{list-style:none; margin-top:6px; display:flex; flex-direction:column; gap:9px}
-  .blk.good li{display:flex; gap:10px; font-size:clamp(13px,1.3vw,15px); color:var(--ice); line-height:1.35}
-  .blk.good li b{color:#fff}
-  .dot-b{width:7px;height:7px;border-radius:50%;background:var(--blue);margin-top:7px;flex-shrink:0}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:9999px;font-size:12px;font-weight:600;letter-spacing:.02em}
+  .pill.blue{background:var(--primary-lowest);color:var(--primary-deep)}
+  .pill.red{background:var(--danger-lowest);color:var(--danger)}
+  .pill.green{background:var(--success-lowest);color:var(--success)}
+  .pill.amber{background:var(--warning-lowest);color:var(--warning)}
+  .pill.grey{background:var(--s-lowest);color:var(--ink-muted)}
 
-  /* fork */
-  .fork{display:grid; grid-template-columns:1fr 1fr; gap:18px}
-  .pole{border-radius:18px; padding:22px 24px; display:flex; flex-direction:column}
-  .pole .ph{display:flex; align-items:center; gap:12px; margin-bottom:6px}
-  .pole .pic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .pole .pic svg{width:21px;height:21px;color:#fff}
-  .pole .lbl{font-family:var(--disp); font-weight:700; font-size:11px; letter-spacing:.12em; text-transform:uppercase}
-  .pole h3{font-family:var(--disp); font-weight:700; font-size:clamp(18px,1.9vw,23px); color:var(--ink); line-height:1.05; margin-bottom:12px}
-  .pole ul{list-style:none; display:flex; flex-direction:column; gap:8px; flex:1}
-  .pole li{display:flex; gap:9px; font-size:13.5px; color:#33414f; line-height:1.35}
-  .pole li svg{width:15px;height:15px;flex-shrink:0;margin-top:2px}
-  .pole .to{margin-top:14px; padding-top:12px; border-top:1px dashed var(--border); font-size:12.5px; color:var(--muted)}
-  .pole .to b{color:var(--ink)}
-  .pole.out{background:var(--pink-bg); border:1px solid #f3c6e2} .pole.out .pic{background:var(--pink)} .pole.out .lbl{color:var(--pink)} .pole.out li svg{color:var(--pink)}
-  .pole.inn{background:var(--green-bg); border:1px solid #bfe9cd} .pole.inn .pic{background:var(--green)} .pole.inn .lbl{color:var(--green)} .pole.inn li svg{color:var(--green)}
-  .forknote{margin-top:16px; text-align:center; font-family:var(--disp); font-weight:600; font-size:clamp(13px,1.3vw,16px); color:var(--ink)}
-  .forknote b{color:var(--blue)}
+  /* fork columns */
+  .fork{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:16px;align-items:stretch}
+  .fork .lane{border-radius:16px;padding:22px;display:flex;flex-direction:column;border:1px solid var(--border);background:var(--white)}
+  .fork .lane.hero{background:linear-gradient(160deg,#0a73eb 0%,#0b56ac 100%);border-color:transparent;box-shadow:0 18px 40px -16px rgba(10,115,235,.55)}
+  .fork .lane .tag{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-muted)}
+  .fork .lane.hero .tag{color:rgba(255,255,255,.8)}
+  .fork .lane h3{font-size:19px;font-weight:600;color:var(--ink);margin-top:8px;line-height:24px}
+  .fork .lane.hero h3{color:#fff}
+  .fork .lane p{font-size:13px;line-height:20px;color:var(--ink-low);margin-top:10px}
+  .fork .lane.hero p{color:rgba(255,255,255,.88)}
+  .fork .lane .ft{margin-top:auto;padding-top:14px;font-size:12px;color:var(--ink-muted)}
+  .fork .lane.hero .ft{color:rgba(255,255,255,.78);border-top:1px solid rgba(255,255,255,.18)}
+  .fork .lane .badge{align-self:flex-start;margin-bottom:2px}
 
-  /* AI */
-  .commodity{display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--muted2); border-radius:12px; padding:14px 18px; margin-bottom:18px; font-size:13.5px; color:var(--muted)}
-  .commodity b{color:var(--ink)} .commodity svg{width:18px;height:18px;color:var(--muted2);flex-shrink:0}
-  .mini{background:#fff; border:1px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:0 4px 14px rgba(3,14,29,.04)}
-  .mini .mic{width:34px;height:34px;border-radius:9px;background:#E6F0FF;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-  .mini .mic svg{width:18px;height:18px;color:var(--blue)}
-  .mini h4{font-family:var(--disp); font-weight:700; font-size:14.5px; color:var(--ink); margin-bottom:4px}
-  .mini p{font-size:12.5px; color:var(--muted); line-height:1.35}
+  /* two-col */
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .cols.wide{grid-template-columns:1.1fr .9fr}
 
-  /* references + table */
-  .refs{display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px}
-  .ref{display:inline-flex; align-items:center; gap:10px; text-decoration:none; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:11px 15px; transition:border-color .2s, transform .2s}
-  .ref:hover{border-color:var(--pink); transform:translateY(-2px)}
-  .ref b{font-family:var(--disp); color:var(--pink); font-size:15px}
-  .ref span{color:var(--muted); font-size:12.5px}
-  .ref svg{width:14px;height:14px;color:var(--muted2)}
-  table{width:100%; border-collapse:separate; border-spacing:0; font-size:clamp(10.5px,1vw,13px)}
-  thead th{font-family:var(--disp); font-weight:700; text-align:left; padding:10px 10px; color:var(--ink); border-bottom:2px solid var(--ink)}
-  thead th:first-child{color:var(--muted); font-weight:600}
-  tbody td{padding:9px 10px; border-bottom:1px solid var(--border); color:var(--ink); vertical-align:top}
-  tbody tr td:first-child{font-weight:600; color:var(--muted)}
-  tbody tr:last-child td{border-bottom:none}
-  .moat-row td{background:var(--surface2)} .no{color:var(--muted2); font-weight:600}
-  .note{margin-top:12px; font-size:13px; color:var(--muted)} .note b{color:var(--pink)}
-  #activation-chart{width:100%; margin-top:2px} #activation-chart svg{display:block; width:100%; height:auto}
+  .panel{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px}
+  .panel.tint{background:var(--primary-lowest);border-color:#cfe4ff}
+  .panel.danger{background:var(--danger-lowest);border-color:var(--danger-low)}
+  .panel.muted{background:var(--s-low)}
+  .panel h4{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px}
+  .panel .ph{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-muted);margin-bottom:14px}
+
+  ul.clean{list-style:none}
+  ul.clean li{position:relative;padding-left:22px;font-size:14px;line-height:22px;color:var(--ink-low);margin-bottom:11px}
+  ul.clean li:last-child{margin-bottom:0}
+  ul.clean li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:2px;background:var(--primary)}
+  ul.clean li b{color:var(--ink);font-weight:600}
+  ul.clean.dash li::before{background:var(--border-strong)}
+  ul.clean.red li::before{background:var(--danger)}
+  ul.clean.green li::before{background:var(--success)}
+
+  /* table */
+  table.bench{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--white);border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+  table.bench th{background:var(--primary-deepest);color:#fff;text-align:left;padding:12px 14px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+  table.bench td{padding:12px 14px;border-top:1px solid var(--border);color:var(--ink-low);vertical-align:top;line-height:17px}
+  table.bench tr.us td{background:var(--primary-lowest);color:var(--ink);font-weight:500}
+  table.bench td b{color:var(--ink);font-weight:600}
+  .nolink{color:var(--ink-disabled);font-weight:600}
+  .yeslink{color:var(--success);font-weight:700}
+
+  /* steps */
+  .steps{display:flex;flex-direction:column;gap:11px}
+  .step{display:flex;align-items:flex-start;gap:14px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+  .step .own{flex:0 0 168px;font-size:13px;font-weight:600;color:var(--ink)}
+  .step .own span{display:block;font-size:11px;color:var(--ink-muted);font-weight:400;margin-top:2px}
+  .step .what{flex:1;font-size:13.5px;color:var(--ink-low);line-height:19px}
+  .step .what b{color:var(--ink);font-weight:600}
+  .sdot{flex:0 0 auto;width:11px;height:11px;border-radius:50%;margin-top:5px}
+  .sdot.done{background:var(--success)}
+  .sdot.now{background:var(--danger)}
+  .sdot.next{background:var(--warning-surface)}
+  .sdot.later{background:var(--success-low);border:1px solid var(--success)}
+
+  .legend{display:flex;gap:18px;margin-top:14px;font-size:12px;color:var(--ink-muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:9px;height:9px;border-radius:50%}
 
   /* questions */
-  .q{background:var(--ink2); border:1px solid #1e3656; border-radius:16px; padding:20px; display:flex; gap:15px; align-items:flex-start}
-  .q .qic{width:42px;height:42px;border-radius:11px;background:var(--blue);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .q .qic svg{width:21px;height:21px;color:#fff}
-  .q h3{font-family:var(--disp); font-weight:700; font-size:clamp(15px,1.5vw,18px); color:#fff; margin-bottom:5px}
-  .q p{font-size:13px; color:var(--ice)}
+  .qlist{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .q{display:flex;gap:14px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px}
+  .q .qn{flex:0 0 auto;width:30px;height:30px;border-radius:8px;background:var(--primary-lowest);color:var(--primary-deep);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+  .q p{font-size:13.5px;line-height:20px;color:var(--ink-low)}
+  .q p b{color:var(--ink);font-weight:600}
 
-  /* annex recap */
-  .rhead{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
-  .rhead h2{font-size:clamp(26px,3.4vw,40px)}
-  .rhead .pos{font-size:clamp(13px,1.3vw,15px); color:var(--muted)}
-  .reflink{display:inline-flex; align-items:center; gap:6px; color:var(--blue); text-decoration:none; font-size:12.5px; font-weight:600; margin-top:8px}
-  .reflink svg{width:12px;height:12px}
-  .recap{display:grid; grid-template-columns:1.05fr 1fr; gap:24px; margin-top:6px}
-  .facts{display:flex; flex-direction:column}
-  .facts .row{display:grid; grid-template-columns:120px 1fr; gap:14px; padding:11px 0; border-bottom:1px solid var(--border); font-size:13.5px; line-height:1.35}
-  .facts .row:last-child{border-bottom:none}
-  .facts .k{color:var(--muted); font-weight:600}
-  .facts .v{color:var(--ink)}
-  .rcol{display:flex; flex-direction:column; gap:14px}
-  .rbox{border-radius:14px; padding:18px 20px}
-  .rbox h4{font-family:var(--disp); font-weight:700; font-size:12px; letter-spacing:.08em; text-transform:uppercase; margin-bottom:8px}
-  .rbox p{font-size:13.5px; line-height:1.45}
-  .rbox.learn{background:var(--surface); border:1px solid var(--border)} .rbox.learn h4{color:var(--muted)} .rbox.learn p{color:var(--ink)}
-  .rbox.rel{background:#E6F0FF; border:1px solid #cfe0fb} .rbox.rel h4{color:var(--blue)} .rbox.rel p{color:var(--ink)}
+  /* mini chart */
+  .trend{display:flex;align-items:flex-end;gap:0;height:150px;padding:0 4px}
+  .ico{stroke-width:0;fill:currentColor}
 
-  .motif{position:absolute; top:-60px; right:-40px; width:420px; height:260px; transform:rotate(16deg); border-radius:24px; background:linear-gradient(135deg, rgba(10,115,235,.35), rgba(233,73,166,.18))}
-  .motif.b{top:60px; right:-120px; width:380px; height:240px; background:linear-gradient(135deg, rgba(233,73,166,.16), rgba(10,115,235,.05))}
+  .note{font-size:12px;color:var(--ink-muted);margin-top:14px;line-height:18px}
+  .note b{color:var(--ink-low)}
 
-  .bar{position:fixed; top:0; left:0; height:3px; background:var(--blue); width:0; z-index:50; transition:width .35s ease}
-  .nav{position:fixed; bottom:22px; right:26px; display:flex; gap:10px; z-index:50}
-  .nav button{width:44px;height:44px;border-radius:50%; border:1px solid var(--border); background:rgba(255,255,255,.9); backdrop-filter:blur(6px); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s, transform .2s}
-  .nav button:hover{background:#fff; transform:translateY(-2px)}
-  .nav svg{width:20px;height:20px;color:var(--ink)}
-  .nav button:disabled{opacity:.35; cursor:default; transform:none}
-  .dots{position:fixed; bottom:30px; left:50%; transform:translateX(-50%); display:flex; gap:9px; z-index:50}
-  .dot{width:8px;height:8px;border-radius:50%; background:var(--muted2); opacity:.4; cursor:pointer; transition:opacity .2s, transform .2s, background .2s}
-  .dot.on{opacity:1; background:var(--blue); transform:scale(1.3)}
-  .counter{position:fixed; bottom:30px; left:26px; z-index:50; font-family:var(--disp); font-weight:700; font-size:13px; color:var(--muted); letter-spacing:.08em}
-  .brand{position:fixed; top:20px; left:26px; z-index:40; font-family:var(--disp); font-weight:800; font-size:14px; color:var(--blue)}
-  .hint{position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(34px); font-size:11px; color:var(--muted2); z-index:40; opacity:0; transition:opacity .4s}
-  body.show-hint .hint{opacity:1}
+  /* dark slide content */
+  .slide.deep h1.title,.slide.dark h1.title{color:#fff}
+  .slide.deep .lead,.slide.dark .lead{color:rgba(255,255,255,.8)}
 
-  @media (max-width:880px){
-    .g4,.g3,.g2,.fork{grid-template-columns:1fr}
-    table{font-size:11.5px} thead th,tbody td{padding:8px}
-    .motif{width:240px;height:150px;right:-30px}
-  }
+  /* dots nav */
+  #dots{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:70}
+  #dots button{width:8px;height:8px;border-radius:50%;border:0;background:rgba(255,255,255,.28);cursor:pointer;padding:0;transition:.25s}
+  #dots button.active{background:#fff;width:22px;border-radius:9999px}
+  #dots button:hover{background:rgba(255,255,255,.6)}
+  #counter{position:fixed;top:16px;right:20px;z-index:70;color:rgba(255,255,255,.6);font-size:13px;font-family:var(--font);letter-spacing:.05em;font-variant-numeric:tabular-nums}
+
+  .clickzone{position:absolute;top:0;bottom:0;width:18%;z-index:50;cursor:pointer}
+  #zprev{left:0}#znext{right:0}
 </style>
 </head>
-<body class="show-hint">
+<body>
+<div id="viewport">
+  <div id="scaler">
+    <div class="stage" id="stage">
+      <div id="progress"></div>
 
-<div class="bar" id="bar"></div>
-<div class="brand">PayFit</div>
-
-<div class="deck" id="deck">
-
-  <!-- 1 — TITLE -->
-  <section class="slide dark active">
-    <div class="motif"></div><div class="motif b"></div>
-    <div class="inner">
-      <span class="eyebrow blue r" style="--d:0">PayFit · Discovery S1 2026 · Design × Product × Strategy</span>
-      <h1 class="r" style="--d:1; color:#fff; margin:18px 0 18px">Vision Expense</h1>
-      <p class="lead r" style="--d:2; font-size:clamp(18px,2vw,26px); color:var(--ice); max-width:820px">Opportunities &amp; bets — and the strategic questions to explore together.</p>
-    </div>
-  </section>
-
-  <!-- 2 — WHY NOW -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">The moment</span><h2 class="r" style="--d:1">Why now</h2></div>
-      <div class="grid g3">
-        <div class="card r" style="--d:2">
-          <div class="ic" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="#C98A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
-          <h3>Usage is declining</h3><p>A widely-used feature, yet −14% submissions YoY (May 25 → May 26). The signal isn't disinterest — it's a real, accelerating decline.</p>
+      <!-- 1 — COVER -->
+      <section class="slide deep active" data-label="">
+        <svg class="blob" style="top:-120px;right:-140px;width:560px" viewBox="0 0 200 200"><path fill="rgba(120,182,252,.14)" d="M44,-66C56,-57,64,-43,69,-28C74,-13,75,4,71,20C67,36,57,51,43,61C29,71,11,76,-7,77C-25,78,-44,75,-58,64C-72,53,-81,34,-83,15C-85,-4,-80,-24,-69,-39C-58,-54,-41,-64,-24,-70C-7,-76,11,-78,27,-75C43,-72,32,-75,44,-66Z" transform="translate(100 100)"/></svg>
+        <svg class="blob" style="bottom:-160px;left:-120px;width:480px" viewBox="0 0 200 200"><path fill="rgba(10,115,235,.18)" d="M38,-58C50,-50,60,-38,66,-24C72,-10,74,6,69,20C64,34,52,47,38,57C24,67,8,74,-9,76C-26,78,-45,75,-58,64C-71,53,-78,34,-80,15C-82,-5,-79,-25,-68,-40C-57,-55,-39,-65,-22,-69C-5,-73,10,-71,38,-58Z" transform="translate(100 100)"/></svg>
+        <div data-reveal style="transition-delay:.05s"><span class="cover-tag"><span class="dot"></span>Exploration — not a decision</span></div>
+        <h1 class="cover-h" data-reveal style="transition-delay:.15s">Vision <span style="color:var(--primary-low)">Expense</span></h1>
+        <p class="cover-sub" data-reveal style="transition-delay:.25s">Where the Expense module stands, what's defensible, and the product × business forks worth exploring — e-cards, payroll-native depth, and AI.</p>
+        <div class="cover-meta">
+          <div class="col" data-reveal style="transition-delay:.4s"><div class="lbl">For</div><div class="val">Strategy review — Pierre-Marie de Haut de Sigy<br>with Inès Salhi (CPO) &amp; Margaux Choplin (PM)</div></div>
+          <div class="col" data-reveal style="transition-delay:.5s"><div class="lbl">Owner</div><div class="val">Damien Boyer — Design Director<br>June 2026</div></div>
         </div>
-        <div class="card r" style="--d:3">
-          <div class="ic" style="background:#E6F0FF"><svg viewBox="0 0 24 24" fill="none" stroke="#0A73EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div>
-          <h3>A tech refactor is coming</h3><p>The ideal window to bake vision into the rebuild — not just clear technical debt.</p>
-        </div>
-        <div class="card r" style="--d:4">
-          <div class="ic" style="background:var(--pink-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="#E949A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-          <h3>Market &amp; regulation move</h3><p>Competitors gone card-first (Spendesk, Mooncard, Pleo) and the 2026 e-invoicing mandate.</p>
-        </div>
-      </div>
-      <div class="banner r" style="--d:5"><span>Competitors are removing the very friction our model rests on —</span> <b>which opens a real strategic question about where we play next.</b></div>
-    </div>
-  </section>
+        <div class="navhint" data-reveal style="transition-delay:.6s"><kbd>←</kbd><kbd>→</kbd><span>to navigate</span></div>
+        <div class="foot on-dark"><span></span><span class="internal">INTERNAL</span></div>
+      </section>
 
-  <!-- 3 — NUMBERS -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">What we know · business</span><h2 class="r" style="--d:1">Expense today, in numbers</h2></div>
-      <div class="grid g4">
-        <div class="stat r" style="--d:2"><div class="v" style="color:var(--blue)">~€100k</div><div class="l">MRR</div></div>
-        <div class="stat r" style="--d:3"><div class="v" style="color:var(--ink)">80k</div><div class="l">employees rolled out (~35% of base)</div></div>
-        <div class="stat r" style="--d:4"><div class="v" style="color:var(--ink)">€1–3</div><div class="l">per employee / mo · list price, often discounted (≈€1 in UK/ES)</div></div>
-        <div class="stat r" style="--d:5"><div class="v" style="color:var(--amber)">−14%</div><div class="l">submissions YoY · 50.3k → 43.4k (May 25→26)</div></div>
-      </div>
-      <div class="banner r" style="--d:6">
-        <b>Popular and widely used — but low-ARPU and eroding.</b>
-        <span style="display:block; font-family:var(--body); font-weight:400; font-size:14px; margin-top:8px; color:var(--ice)">An HRIS add-on priced as a commodity. That low ARPU is exactly why the business-model question — interchange, premium tiers — is worth opening now.</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3b — THE DECLINE IN DATA -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">What we know · the trend</span><h2 class="r" style="--d:1">The decline, in data</h2></div>
-      <div class="r" id="activation-chart" style="--d:2"></div>
-      <p class="note r" style="--d:3"><b style="color:var(--amber)">−21% activations, −11 pts activation rate since Jan 2025.</b> Companies activating Expenses and the activation rate both fall every quarter — the −14% in submissions is the symptom of a top-to-bottom decline, not a blip.</p>
-    </div>
-  </section>
-
-  <!-- 4 — REQUESTS -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">What we know · usage</span><h2 class="r" style="--d:1">What customers are asking for</h2></div>
-      <div class="strengths r" style="--d:2">
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Smooth, appreciated mobile submission</span>
-        <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> HRIS cornerstone for SMBs</span>
-      </div>
-      <div class="grid g4" style="margin-top:20px">
-        <div class="req r" style="--d:3"><span class="num">01</span><span class="t">Bulk submission</span><span class="d">Submit many expenses at once, in a single confirmation.</span></div>
-        <div class="req r" style="--d:4"><span class="num">02</span><span class="t">Custom categories</span><span class="d">Company-specific tags and category management.</span></div>
-        <div class="req r" style="--d:5"><span class="num">03</span><span class="t">Double validation</span><span class="d">Manager + accountant approval flow.</span></div>
-        <div class="req r" style="--d:6"><span class="num">04</span><span class="t">Auto policy validation</span><span class="d">Rule-based automatic approval against policy.</span></div>
-      </div>
-      <p class="note r" style="--d:7"><b style="color:var(--blue)">Worth noting:</b> the strongest requests (double validation, custom categories) reach into admin/manager profiles — a scope boundary to watch.</p>
-    </div>
-  </section>
-
-  <!-- 5 — WHAT'S ACTUALLY DEFENSIBLE -->
-  <section class="slide dark">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">Let's be honest about the moat</span><h2 class="r" style="--d:1; color:#fff">What's actually defensible</h2></div>
-      <div class="grid g2">
-        <div class="blk bad r" style="--d:2">
-          <span class="tag">Not the moat</span>
-          <h3>Being "linked to payroll", on its own</h3>
-          <p>For ordinary out-of-pocket spend, the payslip line only exists because the employee fronts the cash. It's a by-product of a friction — and the market is busy removing that friction. We shouldn't sell it as an asset.</p>
+      <!-- 2 — WHY NOW -->
+      <section class="slide" data-label="01 · Context">
+        <div class="kicker" data-reveal>01 · Context</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Why look at this <span class="accent">now</span></h1>
+        <div class="body">
+          <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+            <div class="card" data-reveal style="transition-delay:.15s">
+              <div class="ic" style="background:var(--warning-lowest);color:var(--warning)">⏱</div>
+              <h3>A stalled feature</h3>
+              <p>The module has barely evolved — a "2010-era" expense experience versus a fast-moving market.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.25s">
+              <div class="ic" style="background:var(--danger-lowest);color:var(--danger)">↓</div>
+              <h3>Declining usage</h3>
+              <p>The drop runs top-to-bottom of the funnel — activations, activation rate and submissions all down YoY.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.35s">
+              <div class="ic" style="background:var(--primary-lowest);color:var(--primary)">⟲</div>
+              <h3>A refactor ahead</h3>
+              <p>A technical rebuild is coming — a rare window to rethink the product, not just patch it.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.45s">
+              <div class="ic" style="background:var(--info-lowest);color:var(--info)">◎</div>
+              <h3>Direction of travel</h3>
+              <p>Pure players get painted into a corner; integrated "people + finance OS" platforms win the long game.</p>
+            </div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.55s">Sponsor: <b>Inès Salhi</b>. This deck is the entry point to an exploration phase — we want Strategy's input on where it's most relevant to dig.</p>
         </div>
-        <div class="blk good r" style="--d:3">
-          <span class="tag">The real moat</span>
-          <h3>Two things no spend tool can copy</h3>
-          <ul>
-            <li><span class="dot-b"></span><span><b>The payroll engine + SMB base + distribution.</b> Expense rides on top of it.</span></li>
-            <li><span class="dot-b"></span><span><b>The payroll-native items:</b> mileage (IK), meal allowances, benefits in kind — anything under social contributions. They must be processed in payroll; URSSAF treatment is non-trivial; a card doesn't remove that.</span></li>
-          </ul>
-        </div>
-      </div>
-      <p class="lead r" style="--d:4; margin-top:16px">Our edge isn't "we connect to payroll" — it's <b style="color:#fff">owning the payroll-native slice no spend tool can touch.</b></p>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 02</span></div>
+      </section>
 
-  <!-- 6 — THE STRATEGIC FORK -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">A direction to explore together</span><h2 class="r" style="--d:1">A strategic fork to explore</h2></div>
-      <div class="fork">
-        <div class="pole out r" style="--d:2">
-          <div class="ph"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><span class="lbl">Lean out → spend</span></div>
-          <h3>Go card-first</h3>
-          <ul>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Remove the advance, capture spend in real time, monetize via interchange.</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Build via BaaS (Treezor, Swan, Stripe Issuing) <i>or</i> partner with an existing player (Qonto).</span></li>
-          </ul>
-          <div class="to"><b>Trade-off:</b> decouples general spend from payroll; adds regulatory &amp; ops load.</div>
+      <!-- 3 — IN NUMBERS -->
+      <section class="slide" data-label="02 · Where we are">
+        <div class="kicker" data-reveal>02 · Where we are</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Expense, in numbers</h1>
+        <div class="body">
+          <div class="stat-row">
+            <div class="stat" data-reveal style="transition-delay:.15s"><div class="v num">~€100<small>k</small></div><div class="k">MRR today</div><div class="sub">vs ~€76k pre-realignment</div></div>
+            <div class="stat" data-reveal style="transition-delay:.23s"><div class="v num">80<small>k</small></div><div class="k">Employees deployed</div><div class="sub">~35% of our base</div></div>
+            <div class="stat" data-reveal style="transition-delay:.31s"><div class="v num">33<small>%</small></div><div class="k">Company equipment rate</div><div class="sub">lower in HBR — 12%</div></div>
+            <div class="stat" data-reveal style="transition-delay:.39s"><div class="v num">€1–3</div><div class="k">Price / employee / month</div><div class="sub">heavily discounted · ~€1 in UK/ES</div></div>
+          </div>
+          <div class="cols" style="margin-top:18px">
+            <div class="panel tint" data-reveal style="transition-delay:.5s">
+              <div class="ph">Strength</div>
+              <ul class="clean">
+                <li>A genuine <b>SMB HRIS pillar</b>, with the full chain through to the payslip</li>
+                <li>Mobile submission is <b>well liked</b> by employees</li>
+                <li>Price realignment has lifted MRR while ARPU stays structurally low</li>
+              </ul>
+            </div>
+            <div class="panel muted" data-reveal style="transition-delay:.58s">
+              <div class="ph">Caveat on the economics</div>
+              <ul class="clean dash">
+                <li>Historically <b>~47% of companies paid nothing</b> — large negotiated contracts + legacy free grants</li>
+                <li>ARPE is uneven across segments and being realigned toward €3</li>
+                <li>Margin is very high (≈98%) — which is exactly what made us protective of it</li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="pole inn r" style="--d:3">
-          <div class="ph"><div class="pic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg></div><span class="lbl">Lean in → payroll-native depth</span></div>
-          <h3>Deepen where we're unique</h3>
-          <ul>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>IK / mileage, allowances, benefits, real-time cumulation, compliance (e-invoicing).</span></li>
-            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span>Cards stay out of scope, or partner-only.</span></li>
-          </ul>
-          <div class="to"><b>Trade-off:</b> smaller surface; doesn't answer the "spend platform" market move.</div>
-        </div>
-      </div>
-      <p class="forknote r" style="--d:4">Both pull on the same resource — the payroll link. <b>Worth exploring as directions, not a verdict — and AI is the cross-cutting lever on either path.</b></p>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 03</span></div>
+      </section>
 
-  <!-- 7 — AI BEYOND PROCESSING -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">The cross-cutting lever</span><h2 class="r" style="--d:1">AI: beyond processing</h2></div>
-      <div class="commodity r" style="--d:2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>OCR &amp; pre-fill = table stakes</b> — already handled well by our partner Mindee. Not where the differentiation lies.</span></div>
-      <p class="lead r" style="--d:3; margin-bottom:16px">Where AI changes the job-to-be-done for the company — an open exploration:</p>
-      <div class="grid g3" style="margin-top:16px">
-        <div class="mini r" style="--d:4"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3a9 9 0 1 0 9 9"/><path d="M21 3v6h-6"/></svg></div><h4>Policy &amp; compliance automation</h4><p>Auto-validate against rules, CCN and URSSAF logic.</p></div>
-        <div class="mini r" style="--d:5"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.3a2 2 0 0 1 3.4 0l8 14A2 2 0 0 1 20 20H4a2 2 0 0 1-1.7-2.7z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg></div><h4>Anomaly &amp; fraud detection</h4><p>Flag duplicates, out-of-policy and suspicious spend.</p></div>
-        <div class="mini r" style="--d:6"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h4>Conversational / agentic capture</h4><p>"Forward the receipt" — the rest is done for you.</p></div>
-        <div class="mini r" style="--d:7"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="3" x2="3" y2="21"/><line x1="3" y1="21" x2="21" y2="21"/><polyline points="7 14 11 9 15 12 20 6"/></svg></div><h4>Predictive budgets</h4><p>Real-time spend guidance and forecasting for finance.</p></div>
-        <div class="mini r" style="--d:8"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 15l2 2 4-4"/></svg></div><h4>Automated month-end close</h4><p>From expense to accounting entry, end to end.</p></div>
-        <div class="mini r" style="--d:9"><div class="mic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><h4>Spend intelligence</h4><p>Insights for finance &amp; HR across the whole base.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8 — E-CARDS FOCUS -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head"><span class="eyebrow pink r" style="--d:0">In focus · e-cards</span><h2 class="r" style="--d:1">How the market plays it</h2></div>
-      <div class="refs r" style="--d:2">
-        <a class="ref" href="https://www.expensya.com/en/solutions/payment-cards/" target="_blank" rel="noopener"><b>Expensya</b><span>Payment cards &amp; budgets</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-        <a class="ref" href="https://www.spendesk.com/platform/smart-company-cards/" target="_blank" rel="noopener"><b>Spendesk</b><span>Smart company cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-        <a class="ref" href="https://www.mooncard.co/fr/vos-besoins/cartes-de-paiement" target="_blank" rel="noopener"><b>Mooncard</b><span>Corporate payment cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-        <a class="ref" href="https://www.pleo.io/en/business-expense-cards" target="_blank" rel="noopener"><b>Pleo</b><span>Business expense cards</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-      </div>
-      <table class="r" style="--d:3">
-        <thead><tr><th></th><th>Spendesk</th><th>Mooncard</th><th>Pleo</th><th>Expensya</th></tr></thead>
-        <tbody>
-          <tr><td>Origin</td><td>France</td><td>France</td><td>Denmark / EU</td><td>France (Medius)</td></tr>
-          <tr><td>Model</td><td>Card-first + spend mgmt</td><td>Corporate card + expense</td><td>Card-first spend mgmt</td><td>Expense mgmt + cards &amp; travel</td></tr>
-          <tr><td>Card issuing</td><td>Own EMI licence</td><td>Via Treezor (BaaS)</td><td>Own EMI (Mastercard)</td><td>Via Adyen (BaaS)</td></tr>
-          <tr><td>Pricing*</td><td>Quote · sub + per-transaction</td><td>Quote · ~€5–6/user/mo + €10/card</td><td>Public · from ~£9.50/user/mo + cashback</td><td>~€5–8/user/mo (Silver/Gold)</td></tr>
-          <tr class="moat-row"><td>Linked to payroll</td><td class="no">No</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
-        </tbody>
-      </table>
-      <p class="note r" style="--d:4"><b>Our angle:</b> cards <i>decouple</i> general spend from payroll — that's the point of the model, not a flaw. The real questions: which segments justify a card, and build (BaaS) vs partner (Qonto)? <span style="color:var(--muted2)">*Most are quote-based; figures to reconfirm. All monetize per-seat <i>and</i> interchange — a richer model than our €1–3 add-on.</span></p>
-    </div>
-  </section>
-
-  <!-- 9 — OPEN QUESTIONS -->
-  <section class="slide dark">
-    <div class="inner">
-      <div class="head"><span class="eyebrow blue r" style="--d:0">Where we go together</span><h2 class="r" style="--d:1; color:#fff">Open questions for the collaboration</h2></div>
-      <p class="lead r" style="--d:2">Questions Design, Product and Strategy need to answer together before we commit design effort.</p>
-      <div class="grid g2" style="margin-top:20px">
-        <div class="q r" style="--d:3"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><div><h3>The fork: lean-out vs lean-in</h3><p>Which direction is worth exploring first — spend platform, payroll-native depth, or a deliberate hybrid?</p></div></div>
-        <div class="q r" style="--d:4"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M5 7h14"/><path d="M5 7l-2 5a3 3 0 0 0 6 0z"/><path d="M19 7l-2 5a3 3 0 0 0 6 0z"/></svg></div><div><h3>Build vs partner</h3><p>On cards: build via a BaaS (Treezor, Swan) or resell/integrate an existing player (Qonto)?</p></div></div>
-        <div class="q r" style="--d:5"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><div><h3>Client &amp; CCN fit</h3><p>Which segments justify a card economically across our SMB base?</p></div></div>
-        <div class="q r" style="--d:6"><div class="qic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></div><div><h3>Existing material &amp; pricing intel</h3><p>Any benchmarks, studies or sizing already on the Strategy side — even partial.</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ANNEX — DIVIDER -->
-  <section class="slide dark">
-    <div class="motif" style="opacity:.55"></div>
-    <div class="inner">
-      <span class="eyebrow blue r" style="--d:0">Annex</span>
-      <h1 class="r" style="--d:1; color:#fff; font-size:clamp(40px,6vw,72px); margin:14px 0 16px">Competitor recaps</h1>
-      <p class="lead r" style="--d:2; max-width:780px">One page each — Spendesk, Mooncard, Pleo, Expensya. Reference detail behind the main narrative. <span style="color:var(--muted2)">Pricing figures are mostly quote-based and to reconfirm.</span></p>
-    </div>
-  </section>
-
-  <!-- ANNEX — SPENDESK -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head" style="margin-bottom:16px">
-        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
-        <div class="rhead r" style="--d:1"><h2>Spendesk</h2><span class="pos">Card-first spend management, built for finance teams</span></div>
-        <a class="reflink r" style="--d:1" href="https://www.spendesk.com/platform/smart-company-cards/" target="_blank" rel="noopener">spendesk.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-      </div>
-      <div class="recap">
-        <div class="facts r" style="--d:2">
-          <div class="row"><span class="k">Origin</span><span class="v">France (Paris), founded 2016</span></div>
-          <div class="row"><span class="k">Model</span><span class="v">Card-first platform: cards, invoices, expense, approvals</span></div>
-          <div class="row"><span class="k">Buyer</span><span class="v">Finance teams, mid-market</span></div>
-          <div class="row"><span class="k">Card issuing</span><span class="v">Own EMI licence (regulated)</span></div>
-          <div class="row"><span class="k">Pricing</span><span class="v">Quote-based · subscription + per-transaction (100/mo incl., ~€50 per extra 100)</span></div>
-          <div class="row"><span class="k">Mileage</span><span class="v">Yes (incl. electric vehicle)</span></div>
-          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+      <!-- 4 — DECLINE -->
+      <section class="slide" data-label="02 · Where we are">
+        <div class="kicker" data-reveal>02 · Where we are</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">The decline — read it <span class="accent">correctly</span></h1>
+        <div class="body">
+          <div class="cols wide">
+            <div data-reveal style="transition-delay:.15s">
+              <div class="stat-row" style="grid-template-columns:1fr 1fr 1fr">
+                <div class="stat"><div class="v down num">−14<small>%</small></div><div class="k">Submissions YoY</div><div class="sub">50,288 → 43,384 · May'25→'26</div></div>
+                <div class="stat"><div class="v down num">−21<small>%</small></div><div class="k">Activations</div><div class="sub">5,755 → 4,520 · Jan'25→Jun'26</div></div>
+                <div class="stat"><div class="v down num">−11<small>pts</small></div><div class="k">Activation rate</div><div class="sub">31.96% → 20.71%</div></div>
+              </div>
+              <div class="panel danger" style="margin-top:16px">
+                <div class="ph" style="color:var(--danger)">The question that changes the read</div>
+                <p style="font-size:14px;line-height:21px;color:var(--ink-low)">Is the drop <b>phantom subscribers</b> realising they pay but never use it — a healthy correction? Or <b>real daily users leaving</b> — a sign we're being dis-positioned on features? These point to opposite conclusions.</p>
+              </div>
+            </div>
+            <div data-reveal style="transition-delay:.3s">
+              <div class="panel" style="height:100%">
+                <div class="ph">Activations &amp; activation rate</div>
+                <svg viewBox="0 0 360 210" style="width:100%;height:auto">
+                  <line x1="40" y1="20" x2="40" y2="170" stroke="#e0e5eb"/>
+                  <line x1="40" y1="170" x2="340" y2="170" stroke="#e0e5eb"/>
+                  <rect x="78" y="46" width="58" height="124" rx="4" fill="#78b6fc"/>
+                  <rect x="244" y="92" width="58" height="78" rx="4" fill="#0a73eb"/>
+                  <text x="107" y="40" text-anchor="middle" font-size="13" font-weight="600" fill="#030e1d">5,755</text>
+                  <text x="273" y="86" text-anchor="middle" font-size="13" font-weight="600" fill="#030e1d">4,520</text>
+                  <text x="107" y="186" text-anchor="middle" font-size="11" fill="#626f7e">Jan 2025</text>
+                  <text x="273" y="186" text-anchor="middle" font-size="11" fill="#626f7e">Jun 2026</text>
+                  <line x1="107" y1="62" x2="273" y2="120" stroke="#cf1125" stroke-width="2" stroke-dasharray="4 4"/>
+                  <circle cx="107" cy="62" r="4" fill="#cf1125"/><circle cx="273" cy="120" r="4" fill="#cf1125"/>
+                  <text x="100" y="56" text-anchor="end" font-size="11" font-weight="600" fill="#cf1125">31.96%</text>
+                  <text x="280" y="116" text-anchor="start" font-size="11" font-weight="600" fill="#cf1125">20.71%</text>
+                  <text x="190" y="205" text-anchor="middle" font-size="10" fill="#8793a1">bars = activations · dashed = activation rate</text>
+                </svg>
+                <p class="note" style="margin-top:6px">Part of the submissions gap may be a public-holiday calendar effect this year — to confirm.</p>
+              </div>
+            </div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.45s"><b>Analysis to run first:</b> activation vs. genuinely active users (the "expense user in past 90 days" variable). It decides whether the decline is reassuring or alarming — and reframes this slide.</p>
         </div>
-        <div class="rcol r" style="--d:3">
-          <div class="rbox learn"><h4>Strongest at</h4><p>Reconciliation logic and approval workflows, with a polished finance-team experience.</p></div>
-          <div class="rbox rel"><h4>Relevance to us</h4><p>The reconciliation pattern is the one to study (multi-step confirmation). But it sells to Finance, not our HR / office-manager buyer — and never touches payroll.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 04</span></div>
+      </section>
 
-  <!-- ANNEX — MOONCARD -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head" style="margin-bottom:16px">
-        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
-        <div class="rhead r" style="--d:1"><h2>Mooncard</h2><span class="pos">Corporate card + expense automation, FR-accounting native</span></div>
-        <a class="reflink r" style="--d:1" href="https://www.mooncard.co/fr/vos-besoins/cartes-de-paiement" target="_blank" rel="noopener">mooncard.co <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-      </div>
-      <div class="recap">
-        <div class="facts r" style="--d:2">
-          <div class="row"><span class="k">Origin</span><span class="v">France (Paris), founded 2016</span></div>
-          <div class="row"><span class="k">Model</span><span class="v">Corporate card + automated expense &amp; accounting</span></div>
-          <div class="row"><span class="k">Card issuing</span><span class="v">Via Treezor (BaaS)</span></div>
-          <div class="row"><span class="k">Pricing</span><span class="v">Quote-based · from ~€5–6/user/mo + €10 per physical card</span></div>
-          <div class="row"><span class="k">Extras</span><span class="v">IK / mileage option · Flying Blue miles · certified archiving</span></div>
-          <div class="row"><span class="k">Payroll link</span><span class="v">No (accounting, not payroll)</span></div>
+      <!-- 5 — CUSTOMER REQUESTS -->
+      <section class="slide" data-label="02 · Where we are">
+        <div class="kicker" data-reveal>02 · Where we are</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">What customers ask for today</h1>
+        <div class="body">
+          <div class="cols">
+            <div class="panel" data-reveal style="transition-delay:.15s">
+              <div class="ph">Top requests (CS · CES · user testing)</div>
+              <ul class="clean">
+                <li><b>Bulk submission</b> — send multiple expenses at once</li>
+                <li><b>Custom categories</b></li>
+                <li><b>Double validation</b></li>
+                <li><b>Policy-based auto-validation</b></li>
+              </ul>
+            </div>
+            <div class="panel tint" data-reveal style="transition-delay:.28s">
+              <div class="ph">The signal in the silence</div>
+              <p style="font-size:15px;line-height:23px;color:var(--ink-low)">Cards are <b>barely mentioned</b> in feedback. Demand here is <b>latent, not vocal</b> — customers ask for incremental fixes, not paradigm shifts.</p>
+              <p style="font-size:14px;line-height:21px;color:var(--ink-low);margin-top:14px">So e-cards are a <b>vision bet, not a backlog item.</b> Absence of pull isn't absence of opportunity — it's why this needs a strategic call rather than a roadmap vote.</p>
+            </div>
+          </div>
         </div>
-        <div class="rcol r" style="--d:3">
-          <div class="rbox learn"><h4>Strongest at</h4><p>French accounting ecosystem — automated entries, IK handling, legal archiving.</p></div>
-          <div class="rbox rel"><h4>Relevance to us</h4><p>The closest "build-via-BaaS" template (Treezor). Handles mileage, but as accounting, not payroll. Good reference if we lean-out via a BaaS.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 05</span></div>
+      </section>
 
-  <!-- ANNEX — PLEO -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head" style="margin-bottom:16px">
-        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
-        <div class="rhead r" style="--d:1"><h2>Pleo</h2><span class="pos">Card-first spend management with consumer-grade UX</span></div>
-        <a class="reflink r" style="--d:1" href="https://www.pleo.io/en/business-expense-cards" target="_blank" rel="noopener">pleo.io <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-      </div>
-      <div class="recap">
-        <div class="facts r" style="--d:2">
-          <div class="row"><span class="k">Origin</span><span class="v">Denmark / EU, founded 2015</span></div>
-          <div class="row"><span class="k">Model</span><span class="v">Card-first; also reimbursements &amp; mileage without cards</span></div>
-          <div class="row"><span class="k">Card issuing</span><span class="v">Own EMI, FCA-authorised (Mastercard)</span></div>
-          <div class="row"><span class="k">Pricing</span><span class="v">Public · from ~£9.50/user/mo · free up to 3 users · cashback 0.5–0.75%</span></div>
-          <div class="row"><span class="k">Focus</span><span class="v">SMB, self-serve onboarding, strong employee UX</span></div>
-          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+      <!-- 6 — DEFENSIBLE -->
+      <section class="slide" data-label="03 · The thesis">
+        <div class="kicker" data-reveal>03 · The thesis</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">What's actually defensible</h1>
+        <div class="body">
+          <div class="panel danger" data-reveal style="transition-delay:.15s;margin-bottom:16px">
+            <div class="ph" style="color:var(--danger)">Key takeaway</div>
+            <p style="font-size:14.5px;line-height:22px;color:var(--ink-low)">The payroll link isn't an asset in itself — it's a <b>consequence</b> of advancing funds. E-cards remove the advance, so they <b>decouple from payroll.</b> "Extend the payroll loop" and "card-first" are therefore antagonistic — and "AI in processing" is a commodity (Mindee already does it).</p>
+          </div>
+          <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:16px">
+            <div class="card" data-reveal style="transition-delay:.3s;border-color:#cfe4ff;background:var(--primary-lowest)">
+              <span class="pill blue" style="margin-bottom:12px">The moat</span>
+              <h3>Engine, base &amp; distribution</h3>
+              <p>The payroll engine, the SMB base and the distribution muscle — hard to copy, and ours.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.4s;border-color:var(--success-low);background:var(--success-lowest)">
+              <span class="pill green" style="margin-bottom:12px">No card replaces this</span>
+              <h3>Payroll-native items</h3>
+              <p>Mileage (IK), meal allowances, benefits in kind, contributable expenses — they <b>must</b> run through payroll for URSSAF treatment.</p>
+            </div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.5s"><b>OCR is table stakes.</b> The defensible ground is the payroll-native core — and, separately, the chance to build a real card product on top of our distribution.</p>
         </div>
-        <div class="rcol r" style="--d:3">
-          <div class="rbox learn"><h4>Strongest at</h4><p>Instant virtual cards and a consumer-grade employee experience; transparent self-serve pricing.</p></div>
-          <div class="rbox rel"><h4>Relevance to us</h4><p>Best UX and pricing transparency to benchmark. Note it still reimburses out-of-pocket &amp; mileage — proof a card player can't drop the reimbursement flow entirely.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 06</span></div>
+      </section>
 
-  <!-- ANNEX — EXPENSYA -->
-  <section class="slide light">
-    <div class="inner">
-      <div class="head" style="margin-bottom:16px">
-        <span class="eyebrow pink r" style="--d:0">Annex · Competitor</span>
-        <div class="rhead r" style="--d:1"><h2>Expensya</h2><span class="pos">Expense management that added cards — the closest analog to us</span></div>
-        <a class="reflink r" style="--d:1" href="https://www.expensya.com/en/solutions/payment-cards/" target="_blank" rel="noopener">expensya.com <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
-      </div>
-      <div class="recap">
-        <div class="facts r" style="--d:2">
-          <div class="row"><span class="k">Origin</span><span class="v">France · Expensya by Medius (acquired 2023)</span></div>
-          <div class="row"><span class="k">Model</span><span class="v">Expense mgmt + cards, budgets &amp; travel — one platform</span></div>
-          <div class="row"><span class="k">Card issuing</span><span class="v">Via Adyen issuing (BaaS)</span></div>
-          <div class="row"><span class="k">Pricing</span><span class="v">~€5–8/user/mo (Silver €5 / Gold €8) + enterprise quote</span></div>
-          <div class="row"><span class="k">Markets</span><span class="v">EUR, GBP, SEK, DKK, NOK, PLN · cashback up to 0.5%</span></div>
-          <div class="row"><span class="k">AI</span><span class="v">Anomaly &amp; fraud detection (Medius Copilot)</span></div>
-          <div class="row"><span class="k">Payroll link</span><span class="v">No</span></div>
+      <!-- 7 — FORK -->
+      <section class="slide" data-label="03 · The thesis">
+        <div class="kicker" data-reveal>03 · The thesis</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">A strategic fork to explore</h1>
+        <div class="body">
+          <div class="fork">
+            <div class="lane" data-reveal style="transition-delay:.15s">
+              <span class="pill grey badge">A · Partnership-light</span>
+              <h3>Resell cards as an add-on</h3>
+              <p>Via Qonto / Swan, no deep integration. Low effort, no transformation. Already sized — keep as a fallback / market test.</p>
+              <div class="ft">The small end of the telescope</div>
+            </div>
+            <div class="lane hero" data-reveal style="transition-delay:.25s">
+              <span class="pill blue badge" style="background:rgba(255,255,255,.18);color:#fff">B · The thesis</span>
+              <h3>An integrated card product</h3>
+              <p><b>Expenses by PayFit</b> — we own the management experience (rules, limits, reconciliation); card issued via a BaaS partner. A new paradigm: dedicated team, no "baby version". Unlocks interchange + NII revenue.</p>
+              <div class="ft">The only answer to "pure players will die"</div>
+            </div>
+            <div class="lane" data-reveal style="transition-delay:.35s">
+              <span class="pill green badge">C · Payroll-native depth</span>
+              <h3>Go deeper, no card</h3>
+              <p>Double down on IK / allowances / benefits + compliance. Most defensible, smaller TAM. Card out of scope or partner-only.</p>
+              <div class="ft">"Lean-in" · hybrid possible (C + card via partner)</div>
+            </div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.5s">This is a <b>direction to pick, not a feature to vote on.</b> The recommendation to test: <b>B</b> as the thesis, <b>A</b> as a hedge.</p>
         </div>
-        <div class="rcol r" style="--d:3">
-          <div class="rbox learn"><h4>Strongest at</h4><p>Expense-management depth plus integrated cards/travel and AI anomaly detection — the closest to an HRIS-adjacent positioning.</p></div>
-          <div class="rbox rel"><h4>Relevance to us</h4><p>The most analogous path: expense-led, adds cards via a BaaS (Adyen) — a lean-in + partner hybrid. Still no payroll link, which remains our opening.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 07</span></div>
+      </section>
 
+      <!-- 8 — HR vs PROCUREMENT -->
+      <section class="slide" data-label="03 · The thesis">
+        <div class="kicker" data-reveal>03 · The thesis</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">The decision underneath it all</h1>
+        <p class="lead" data-reveal style="transition-delay:.1s">Before the build question, one positioning question conditions everything else.</p>
+        <div class="body">
+          <div class="cols" data-reveal style="transition-delay:.2s">
+            <div class="panel">
+              <span class="pill blue" style="margin-bottom:12px">Lens 1</span>
+              <h4>HR · employee benefits</h4>
+              <p style="font-size:14px;line-height:21px;color:var(--ink-low);margin-top:6px">Expense as part of how we manage employee benefits and HR, sitting <b>alongside payroll</b>. Core target 1–250 employees.</p>
+            </div>
+            <div class="panel">
+              <span class="pill amber" style="margin-bottom:12px">Lens 2</span>
+              <h4>Procurement · corporate spend</h4>
+              <p style="font-size:14px;line-height:21px;color:var(--ink-low);margin-top:6px">Expense as <b>corporate spend management</b> — closer to procurement, where new entrants attack. Wins specific needs (e.g. construction).</p>
+            </div>
+          </div>
+          <div class="panel danger" data-reveal style="transition-delay:.35s;margin-top:16px">
+            <div class="ph" style="color:var(--danger)">Question</div>
+            <p style="font-size:15px;line-height:23px;color:var(--ink-low)">Today reimbursement <b>is</b> a payroll variable. Cards take spend <b>out of the payroll circuit</b>. Do we want that decoupling? This is the call that frames lens, fork and team — and it belongs in this room, not in a follow-up.</p>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 08</span></div>
+      </section>
+
+      <!-- 9 — COMPETITIVE PICTURE -->
+      <section class="slide" data-label="04 · E-cards in focus">
+        <div class="kicker" data-reveal>04 · E-cards in focus</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">The competitive picture</h1>
+        <p class="lead" data-reveal style="transition-delay:.1s">Everyone is moving to cards — and <b>none of them has a payroll link.</b> That's the white space.</p>
+        <div class="body">
+          <div class="grid" style="grid-template-columns:repeat(4,1fr)">
+            <div class="card" data-reveal style="transition-delay:.18s">
+              <h3>Spendesk</h3>
+              <p><span class="pill grey">FR · 2016</span></p>
+              <p>Card-first + spend mgmt. Own EMI. Finance buyer. Strong on reconciliation.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.26s">
+              <h3>Mooncard</h3>
+              <p><span class="pill grey">FR · 2016</span></p>
+              <p>Corporate card + expense. Issued via Treezor (BaaS). Strong FR accounting + IK.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.34s">
+              <h3>Pleo</h3>
+              <p><span class="pill grey">DK/EU · 2015</span></p>
+              <p>Card-first + reimbursement/IK without card. Own EMI. SMB UX reference.</p>
+            </div>
+            <div class="card" data-reveal style="transition-delay:.42s;border-color:var(--primary-low)">
+              <h3>Expensya</h3>
+              <p><span class="pill blue">closest analog</span></p>
+              <p>Expense + cards/budgets/travel. Adyen (BaaS). AI anomaly detection.</p>
+            </div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.52s">The move is now table-shifting — even majors (Rippling, Lucca…) bundle cards. Pure players increasingly can't justify asking clients to hop between HR, finance and expense systems. <b>Full comparison in annex.</b></p>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 09</span></div>
+      </section>
+
+      <!-- 10 — OLD ANALYSIS -->
+      <section class="slide" data-label="04 · E-cards in focus">
+        <div class="kicker" data-reveal>04 · E-cards in focus</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">What the prior analysis <span class="accent">actually</span> answered</h1>
+        <div class="body">
+          <div class="cols wide">
+            <div class="panel muted" data-reveal style="transition-delay:.15s">
+              <div class="ph">The 2025 Qonto Embed sizing</div>
+              <p style="font-size:14px;line-height:21px;color:var(--ink-low)">It sized <b>option A</b> — reselling Qonto cards as an add-on, in an <b>ARR-protective</b> posture. Deliberately the small end of the telescope.</p>
+              <div class="stat-row" style="grid-template-columns:1fr 1fr;margin-top:14px;gap:12px">
+                <div class="stat" style="padding:16px"><div class="v num" style="font-size:30px">572</div><div class="k">identifiable Spendesk / Payhawk clients</div></div>
+                <div class="stat" style="padding:16px"><div class="v num" style="font-size:30px">~8%</div><div class="k">take rate (Benefiz-equivalent)</div></div>
+                <div class="stat" style="padding:16px"><div class="v num" style="font-size:30px">€56k</div><div class="k">ARR · €4.9k MRR</div></div>
+                <div class="stat" style="padding:16px"><div class="v num" style="font-size:30px">~11.6%</div><div class="k">of partnerships objective · ARPE €1.57 ⚠</div></div>
+              </div>
+            </div>
+            <div data-reveal style="transition-delay:.3s">
+              <div class="panel danger">
+                <div class="ph" style="color:var(--danger)">Why we shouldn't carry over its conclusion</div>
+                <p style="font-size:14px;line-height:21px;color:var(--ink-low)">Its verdict — <i>"meaningful but not enough to move"</i> — answered <b>option A</b>. It never sized <b>option B</b>, the integrated product. Different ambition, different economics.</p>
+              </div>
+              <div class="panel tint" style="margin-top:14px">
+                <div class="ph">Still useful from it</div>
+                <p style="font-size:14px;line-height:21px;color:var(--ink-low)">Among card-solution users, only <b>4% pay for Expense — yet most still use it.</b> Coexistence, not head-to-head substitution. Cannibalisation risk is lower than feared.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 10</span></div>
+      </section>
+
+      <!-- 11 — SIZING B -->
+      <section class="slide" data-label="04 · E-cards in focus">
+        <div class="kicker" data-reveal>04 · E-cards in focus</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Sizing option B — the model to build</h1>
+        <div class="body">
+          <div class="cols wide">
+            <div data-reveal style="transition-delay:.15s">
+              <div class="panel">
+                <div class="ph">Two revenue streams from embedded cards</div>
+                <ul class="clean">
+                  <li><b>Interchange revenue share</b> — a % of interchange, tiered 30 → 40% by monthly card spend</li>
+                  <li><b>Net interest income share</b> — a % of interest on deposits, tiered 20 → 30% by client count</li>
+                </ul>
+                <p class="note" style="margin-top:12px"><b>Both ride high rates right now</b> — interchange and interest are elevated, which lifts the case.</p>
+              </div>
+              <div class="panel tint" style="margin-top:14px">
+                <div class="ph">We can model it in-house</div>
+                <p style="font-size:14px;line-height:21px;color:var(--ink-low)">Extrapolate <b>transactions / head × interchange</b> (~€1–1.20/tx, our reverse share) × adoption, from data already in PayFit. No need to trust Swan/Qonto business plans.</p>
+              </div>
+            </div>
+            <div data-reveal style="transition-delay:.3s">
+              <div class="panel" style="height:100%;background:linear-gradient(160deg,#0a73eb,#0b56ac);border:0;display:flex;flex-direction:column;justify-content:center">
+                <div class="ph" style="color:rgba(255,255,255,.75)">Back-of-envelope — to validate</div>
+                <div style="font-size:60px;font-weight:600;color:#fff;letter-spacing:-.02em;line-height:1">~1.5×</div>
+                <p style="color:rgba(255,255,255,.9);font-size:15px;line-height:22px;margin-top:10px">current revenue / employee added on top — pushing the Expense-vs-payroll case up by roughly <b style="color:#fff">+30%</b>.</p>
+                <p style="color:rgba(255,255,255,.7);font-size:12.5px;line-height:18px;margin-top:16px;border-top:1px solid rgba(255,255,255,.2);padding-top:14px">This bottom-up model is <b style="color:#fff">the missing deliverable</b> for a credible go / no-go — it replaces the under-selling €56k figure.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 11</span></div>
+      </section>
+
+      <!-- 12 — AI -->
+      <section class="slide" data-label="05 · Adjacent">
+        <div class="kicker" data-reveal>05 · Adjacent</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">AI — beyond processing</h1>
+        <p class="lead" data-reveal style="transition-delay:.1s">OCR is a commodity. The opportunity is AI on the <b>job-to-be-done</b>, not the scan.</p>
+        <div class="body">
+          <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+            <div class="card" data-reveal style="transition-delay:.18s"><h3>Compliance &amp; policy</h3><p>Automatic policy checks and compliance flags at capture time.</p></div>
+            <div class="card" data-reveal style="transition-delay:.24s"><h3>Anomaly &amp; fraud</h3><p>Detect outliers and fraud patterns across spend — Expensya already markets this.</p></div>
+            <div class="card" data-reveal style="transition-delay:.30s"><h3>Conversational capture</h3><p>Agentic / chat-based expense entry instead of forms.</p></div>
+            <div class="card" data-reveal style="transition-delay:.36s"><h3>Predictive budgets</h3><p>Forecast spend and surface budget drift before it happens.</p></div>
+            <div class="card" data-reveal style="transition-delay:.42s"><h3>Auto-close</h3><p>Automated month-end reconciliation and closing.</p></div>
+            <div class="card" data-reveal style="transition-delay:.48s"><h3>Spend intelligence</h3><p>Cross-company benchmarks and savings recommendations.</p></div>
+          </div>
+          <p class="note" data-reveal style="transition-delay:.56s">With cards in the loop, several of these become uniquely ours — we'd hold both the spend data and the payroll context.</p>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 12</span></div>
+      </section>
+
+      <!-- 13 — ROADMAP -->
+      <section class="slide" data-label="06 · The ask">
+        <div class="kicker" data-reveal>06 · The ask</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Where this sits — and what we're asking</h1>
+        <div class="body">
+          <div class="cols" data-reveal style="transition-delay:.15s">
+            <div class="panel muted">
+              <div class="ph">Roadmap reality</div>
+              <ul class="clean dash">
+                <li><b>Not on the immediate roadmap</b> — H2 is already defined</li>
+                <li>Realistic horizon: <b>2027 exploration</b></li>
+                <li>Needs a <b>dedicated team</b> — this is a product, not a minor feature, and there's no credible "baby version"</li>
+              </ul>
+            </div>
+            <div class="panel tint">
+              <div class="ph">The ask today</div>
+              <p style="font-size:16px;line-height:24px;color:var(--ink)">Not "let's build it."</p>
+              <p style="font-size:16px;line-height:24px;color:var(--ink-low);margin-top:8px">It's: <b>fund the exploration + the business case</b>, with Strategy's support, so we can decide — within months — whether to aim for an MVP.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 13</span></div>
+      </section>
+
+      <!-- 14 — OPEN QUESTIONS -->
+      <section class="slide" data-label="06 · The ask">
+        <div class="kicker" data-reveal>06 · The ask</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Open questions for Strategy</h1>
+        <div class="body">
+          <div class="qlist">
+            <div class="q" data-reveal style="transition-delay:.15s"><div class="qn">1</div><p><b>Fork direction</b> — lean-out (A/B), lean-in (C), or hybrid?</p></div>
+            <div class="q" data-reveal style="transition-delay:.22s"><div class="qn">2</div><p><b>Card build</b> — BaaS (Treezor / Swan / Stripe Issuing) vs partner (Qonto)?</p></div>
+            <div class="q" data-reveal style="transition-delay:.29s"><div class="qn">3</div><p><b>Client fit &amp; CCN</b> — which segments economically justify a card? (e.g. construction: live card on/off is a real CvR booster)</p></div>
+            <div class="q" data-reveal style="transition-delay:.36s"><div class="qn">4</div><p><b>Out of payroll?</b> — do we commit to decoupling expense from the payslip?</p></div>
+            <div class="q" data-reveal style="transition-delay:.43s"><div class="qn">5</div><p><b>Existing material</b> — what bench, studies, sizing or pricing intel does Strategy already hold?</p></div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 14</span></div>
+      </section>
+
+      <!-- 15 — ANNEX: COMPARISON -->
+      <section class="slide" data-label="Annex">
+        <div class="kicker" data-reveal>Annex</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Competitor comparison</h1>
+        <div class="body">
+          <table class="bench" data-reveal style="transition-delay:.15s">
+            <thead><tr><th>Player</th><th>Origin</th><th>Model</th><th>Card issuance</th><th>Indicative price</th><th>Edge</th><th>Payroll link</th></tr></thead>
+            <tbody>
+              <tr><td><b>Spendesk</b></td><td>FR · 2016</td><td>Card-first + spend mgmt</td><td>Own EMI</td><td>Quote (sub + per-tx)</td><td>Reconciliation; finance buyer</td><td class="nolink">None</td></tr>
+              <tr><td><b>Mooncard</b></td><td>FR · 2016</td><td>Corporate card + expense</td><td>Treezor (BaaS)</td><td>~€5–6/user + €10/card</td><td>FR accounting ecosystem; IK</td><td class="nolink">None</td></tr>
+              <tr><td><b>Pleo</b></td><td>DK/EU · 2015</td><td>Card-first + reimb/IK</td><td>Own EMI (Mastercard)</td><td>~£9.50/user + cashback</td><td>SMB UX reference</td><td class="nolink">None</td></tr>
+              <tr><td><b>Expensya</b></td><td>FR · Medius '23</td><td>Expense + cards/budgets/travel</td><td>Adyen (BaaS)</td><td>~€5–8/user</td><td>AI anomaly detection · closest analog</td><td class="nolink">None</td></tr>
+              <tr><td><b>Lucca</b></td><td>FR · 2002</td><td>HR/finance suite + expense + cards</td><td>Swan (BaaS)</td><td>Account &amp; cards free → interchange</td><td>HR-native: card auto-deleted on exit, blocked on absences</td><td class="nolink">None</td></tr><tr><td><b>Gusto</b></td><td>US · 2011</td><td>Payroll/HR + money layer</td><td>nbkc bank / Visa (partner)</td><td>Card free; cash mgmt ~$200/yr</td><td>Early pay tied to paycheck; Bill Pay, credit</td><td class="yeslink">Native ✓ (US)</td></tr><tr class="us"><td><b>PayFit</b></td><td>FR</td><td>Reimbursement via payslip</td><td>None today</td><td>€1–3/user (discounted)</td><td>Payroll-native; SMB HRIS; full chain to payslip</td><td class="yeslink">Native ✓</td></tr>
+            </tbody>
+          </table>
+          <p class="note" data-reveal style="transition-delay:.3s">Pricing is mostly quote-based and to be reconfirmed. The structural point holds: <b>no competitor in our markets owns the payroll link</b> — and Gusto shows, in the US, that pairing it with money/cards works. Lucca proves the HR-native card already ships in France. See deep-dives next.</p>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 15</span></div>
+      </section>
+
+      <!-- 16 — ANNEX: LUCCA -->
+      <section class="slide" data-label="Annex · Closest analog">
+        <div class="kicker" data-reveal>Annex · Closest analog (FR)</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Lucca — the HR-native card, <span class="accent">already shipping</span></h1>
+        <div class="body">
+          <div class="cols wide">
+            <div data-reveal style="transition-delay:.15s">
+              <div class="panel">
+                <div class="ph">What it is</div>
+                <ul class="clean">
+                  <li>A French HR/finance suite (SIRH). <b>"Moyens de paiement"</b> = a payment account + cards built into Lucca, next to Cleemy (expense reports)</li>
+                  <li>Issued via <b>Swan (BaaS)</b> · Mastercard · funds secured at BNP — no banking licence of their own</li>
+                  <li>Account &amp; virtual cards are <b>free (€0)</b> → monetised on <b>interchange</b>, not subscription</li>
+                  <li>Real-time limits, policy blocks, single-use cards generated only after manager approval, auto-reconciliation into Cleemy</li>
+                </ul>
+              </div>
+            </div>
+            <div data-reveal style="transition-delay:.3s">
+              <div class="panel tint">
+                <div class="ph">The moat they market — and it's ours to claim</div>
+                <ul class="clean">
+                  <li>Native SIRH integration <b>auto-deletes cards when an employee leaves</b></li>
+                  <li>Cards <b>blocked on absences</b> — leave, paid holidays, sick days</li>
+                  <li>They explicitly ding pure players for handling absences only "partially"</li>
+                </ul>
+                <p style="font-size:13.5px;line-height:20px;color:var(--ink-low);margin-top:14px;border-top:1px solid #cfe4ff;padding-top:12px">This is the strongest evidence that our <b>HR/payroll context is an asset on the card itself</b> — not just for reimbursement. It validates option B, and it's an <b>urgency flag</b>: a direct FR HRIS competitor already does it.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 16</span></div>
+      </section>
+
+      <!-- 17 — ANNEX: GUSTO -->
+      <section class="slide" data-label="Annex · US payroll twin">
+        <div class="kicker" data-reveal>Annex · US payroll twin</div>
+        <h1 class="title" data-reveal style="transition-delay:.05s">Gusto — a payroll company that built a <span class="accent">money layer</span></h1>
+        <div class="body">
+          <div class="cols" data-reveal style="transition-delay:.15s">
+            <div class="panel">
+              <span class="pill blue" style="margin-bottom:12px">Employee side</span>
+              <h4>Gusto Wallet</h4>
+              <ul class="clean" style="margin-top:10px">
+                <li>Spending account + <b>Gusto Debit Card</b> (Visa, via nbkc bank)</li>
+                <li><b>Early pay</b> tied to the paycheck · on-demand pay (Clair)</li>
+                <li>Savings goals &amp; budgeting tools</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <span class="pill green" style="margin-bottom:12px">Business side</span>
+              <h4>Gusto Money</h4>
+              <ul class="clean green" style="margin-top:10px">
+                <li>Bill Pay &amp; Invoicing — money in/out, same place as payroll</li>
+                <li><b>Payroll Bridge</b> line of credit</li>
+                <li>App lists "corporate cards + expense mgmt"</li>
+              </ul>
+            </div>
+          </div>
+          <div class="cols" data-reveal style="transition-delay:.32s;margin-top:16px">
+            <div class="panel muted">
+              <div class="ph">Model &amp; monetisation</div>
+              <p style="font-size:13.5px;line-height:20px;color:var(--ink-low)">Built on <b>banking partners</b> (nbkc, Visa; Clair) — "a payroll company, not a bank". Tools included with the subscription; transaction fees apply, with a cash-management service charge (~$200/yr) and discounted rates as upsell.</p>
+            </div>
+            <div class="panel tint">
+              <div class="ph">Why it matters for us</div>
+              <p style="font-size:13.5px;line-height:20px;color:var(--ink-low)">The <b>payroll-native → money path is proven at scale</b> in the US, on partners, tied to the paycheck. Directional validation for B — and a reminder that <b>employee wallet vs. corporate expense card are two different bets</b> to scope.</p>
+            </div>
+          </div>
+        </div>
+        <div class="foot"><span>Vision Expense</span><span class="internal">INTERNAL · 17</span></div>
+      </section>
+
+      <div class="clickzone" id="zprev"></div>
+      <div class="clickzone" id="znext"></div>
+    </div>
+  </div>
 </div>
 
-<div class="counter" id="counter">01 / 15</div>
-<div class="dots" id="dots"></div>
-<div class="nav">
-  <button id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-  <button id="next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-</div>
-<div class="hint">← → or space to navigate</div>
+<div id="counter">01 / 16</div>
+<div id="dots"></div>
 
 <script>
   const slides = Array.from(document.querySelectorAll('.slide'));
   const total = slides.length;
-  let i = 0;
-  const bar = document.getElementById('bar');
+  let cur = 0;
+  const progress = document.getElementById('progress');
   const counter = document.getElementById('counter');
-  const prev = document.getElementById('prev');
-  const next = document.getElementById('next');
   const dotsWrap = document.getElementById('dots');
-  slides.forEach((_, idx) => {
-    const d = document.createElement('div');
-    d.className = 'dot' + (idx===0?' on':'');
-    d.addEventListener('click', () => go(idx));
-    dotsWrap.appendChild(d);
-  });
-  const dots = Array.from(document.querySelectorAll('.dot'));
-  const pad = n => String(n).padStart(2,'0');
-  function go(n){
-    n = Math.max(0, Math.min(total-1, n));
-    slides[i].classList.remove('active');
-    i = n;
-    slides[i].classList.add('active');
-    bar.style.width = (i/(total-1))*100 + '%';
-    counter.textContent = pad(i+1) + ' / ' + pad(total);
-    dots.forEach((d,idx)=>d.classList.toggle('on', idx===i));
-    prev.disabled = i===0; next.disabled = i===total-1;
-    const dark = slides[i].classList.contains('dark');
-    counter.style.color = dark ? 'var(--ice)' : 'var(--muted)';
-    document.querySelector('.brand').style.color = dark ? '#fff' : 'var(--blue)';
-  }
-  next.addEventListener('click', ()=>go(i+1));
-  prev.addEventListener('click', ()=>go(i-1));
-  document.addEventListener('keydown', e=>{
-    if(e.key==='ArrowRight'||e.key===' '){e.preventDefault(); go(i+1)}
-    else if(e.key==='ArrowLeft'){go(i-1)}
-    else if(e.key==='Home'){go(0)} else if(e.key==='End'){go(total-1)}
-  });
-  setTimeout(()=>document.body.classList.remove('show-hint'), 4200);
-  go(0);
 
-  // --- Activation trend chart (bars = total, line = rate) ---
-  (function(){
-    const months=['Jan 25','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan 26','Feb','Mar','Apr','May','Jun'];
-    const totals=[5755,5736,5663,5575,5512,5410,5367,5318,5259,5112,4969,4913,4760,4700,4588,4565,4554,4520];
-    const rates=[31.96,32.10,31.58,30.84,30.51,29.76,29.16,27.97,26.01,24.89,24.19,24.03,22.06,22.01,21.36,21.07,20.88,20.71];
-    const W=1160,H=420,mL=58,mR=56,mT=30,mB=46;
-    const pw=W-mL-mR, ph=H-mT-mB, n=totals.length, slot=pw/n, bw=slot*0.58;
-    const maxT=6000,maxR=40;
-    const yT=v=>mT+ph-(v/maxT)*ph, yR=v=>mT+ph-(v/maxR)*ph, xC=i=>mL+slot*i+slot/2;
-    let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="Manrope, sans-serif">`;
-    for(let g=0; g<=6000; g+=2000){ const y=yT(g); s+=`<line x1="${mL}" y1="${y}" x2="${W-mR}" y2="${y}" stroke="#E0E5EB" stroke-width="1"/>`; s+=`<text x="${mL-10}" y="${y+4}" text-anchor="end" font-size="12" fill="#8793A1">${g?g/1000+'k':'0'}</text>`; }
-    for(let i=0;i<n;i++){ const x=xC(i)-bw/2, y=yT(totals[i]), h=mT+ph-y; s+=`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="#0A73EB" opacity="${i===0||i===n-1?'1':'0.88'}"/>`; }
-    let d=''; for(let i=0;i<n;i++){ d+=(i?'L':'M')+xC(i).toFixed(1)+' '+yR(rates[i]).toFixed(1)+' '; }
-    s+=`<path d="${d}" fill="none" stroke="#C98A00" stroke-width="3" stroke-linejoin="round"/>`;
-    for(let i=0;i<n;i++){ s+=`<circle cx="${xC(i).toFixed(1)}" cy="${yR(rates[i]).toFixed(1)}" r="3" fill="#C98A00"/>`; }
-    s+=`<text x="${xC(0)}" y="${(yT(totals[0])-8).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#0A73EB">5,755</text>`;
-    s+=`<text x="${xC(n-1)}" y="${(yT(totals[n-1])-8).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="700" fill="#0A73EB">4,520</text>`;
-    s+=`<text x="${xC(0)}" y="${(yR(rates[0])-10).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#C98A00" stroke="#FFFFFF" stroke-width="3.5" paint-order="stroke">32.0%</text>`;
-    s+=`<text x="${xC(n-1)}" y="${(yR(rates[n-1])-10).toFixed(1)}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#C98A00" stroke="#FFFFFF" stroke-width="3.5" paint-order="stroke">20.7%</text>`;
-    [0,3,6,9,12,15,17].forEach(i=>{ s+=`<text x="${xC(i).toFixed(1)}" y="${H-mB+22}" text-anchor="middle" font-size="11.5" fill="#626F7E">${months[i]}</text>`; });
-    s+=`<line x1="${mL}" y1="${mT+ph}" x2="${W-mR}" y2="${mT+ph}" stroke="#030E1D" stroke-width="1.5"/>`;
-    s+=`<rect x="${mL}" y="4" width="12" height="12" rx="2" fill="#0A73EB"/><text x="${mL+18}" y="14" font-size="12.5" fill="#626F7E">Activations — total</text>`;
-    s+=`<line x1="${mL+165}" y1="10" x2="${mL+189}" y2="10" stroke="#C98A00" stroke-width="3"/><text x="${mL+195}" y="14" font-size="12.5" fill="#626F7E">Activation rate</text>`;
-    s+=`</svg>`;
-    const el=document.getElementById('activation-chart'); if(el) el.innerHTML=s;
-  })();
+  slides.forEach((_,i)=>{
+    const b=document.createElement('button');
+    b.addEventListener('click',()=>go(i));
+    dotsWrap.appendChild(b);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function go(i){
+    if(i<0||i>=total) return;
+    slides[cur].classList.remove('active');
+    cur=i;
+    slides[cur].classList.add('active');
+    progress.style.width = ((cur)/(total-1))*100 + '%';
+    counter.textContent = String(cur+1).padStart(2,'0') + ' / ' + total;
+    dots.forEach((d,k)=>d.classList.toggle('active',k===cur));
+    // adapt counter/dots color contrast on light slides
+    const dark = slides[cur].classList.contains('deep') || slides[cur].classList.contains('dark');
+    counter.style.color = dark ? 'rgba(255,255,255,.6)' : 'rgba(3,14,29,.4)';
+    dots.forEach(d=>{ if(!d.classList.contains('active')) d.style.background = dark?'rgba(255,255,255,.28)':'rgba(3,14,29,.2)';});
+  }
+  const next=()=>go(Math.min(cur+1,total-1));
+  const prev=()=>go(Math.max(cur-1,0));
+
+  document.getElementById('znext').addEventListener('click',next);
+  document.getElementById('zprev').addEventListener('click',prev);
+  document.addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next();}
+    else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev();}
+    else if(e.key==='Home'){go(0);}
+    else if(e.key==='End'){go(total-1);}
+    else if(e.key==='f'||e.key==='F'){toggleFs();}
+  });
+
+  function toggleFs(){
+    if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
+    else{document.exitFullscreen?.();}
+  }
+
+  // scale stage to viewport
+  function scale(){
+    const s=document.getElementById('scaler');
+    const pad=40;
+    const sc=Math.min((window.innerWidth-pad)/1280,(window.innerHeight-pad)/720);
+    s.style.transform='scale('+sc+')';
+  }
+  window.addEventListener('resize',scale);
+  scale();
+  go(0);
 </script>
 </body>
 </html>
