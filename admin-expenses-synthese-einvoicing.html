@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin-compte · Synthèse NDF — ajouts e-invoicing (Q3)</title>
+<style>
+:root{
+  --canvas:#f8f9fc;
+  --surface-neutral:#ffffff; --surface-neutral-low:#f5f6f9; --surface-neutral-lowest:#eceff4;
+  --surface-primary:#0a73eb; --surface-primary-hover:#0d62c4;
+  --surface-warning-lowest:#fff7db; --surface-warning-low:#ffeda3;
+  --surface-info-lowest:#e6f8ff;
+  --surface-success-low:#bff8d3;
+  --surface-danger-lowest:#ffebed;
+  --content-default:#030e1d; --content-low:#364251; --content-muted:#626f7e; --content-disabled:#8793a1;
+  --content-primary:#0a73eb; --content-warning:#f0ac00; --content-success:#0b993c; --content-danger:#cf1125; --content-info:#3cb5e4;
+  --border-default:#e0e5eb; --border-strong:#a8b3c1;
+  --s50:4px; --s100:8px; --s150:12px; --s200:16px; --s300:24px; --s400:32px; --s500:40px; --s600:48px; --s800:64px;
+  --r-sm:8px; --r-md:10px; --r-lg:16px; --r-pill:9999px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,-apple-system,system-ui,sans-serif;background:var(--canvas);color:var(--content-default);}
+
+/* proto toolbar */
+.toolbar{position:sticky;top:0;z-index:60;display:flex;flex-wrap:wrap;align-items:center;gap:var(--s300);
+  background:var(--content-default);color:#fff;padding:var(--s150) var(--s300);font-size:13px;}
+.toolbar b{font-weight:600;}
+.toolbar .grp{display:flex;align-items:center;gap:var(--s100);color:#c7cfdb;}
+.seg{display:inline-flex;border:1px solid #3a4656;border-radius:var(--r-sm);overflow:hidden;}
+.seg button{font-family:inherit;font-size:12px;font-weight:500;border:none;background:transparent;color:#c7cfdb;padding:6px 12px;cursor:pointer;}
+.seg button.on{background:var(--surface-primary);color:#fff;}
+.toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer;color:#c7cfdb;}
+.s2{display:inline-block;background:var(--surface-warning-low);color:var(--content-warning);border-radius:var(--r-pill);font-size:11px;font-weight:600;padding:1px 8px;}
+
+/* internal red admin bar (repro légère) */
+.redbar{display:flex;align-items:center;gap:var(--s300);background:#e21328;color:#fff;font-size:13px;padding:8px var(--s300);}
+.redbar .chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;}
+.redbar .right{margin-left:auto;display:flex;gap:var(--s300);align-items:center;}
+
+.app{display:flex;min-height:100vh;}
+.side{width:250px;flex:0 0 250px;background:var(--surface-neutral);border-right:1px solid var(--border-default);padding:var(--s200);}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:18px;margin:var(--s100) var(--s100) var(--s300);}
+.brand .logo{width:28px;height:28px;border-radius:8px;background:#2f6bff;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface-neutral-low);border-radius:var(--r-sm);padding:10px 12px;color:var(--content-muted);font-size:13px;margin-bottom:var(--s300);}
+.navgrp{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--content-muted);margin:var(--s200) var(--s100) var(--s100);font-weight:600;}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r-sm);color:var(--content-low);font-size:14px;font-weight:500;}
+.nav.open{color:var(--content-default);}
+.nav .dot{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-strong);flex:0 0 18px;}
+.sub{display:flex;flex-direction:column;}
+.sub a{padding:8px 12px 8px 40px;font-size:14px;color:var(--content-low);border-radius:var(--r-sm);text-decoration:none;}
+.sub a.active{background:var(--surface-neutral-lowest);color:var(--content-default);font-weight:500;}
+
+.main{flex:1;padding:var(--s400) var(--s500);min-width:0;}
+.page-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s400);}
+.page-title{font-size:24px;font-weight:600;}
+.btn{font-family:inherit;font-size:14px;font-weight:500;border-radius:var(--r-sm);padding:10px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;}
+.btn-primary{background:var(--surface-primary);color:#fff;} .btn-primary:hover{background:var(--surface-primary-hover);}
+.btn-ghost{background:var(--surface-neutral);border-color:var(--border-default);color:var(--content-low);} .btn-ghost:hover{background:var(--surface-neutral-low);}
+
+.card{background:var(--surface-neutral);border:1px solid var(--border-default);border-radius:var(--r-lg);padding:var(--s400);margin-bottom:var(--s400);}
+.sec-title{font-size:20px;font-weight:600;margin-bottom:var(--s300);}
+
+/* clôture summary card (Summary, PAS Alert) */
+.cloture{display:flex;align-items:center;gap:var(--s500);background:var(--surface-neutral);border:1px solid var(--border-default);border-left:4px solid var(--content-warning);
+  border-radius:var(--r-lg);padding:var(--s300) var(--s400);margin-bottom:var(--s400);}
+.cloture .big{display:flex;flex-direction:column;gap:2px;padding-right:var(--s500);border-right:1px solid var(--border-default);}
+.cloture .big .n{font-size:32px;font-weight:600;line-height:1;}
+.cloture .big .l{font-size:13px;color:var(--content-muted);}
+.cloture .chips{display:flex;flex-wrap:wrap;gap:var(--s150);flex:1;}
+.cloture .review-link{font-size:14px;font-weight:500;color:var(--content-primary);white-space:nowrap;}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-pill);font-size:12px;font-weight:500;padding:3px 10px;white-space:nowrap;}
+.badge .pt{width:8px;height:8px;border-radius:50%;flex:0 0 8px;}
+.badge-danger{background:var(--surface-danger-lowest);color:var(--content-danger);} .badge-danger .pt{background:var(--content-danger);}
+.badge-warning{background:var(--surface-warning-low);color:var(--content-warning);} .badge-warning .pt{background:var(--content-warning);}
+.badge-info{background:var(--surface-info-lowest);color:var(--content-info);} .badge-info .pt{background:var(--content-info);}
+.badge-neutral{background:var(--surface-neutral-lowest);color:var(--content-muted);} .badge-neutral .pt{background:var(--content-muted);}
+.badge-success{background:var(--surface-success-low);color:var(--content-success);} .badge-success .pt{background:var(--content-success);}
+
+/* synthèse table */
+.synth{display:flex;gap:var(--s600);}
+.synth .tbl{flex:1;}
+table{width:100%;border-collapse:collapse;}
+.synth thead th{text-align:left;font-size:13px;color:var(--content-muted);font-weight:600;padding:var(--s150) var(--s200);border-bottom:1px solid var(--border-default);}
+.synth tbody td{padding:var(--s200);font-size:14px;border-bottom:1px solid var(--border-default);}
+.synth tbody tr:last-child td{font-weight:600;border-bottom:none;}
+.type-cell{display:flex;align-items:center;gap:10px;}
+.type-ic{width:28px;height:28px;border-radius:8px;background:var(--surface-neutral-low);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.pct{color:var(--content-muted);font-size:13px;margin-left:8px;}
+.donut-wrap{width:220px;flex:0 0 220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;}
+.donut{width:180px;height:180px;border-radius:50%;background:conic-gradient(var(--surface-primary) 0 98%, var(--border-default) 98% 100%);display:flex;align-items:center;justify-content:center;}
+.donut .hole{width:120px;height:120px;border-radius:50%;background:var(--surface-neutral);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;}
+.donut-cap{font-size:13px;color:var(--content-muted);}
+
+/* vue détaillée */
+.vd-controls{display:flex;align-items:center;gap:var(--s200);margin-bottom:var(--s200);flex-wrap:wrap;}
+.inp{display:flex;align-items:center;gap:8px;background:var(--surface-neutral);border:1px solid var(--border-default);border-radius:var(--r-sm);padding:9px 12px;color:var(--content-muted);font-size:14px;min-width:280px;}
+.spacer{flex:1;}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:var(--s200);}
+.preset{font-family:inherit;font-size:13px;font-weight:500;border:1px solid var(--border-default);background:var(--surface-neutral);color:var(--content-low);border-radius:var(--r-pill);padding:6px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+.preset.on{background:var(--surface-primary);border-color:var(--surface-primary);color:#fff;}
+.preset .c{background:var(--surface-neutral-lowest);color:var(--content-muted);border-radius:var(--r-pill);font-size:11px;padding:0 6px;}
+.preset.on .c{background:rgba(255,255,255,.25);color:#fff;}
+
+.vd thead th{text-align:left;font-size:13px;color:var(--content-muted);font-weight:600;padding:var(--s150) var(--s200);border-bottom:1px solid var(--border-default);}
+.vd tbody td{padding:var(--s200);font-size:14px;border-bottom:1px solid var(--border-default);color:var(--content-default);}
+.collab{display:flex;align-items:center;gap:10px;}
+.emoji{font-size:18px;}
+.tprodmt{color:var(--content-default);}
+.dots{color:var(--content-muted);cursor:pointer;letter-spacing:2px;}
+.pagination{display:flex;justify-content:flex-end;align-items:center;gap:var(--s150);margin-top:var(--s300);font-size:14px;color:var(--content-muted);}
+.pg{width:28px;height:28px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;}
+.pg.on{background:var(--surface-primary);color:#fff;}
+
+/* annotations */
+.anno{position:relative;}
+body:not(.anno-off) .anno{outline:1.5px dashed var(--content-primary);outline-offset:3px;border-radius:6px;}
+body:not(.anno-off) .anno > .tag{display:inline-flex;position:absolute;top:-12px;left:-10px;z-index:5;
+  background:var(--content-primary);color:#fff;font-size:11px;font-weight:600;border-radius:var(--r-pill);width:22px;height:22px;align-items:center;justify-content:center;}
+.anno .tag{display:none;}
+body.anno-off .legend{display:none;}
+.legend{margin-top:var(--s500);}
+.legend h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--content-muted);margin-bottom:var(--s150);}
+.legend .li{display:flex;gap:12px;padding:var(--s150) 0;border-top:1px solid var(--border-default);font-size:13px;color:var(--content-low);line-height:1.55;}
+.legend .n{flex:0 0 22px;height:22px;background:var(--content-primary);color:#fff;border-radius:var(--r-pill);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+.legend .li b{color:var(--content-default);}
+.flagnote{display:flex;gap:12px;padding:var(--s150) 0;border-top:1px solid var(--border-default);font-size:13px;color:var(--content-low);line-height:1.55;}
+.flagnote .w{flex:0 0 22px;height:22px;background:var(--surface-warning-low);color:var(--content-warning);border-radius:var(--r-pill);font-size:12px;display:flex;align-items:center;justify-content:center;}
+.pri{display:inline-block;background:var(--surface-info-lowest);color:var(--content-info);border-radius:var(--r-pill);font-size:11px;font-weight:600;padding:1px 8px;}
+
+/* --- version simplifiée : info TTC > 150 non bloquante --- */
+.ttc-info{display:none;position:relative;margin-left:6px;cursor:default;vertical-align:middle;
+  width:16px;height:16px;border-radius:50%;background:var(--surface-info-lowest);color:var(--content-info);
+  font-size:11px;font-weight:700;align-items:center;justify-content:center;font-style:normal;}
+body.simplified .ttc-info{display:inline-flex;}
+.ttc-info .tipbox{visibility:hidden;opacity:0;transition:opacity .12s;position:absolute;bottom:135%;left:50%;transform:translateX(-50%);
+  width:260px;background:var(--content-default);color:#fff;border-radius:var(--r-sm);padding:10px 12px;font-size:12px;font-weight:400;line-height:1.5;z-index:30;text-align:left;box-shadow:0 6px 20px rgba(3,14,29,.25);}
+.ttc-info .tipbox b{font-weight:600;display:block;margin-bottom:2px;}
+.ttc-info:hover .tipbox{visibility:visible;opacity:1;}
+body.simplified #annoCloture, body.simplified #annoPresets, body.simplified #grpFilter{display:none!important;}
+body.simplified .vd thead th:nth-child(8), body.simplified .vd tbody td:nth-child(8){display:none;}
+body.simplified .legend{display:none;}
+.legend-simple{display:none;margin-top:var(--s500);}
+body.simplified:not(.anno-off) .legend-simple{display:block;}
+.legend-simple h3{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--content-muted);margin-bottom:var(--s150);}
+.legend-simple p{font-size:13px;color:var(--content-low);line-height:1.6;border-top:1px solid var(--border-default);padding-top:var(--s150);}
+.legend-simple p b{color:var(--content-default);}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <b>Mock — Admin-compte · Synthèse NDF (clôture)</b>
+  <span class="s2">Q3 · à construire</span>
+  <span class="grp">Version :
+    <span class="seg" id="segVer">
+      <button class="on" data-v="complete" onclick="setVersion('complete')">Complète</button>
+      <button data-v="simple" onclick="setVersion('simple')">Simplifiée (TTC &gt;150)</button>
+    </span>
+  </span>
+  <span class="grp" id="grpFilter">Filtre actif :
+    <span class="seg" id="segScn">
+      <button class="on" data-p="tout" onclick="setPreset('tout')">Tout</button>
+      <button data-p="traiter" onclick="setPreset('traiter')">À traiter (A)</button>
+      <button data-p="horspolitique" onclick="setPreset('horspolitique')">Hors politique (B)</button>
+      <button data-p="tvaperdue" onclick="setPreset('tvaperdue')">TVA perdue (C)</button>
+    </span>
+  </span>
+  <label><input type="checkbox" id="annoChk" checked onchange="document.body.classList.toggle('anno-off',!this.checked)"> Annotations</label>
+</div>
+
+<div class="redbar">
+  <span class="chip">88 - avr. 2022 ▾</span>
+  <span class="chip">ActionId</span>
+  <span class="chip">See comp action</span>
+  <span class="chip">⟳</span>
+  <span class="right">
+    <span>⟲ Correction portal</span><span>▢ Copy ID</span><span>⚡ Compute Comp</span><span>ⓘ</span><span>✕</span>
+  </span>
+</div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="logo">P</span> PayFit</div>
+    <div class="search">🔎 Rechercher …</div>
+    <div class="navgrp">Les essentiels</div>
+    <div class="nav"><span class="dot"></span> Tableau de bord</div>
+    <div class="nav"><span class="dot"></span> Mes collaborateurs</div>
+    <div class="nav"><span class="dot"></span> Demandes à valider</div>
+    <div class="nav"><span class="dot"></span> Vérifier et clôturer la paie</div>
+    <div class="navgrp">Au quotidien</div>
+    <div class="nav"><span class="dot"></span> Absences et temps de travail</div>
+    <div class="nav open"><span class="dot"></span> Éléments de rémunération ▴</div>
+    <div class="sub">
+      <a>Salaires de base</a><a>Repas</a><a>Primes</a><a>Transport</a>
+      <a class="active">Notes de frais</a><a>Avantages et frais</a><a>Épargne salariale</a><a>Imports multiples</a>
+    </div>
+    <div class="nav"><span class="dot"></span> Gestion de l'équipe</div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div class="page-title">Notes de frais</div>
+      <button class="btn btn-primary">⚙ Paramètres des notes de frais</button>
+    </div>
+
+    <!-- (1) Tuile "À vérifier avant clôture" — Summary, PAS Alert -->
+    <div class="anno" id="annoCloture"><span class="tag">1</span>
+      <div class="cloture">
+        <div class="big"><span class="n">2</span><span class="l">à traiter avant clôture</span></div>
+        <div class="chips">
+          <span class="badge badge-danger"><span class="pt"></span>1 doublon potentiel</span>
+          <span class="badge badge-warning"><span class="pt"></span>1 facture entreprise (e-invoicing)</span>
+          <span class="badge badge-info"><span class="pt"></span>1 hors politique</span>
+          <span class="badge badge-neutral"><span class="pt"></span>TVA potentiellement perdue : 21,33 €</span>
+        </div>
+        <a class="review-link">Vérifier avant de clôturer →</a>
+      </div>
+    </div>
+
+    <!-- Synthèse du mois -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--s300)">
+        <div class="sec-title" style="margin:0">Synthèse du mois</div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <span class="inp" style="min-width:150px">Avril 2022 ▾</span>
+          <button class="btn btn-primary">Éditer</button>
+        </div>
+      </div>
+      <div class="synth">
+        <div class="tbl">
+          <table>
+            <thead><tr><th>Type ↕</th><th>Nombre ↕</th><th>Remboursements ↕</th></tr></thead>
+            <tbody>
+              <tr><td><span class="type-cell"><span class="type-ic">🍽</span> Repas</span></td><td>7</td><td>10 048,37 € <span class="pct">98 %</span></td></tr>
+              <tr><td><span class="type-cell"><span class="type-ic">▦</span> Autre</span></td><td>7</td><td>109,00 € <span class="pct">1 %</span></td></tr>
+              <tr><td><span class="type-cell"><span class="type-ic">🚆</span> Transport</span></td><td>2</td><td>44,54 €</td></tr>
+              <tr><td><span class="type-cell"><span class="type-ic">⛽</span> Indemnité kilométrique</span></td><td>1</td><td>23,00 €</td></tr>
+              <tr><td><span class="type-cell"><span class="type-ic">🏨</span> Hôtel / Logement</span></td><td>1</td><td>13,00 €</td></tr>
+              <tr><td>Avril 2022</td><td>18</td><td>10 237,91 €</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut"><div class="hole">98%</div></div>
+          <div class="donut-cap">Graphique des dépenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vue détaillée -->
+    <div class="card">
+      <div class="sec-title">Vue détaillée</div>
+      <div class="vd-controls">
+        <span class="inp">🔎 Recherche</span>
+        <button class="btn btn-ghost">⌄ Filtrer</button>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost">☁ Justificatifs</button>
+        <button class="btn btn-ghost">☁ Exporter</button>
+      </div>
+
+      <!-- (3) Presets de filtre calés sur A›B›C -->
+      <div class="anno" id="annoPresets" style="display:block"><span class="tag">3</span>
+        <div class="presets">
+          <button class="preset on" data-p="tout" onclick="setPreset('tout')">Tout <span class="c">10</span></button>
+          <button class="preset" data-p="traiter" onclick="setPreset('traiter')">À traiter avant clôture <span class="c">2</span></button>
+          <button class="preset" data-p="horspolitique" onclick="setPreset('horspolitique')">Hors politique <span class="c">1</span></button>
+          <button class="preset" data-p="tvaperdue" onclick="setPreset('tvaperdue')">TVA perdue <span class="c">1</span></button>
+        </div>
+      </div>
+
+      <table class="vd">
+        <thead>
+          <tr>
+            <th>Collaborateur</th><th>Type</th><th>Date</th><th>Désignation</th><th>Projet</th>
+            <th>Montant TTC ↕</th><th>Total TVA</th>
+            <!-- (2) Statut -->
+            <th><span class="anno" id="annoStatutHead" style="display:inline-block"><span class="tag">2</span>Statut</span></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="vdBody">
+          <tr data-flags="einvoice traiter">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🏨</td><td>12/11/2025</td><td>Nuitée Barcelona (pro)</td><td></td><td>275,64 €</td><td>27,56 €</td>
+            <td><span class="badge badge-warning"><span class="pt"></span>Facture entreprise</span></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="doublon traiter">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🏨</td><td>12/11/2025</td><td>Nuitée Barcelona (pro)</td><td></td><td>275,64 €</td><td>27,56 €</td>
+            <td><span class="badge badge-danger"><span class="pt"></span>Doublon potentiel</span></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="horspolitique">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🍽</td><td>14/08/2024</td><td>TEst incident</td><td></td><td>10 000,00 €</td><td>0,00 €</td>
+            <td><span class="badge badge-info"><span class="pt"></span>Hors politique</span></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="tvaperdue">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🍽</td><td>06/03/2024</td><td>Restaurant client</td><td></td><td>128,00 €</td><td>21,33 €</td>
+            <td><span class="badge badge-neutral"><span class="pt"></span>TVA perdue</span></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>⛽</td><td>14/05/2024</td><td>Test IK n2</td><td></td><td>23,00 €</td><td>1,20 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🍽</td><td>29/03/2024</td><td>Test Margaux</td><td></td><td>10,00 €</td><td>0,00 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🚆</td><td>17/01/2024</td><td>Transport - 17/01/2024</td><td></td><td>14,54 €</td><td>0,00 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🍽</td><td>05/07/2023</td><td>Test Lunch Margaux</td><td></td><td>10,00 €</td><td>0,00 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>🍽</td><td>04/07/2023</td><td>Dej client</td><td></td><td>4,20 €</td><td>0,38 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+          <tr data-flags="">
+            <td><span class="collab"><span class="emoji">🤓</span> Louise Dumont</span></td><td>▦</td><td>23/02/2023</td><td>Test for Projects</td><td>Test Code Projet</td><td>10,00 €</td><td>0,00 €</td>
+            <td></td><td><span class="dots">•••</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination"><span>Précédent</span><span class="pg on">1</span><span class="pg">2</span><span style="color:var(--content-primary)">Suivant</span></div>
+    </div>
+
+    <!-- legend -->
+    <div class="legend">
+      <h3>Ajouts e-invoicing / clôture (Q3) — annotations</h3>
+      <div class="li"><span class="n">1</span><div><b>Tuile « À vérifier avant clôture »</b> <span class="pri">JTBD A : clôture paie exacte</span><br>Compteur des exceptions à traiter avant que l'argent parte en paie (doublon + facture entreprise), puis hors politique (B) et TVA perdue agrégée (C). <b>Composant Summary / Card, jamais Alert</b> — le DS réserve l'Alert au feedback, pas à de la guidance permanente.</div></div>
+      <div class="li"><span class="n">2</span><div><b>Colonne « Statut » unique</b> <span class="pri">priorité : Doublon › Facture entreprise › Hors politique › TVA perdue</span><br>Un seul badge par ligne, priorisé (même logique que le slot unique employé/manager). Badge = donnée sur tableau agrégé (OK), pas une alerte empilée. Les lignes conformes restent sans badge — on ne signale que les exceptions (sinon bruit).</div></div>
+      <div class="li"><span class="n">3</span><div><b>Presets de filtre calés sur A›B›C</b><br>Réutilise le bouton « Filtrer » existant. Transforme la synthèse passive en check-list de clôture : <i>À traiter avant clôture</i> (A) · <i>Hors politique</i> (B) · <i>TVA perdue</i> (C).</div></div>
+      <div class="flagnote"><span class="w">!</span><div><b>Flag off-brand / à trancher — base HT vs TTC.</b> La colonne de cet écran est <b>Montant TTC</b>, or le seuil e-invoicing est en <b>150 € HT</b>. La détection « facture entreprise » doit s'appuyer sur une base HT (colonne dérivée), sinon le badge se déclenche à côté autour de 150. Même point ouvert que la spec.</div></div>
+      <div class="flagnote"><span class="w">!</span><div><b>Pas de flag « &gt; 150 € » brut.</b> Un flag basé sur le seul montant crée des faux positifs sur les NDF salarié légitimes. Le seuil montant reste une sous-cause du badge « Facture entreprise » (montant HT + destinataire = entreprise), jamais un signal autonome.</div></div>
+    </div>
+
+    <div class="legend-simple">
+      <h3>Version simplifiée — logique</h3>
+      <p><b>Décision équipe (Slack Margaux / Daniel, 06/07).</b> Le HT n'est pas extractible de façon fiable (plusieurs taux de TVA sur un même ticket, OCR faillible). Plutôt que de soustraire une TVA mal détectée — au risque d'un faux négatif (« tout va bien » alors que non) — on flague sur le <b>TTC &gt; 150 €</b> via une information <b>non bloquante</b> (tooltip à côté du montant), en assumant quelques faux positifs. Pas de colonne Statut, pas de tuile de clôture : juste l'info à côté du montant, à vérifier manuellement avant clôture.</p>
+    </div>
+  </main>
+</div>
+
+<script>
+function setPreset(p){
+  document.querySelectorAll('#segScn button').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  document.querySelectorAll('.preset').forEach(b=>b.classList.toggle('on',b.dataset.p===p));
+  document.querySelectorAll('#vdBody tr').forEach(tr=>{
+    const f=tr.getAttribute('data-flags')||'';
+    tr.style.display=(p==='tout'||f.split(' ').includes(p))?'':'none';
+  });
+}
+setPreset('tout');
+
+function setVersion(v){
+  document.body.classList.toggle('simplified', v==='simple');
+  document.querySelectorAll('#segVer button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(v==='simple') setPreset('tout');
+}
+// injecte une info non bloquante à côté de chaque Montant TTC > 150 €
+document.querySelectorAll('#vdBody tr').forEach(tr=>{
+  const cell=tr.children[5];
+  if(!cell) return;
+  const num=parseFloat(cell.textContent.replace(/\s/g,'').replace('€','').replace(',','.'));
+  if(num>150){
+    const info=document.createElement('span');
+    info.className='ttc-info';
+    info.innerHTML='i<span class="tipbox"><b>Montant supérieur à 150 €</b>Cette dépense pourrait relever de la facturation électronique si la facture est au nom de l\'entreprise. Seuil calculé sur le TTC (approximation) — à vérifier avant clôture.</span>';
+    cell.appendChild(info);
+  }
+});
+setVersion('complete');
+</script>
+</body>
+</html>
